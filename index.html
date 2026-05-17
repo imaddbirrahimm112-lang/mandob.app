@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>أرسل Command Center v21 Theme Scroll Fix</title>
+  <title>أرسل Command Center v22 Theme Scroll Fix</title>
   <style>
     :root{
       --bg:#050711;--bg2:#0d1424;--glass:rgba(255,255,255,.085);--glass2:rgba(255,255,255,.13);
@@ -132,7 +132,7 @@
     #cashboxPanel h3::after{content:' — صندوق سوري / صندوق دولار';font-size:12px;color:var(--muted);font-weight:800;margin-inline-start:8px}
 
 
-    /* v21: وضع فاتح زجاجي مريح + إصلاح تموضع قسم الصندوق */
+    /* v22: وضع فاتح زجاجي مريح + إصلاح تموضع قسم الصندوق */
     body.theme-light{
       --bg:#dbe6f3;--bg2:#c8d6e8;--glass:rgba(238,245,252,.62);--glass2:rgba(227,237,248,.76);
       --line:rgba(33,58,92,.18);--text:#142033;--muted:#52647b;--shadow:0 24px 70px rgba(31,48,72,.18);
@@ -400,11 +400,13 @@
             </div>
             <div class="aiProBox">
               <div class="aiProGrid">
-                <div><label>وضع الجواب</label><select id="aiMode"><option value="local">تحليل داخلي سريع</option><option value="chatgpt">ChatGPT اختياري</option></select></div>
-                <div><label>مفتاح OpenAI API اختياري — لا تضعه داخل الكود</label><input id="aiOpenAiKey" type="password" placeholder="sk-... محفوظ على هذا الجهاز فقط"></div>
+                <div><label>وضع الجواب</label><select id="aiMode"><option value="chatgpt" selected>ChatGPT الحقيقي</option><option value="local">التحليل الداخلي</option></select></div>
+                <div><label>الموديل</label><select id="aiModel"><option value="gpt-4o-mini" selected>gpt-4o-mini — أخف وأثبت</option><option value="gpt-4.1-mini">gpt-4.1-mini</option></select></div>
+                <div><label>مفتاح OpenAI API — محفوظ على هذا الجهاز فقط</label><input id="aiOpenAiKey" type="password" placeholder="sk-... لا تضعه داخل الكود"></div>
                 <button class="secondary" id="aiSaveKeyBtn">حفظ المفتاح</button>
+                <button class="secondary" id="aiTestKeyBtn">اختبار ChatGPT</button>
               </div>
-              <div class="aiHintLine">التحليل الداخلي يشتغل بدون مفتاح. وضع ChatGPT يستخدم المفتاح المحفوظ محلياً فقط ويُرجع جواباً مصاغاً فوق الحسابات الدقيقة من التطبيق.</div>
+              <div class="aiHintLine" id="aiApiStatus">ChatGPT الحقيقي هو الافتراضي. إذا كان المفتاح/الرصيد فيه مشكلة، سيظهر السبب الواضح هنا.</div>
             </div>
             <div class="aiAnswer" id="aiAnswer">اكتب سؤال أو اختر سؤال جاهز. أمثلة: مبيع علي شهر 5؟ رصيد مكتب هوكر؟ أفضل 3 مندوبين هذا الشهر؟</div>
           </div>
@@ -1098,16 +1100,97 @@
   }
 
   function aiAnswerQuestion(q){return advLocalAnswer(q)}
-  function advSnapshot(q,local){const r=advRangeFromQuestion(q), m=advMetrics(r); const reps=Object.entries(m.byRep).sort((a,b)=>b[1]-a[1]).slice(0,12).map(([k,v])=>`${k}: ${fmt(v)} SYP`).join('\n'); const regs=Object.entries(m.byRegion).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`${k}: ${fmt(v)} SYP`).join('\n'); const wallets=officeWalletRows().slice().sort((a,b)=>Math.abs(b.sypBalance)+Math.abs(b.usdBalance)-Math.abs(a.sypBalance)-Math.abs(a.usdBalance)).slice(0,12).map(o=>`${o.name}: ${fmt(o.sypBalance)} SYP / ${fmt(o.usdBalance)} USD — ${o.status}`).join('\n'); return `السؤال: ${q}\nالفترة: ${r.label}\nالإجابة الحسابية الدقيقة من النظام:\n${local}\n\nأفضل المندوبين:\n${reps}\n\nالمناطق:\n${regs}\n\nأرصدة المكاتب:\n${wallets}`;}
-  async function advChatGptAnswer(q,local){
-    const mode=$('aiMode')?.value||'local'; if(mode!=='chatgpt')return local;
-    const key=(localStorage.getItem('arsel_openai_key')||'').trim(); if(!key)return local+'\n\nملاحظة: وضع ChatGPT مختار، لكن لا يوجد مفتاح محفوظ. الصق المفتاح في الخانة واحفظه.';
-    try{
-      const res=await fetch('https://api.openai.com/v1/responses',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},body:JSON.stringify({model:'gpt-4.1-mini',input:[{role:'system',content:'أنت مساعد إداري عربي داخل تطبيق أرسل. لا تخترع أرقاماً. اعتمد فقط على الملخص المرسل من النظام. أجب باختصار ووضوح وبأسلوب عملي.'},{role:'user',content:advSnapshot(q,local)}],max_output_tokens:700})});
-      if(!res.ok)throw new Error('HTTP '+res.status); const data=await res.json(); const txt=data.output_text || (data.output||[]).flatMap(o=>o.content||[]).map(c=>c.text||'').join('\n').trim(); return txt||local;
-    }catch(e){return local+'\n\nملاحظة: تعذر تشغيل ChatGPT من المتصفح، فاعتمدت الجواب الداخلي الدقيق. السبب: '+String(e.message||e);}
+  function advSnapshot(q,local){
+    const r=advRangeFromQuestion(q), m=advMetrics(r);
+    const reps=Object.entries(m.byRep).sort((a,b)=>b[1]-a[1]).slice(0,8).map(([k,v])=>`${k}: ${fmt(v)} SYP`).join('\n');
+    const regs=['R1','R2','R3','R4'].map(k=>`${k}: ${fmt(m.byRegion[k]||0)} SYP`).join('\n');
+    const wallets=officeWalletRows().slice().sort((a,b)=>Math.abs(b.sypBalance)+Math.abs(b.usdBalance)-Math.abs(a.sypBalance)-Math.abs(a.usdBalance)).slice(0,6).map(o=>`${o.name}: ${fmt(o.sypBalance)} SYP / ${fmt(o.usdBalance)} USD — ${o.status}`).join('\n');
+    const compact=String(local||'').split('\n').slice(0,45).join('\n');
+    return `السؤال: ${q}\nالفترة: ${r.label}\nالجواب الحسابي الدقيق من النظام:\n${compact}\n\nالمناطق:\n${regs}\n\nأفضل المندوبين:\n${reps}\n\nأهم أرصدة المكاتب:\n${wallets}\n\nمهمتك: أعد صياغة الجواب باحتراف وباختصار. لا تضف أرقاماً غير موجودة. إذا احتجت تنبيه إداري اكتبه بوضوح.`;
   }
-  async function runAiAsk(){const q=$('aiQuestion')?.value||''; if($('aiAnswer')){$('aiAnswer').textContent='عم يحلل البيانات...'; const local=advLocalAnswer(q); $('aiAnswer').textContent=await advChatGptAnswer(q,local);} }
+  function advSetApiStatus(txt,kind='info'){
+    const el=$('aiApiStatus'); if(el){el.textContent=txt; el.className='aiHintLine '+kind;}
+  }
+  function advDelay(ms){return new Promise(r=>setTimeout(r,ms));}
+  async function advReadOpenAiError(res){
+    let body=null, msg='HTTP '+res.status;
+    try{body=await res.json();}catch(_){try{msg=await res.text();}catch(__){}}
+    const e=body?.error||{};
+    return {status:res.status, code:e.code||'', type:e.type||'', message:e.message||msg};
+  }
+  async function advOpenAiRequest(q,local,{test=false,retry=true}={}){
+    const key=(localStorage.getItem('arsel_openai_key')||'').trim();
+    if(!key)throw new Error('لا يوجد مفتاح محفوظ. الصق المفتاح واضغط حفظ المفتاح.');
+    const model=$('aiModel')?.value||localStorage.getItem('arsel_openai_model')||'gpt-4o-mini';
+    const payload=test ? {
+      model,
+      input:[{role:'user',content:'اختبار اتصال فقط. اكتب: جاهز'}],
+      max_output_tokens:40,
+      store:false
+    } : {
+      model,
+      input:[
+        {role:'system',content:'أنت مساعد إداري عربي داخل تطبيق أرسل. تعتمد فقط على ملخص النظام، ولا تخترع أرقاماً. أجب بأسلوب عملي ومختصر.'},
+        {role:'user',content:advSnapshot(q,local)}
+      ],
+      max_output_tokens:420,
+      store:false
+    };
+    const res=await fetch('https://api.openai.com/v1/responses',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+      body:JSON.stringify(payload)
+    });
+    if(!res.ok){
+      const err=await advReadOpenAiError(res);
+      if(res.status===429 && retry && err.code!=='insufficient_quota'){
+        advSetApiStatus('وصل حد مؤقت من OpenAI، عم أعيد المحاولة بعد ثواني...', 'warn');
+        await advDelay(3500);
+        return advOpenAiRequest(q,local,{test,retry:false});
+      }
+      let human=`OpenAI رفض الطلب: ${err.status} — ${err.message}`;
+      if(err.status===429 && err.code==='insufficient_quota') human='المفتاح صحيح غالباً، لكن لا يوجد رصيد/حصة API كافية في حساب OpenAI.';
+      else if(err.status===429) human='وصل حد الطلبات مؤقتاً. انتظر دقيقة أو خفف الأسئلة المتكررة.';
+      else if(err.status===401) human='المفتاح غير صحيح أو لم يعد صالحاً.';
+      else if(err.status===403) human='المفتاح لا يملك صلاحية لهذا الطلب أو المشروع.';
+      else if(err.status===404) human='الموديل المختار غير متاح لهذا المفتاح. جرّب gpt-4o-mini.';
+      throw new Error(human);
+    }
+    const data=await res.json();
+    const txt=data.output_text || (data.output||[]).flatMap(o=>o.content||[]).map(c=>c.text||'').join('\n').trim();
+    return txt||local;
+  }
+  async function advChatGptAnswer(q,local){
+    const mode=$('aiMode')?.value||'chatgpt';
+    if(mode!=='chatgpt')return local;
+    try{
+      advSetApiStatus('ChatGPT الحقيقي يعمل الآن...', 'info');
+      const txt=await advOpenAiRequest(q,local);
+      advSetApiStatus('تم تشغيل ChatGPT الحقيقي بنجاح.', 'ok');
+      return txt;
+    }catch(e){
+      advSetApiStatus(String(e.message||e), 'danger');
+      return `تعذر تشغيل ChatGPT الحقيقي.\nالسبب: ${String(e.message||e)}\n\nالجواب الداخلي الدقيق من بيانات التطبيق:\n${local}`;
+    }
+  }
+  async function testOpenAiKey(){
+    if($('aiApiStatus'))advSetApiStatus('عم أختبر ChatGPT الحقيقي...', 'info');
+    try{const out=await advOpenAiRequest('اختبار', 'اختبار اتصال', {test:true}); advSetApiStatus('نجح الاختبار: '+String(out||'جاهز').slice(0,80), 'ok'); toast('ChatGPT الحقيقي شغال');}
+    catch(e){advSetApiStatus('فشل اختبار ChatGPT: '+String(e.message||e), 'danger'); toast('فشل اختبار ChatGPT');}
+  }
+  async function runAiAsk(){
+    const q=($('aiQuestion')?.value||'').trim();
+    if(!$('aiAnswer'))return;
+    const btn=$('aiAskBtn');
+    try{
+      if(btn){btn.disabled=true;btn.textContent='عم يجاوب...';}
+      $('aiAnswer').textContent='عم يحلل البيانات ويشغّل ChatGPT الحقيقي...';
+      const local=advLocalAnswer(q||'تقرير سريع');
+      $('aiAnswer').textContent=await advChatGptAnswer(q||'تقرير سريع',local);
+    }finally{
+      if(btn){btn.disabled=false;btn.textContent='اسأل';}
+    }
+  }
 
 function buildIssues(){
     if(!isManager())return [];
@@ -1337,7 +1420,9 @@ function buildIssues(){
     if($('aiQuestion'))$('aiQuestion').addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();runAiAsk();}});
     if($('aiCopyBtn'))$('aiCopyBtn').onclick=()=>copyText($('aiAnswer')?.textContent||'');
     if($('aiOpenAiKey'))$('aiOpenAiKey').value=localStorage.getItem('arsel_openai_key')||'';
-    if($('aiSaveKeyBtn'))$('aiSaveKeyBtn').onclick=()=>{localStorage.setItem('arsel_openai_key',($('aiOpenAiKey')?.value||'').trim());toast('تم حفظ مفتاح الذكاء على هذا الجهاز فقط')};
+    if($('aiModel')){$('aiModel').value=localStorage.getItem('arsel_openai_model')||'gpt-4o-mini'; $('aiModel').onchange=()=>{localStorage.setItem('arsel_openai_model',$('aiModel').value); advSetApiStatus('تم اختيار الموديل: '+$('aiModel').value,'info');};}
+    if($('aiSaveKeyBtn'))$('aiSaveKeyBtn').onclick=()=>{localStorage.setItem('arsel_openai_key',($('aiOpenAiKey')?.value||'').trim());toast('تم حفظ المفتاح على هذا الجهاز فقط');advSetApiStatus('تم حفظ المفتاح. اضغط اختبار ChatGPT للتأكد.','ok')};
+    if($('aiTestKeyBtn'))$('aiTestKeyBtn').onclick=testOpenAiKey;
 
     $("applyCmdFilter").onclick=()=>{state.filters={from:$("cmdFrom").value,to:$("cmdTo").value,region:$("cmdRegion").value}; renderAll()}; $("resetCmdFilter").onclick=()=>{state.filters={from:'',to:'',region:''};["cmdFrom","cmdTo","cmdRegion"].forEach(id=>$(id).value='');renderAll()}; $("manualTargetType").onchange=()=>{$("manualOfficeWrap").classList.toggle('hide',$("manualTargetType").value!=='office');$("manualRepWrap").classList.toggle('hide',$("manualTargetType").value!=='representative')}; $("closeModal").onclick=()=>$("modal").classList.remove('show'); if($("themeSelect"))$("themeSelect").onchange=()=>setTheme($("themeSelect").value,true); if($("emptyTrashBtn"))$("emptyTrashBtn").onclick=()=>emptyTrash(); if($("refreshTrashBtn"))$("refreshTrashBtn").onclick=()=>loadData(); ["walletOffice","walletOperation","walletSyp","walletUsd","walletRate","cashboxOperation","cashboxSyp","cashboxUsd","cashboxRate"].forEach(id=>{if($(id)){const ev=id==="walletOffice"||id==="walletOperation"||id==="cashboxOperation"?"change":"input";$(id).addEventListener(ev,()=>{updateWalletPreview();updateCashboxPreview();})}}); $("refreshBtn").onclick=()=>withBusy('refreshBtn','جاري التحديث...',async()=>{await loadBase();await loadData();toast('تم التحديث')}); $("quickCopyBtn").onclick=copyWhatsappSummary; $("copyManagerWhatsapp").onclick=copyWhatsappSummary; $("copyIssuesBtn").onclick=()=>copyText(buildIssuesText()); $("enableSoundBtn").onclick=()=>{state.sound=!state.sound;toast(state.sound?'تم تشغيل صوت التنبيه':'تم إيقاف صوت التنبيه')}; $("exportSalesCsv").onclick=()=>downloadCsv('sales.csv',live(state.sales)); $("exportDeliveriesCsv").onclick=()=>downloadCsv('deliveries.csv',live(state.deliveries)); $("exportPdfBtn").onclick=()=>withBusy('exportPdfBtn','جاري تجهيز PDF...',()=>exportPdf($("pdfReportType").value)); $("quickFullPdf").onclick=()=>withBusy('quickFullPdf','تجهيز...',()=>exportPdf('full')); $("quickRepPdf").onclick=()=>withBusy('quickRepPdf','تجهيز...',()=>exportPdf('reps')); $("quickOfficePdf").onclick=()=>withBusy('quickOfficePdf','تجهيز...',()=>exportPdf('offices')); $("quickIssuesPdf").onclick=()=>withBusy('quickIssuesPdf','تجهيز...',()=>exportPdf('issues')); }
   async function saveSale(){try{if(state.profile.role!=="representative")throw new Error('هذا الإجراء للمندوب فقط.'); const syp=n($("saleSyp").value), usd=n($("saleUsd").value), rate=usd>0?n($("saleRate").value):0; if(syp<=0&&usd<=0)throw new Error('اكتب المبلغ السوري.'); if(usd>0&&rate<=0)throw new Error('اكتب سعر الصرف.'); await addDoc(collection(db,'sales_reports'),{representativeId:state.profile.representativeId,representativeName:state.profile.representativeName||state.profile.name,region:state.profile.region,date:$("saleDate").value||today,amountSyp:syp,amountUsd:usd,exchangeRate:rate,notes:$("saleNotes").value.trim(),createdBy:state.user.uid,createdAt:serverTimestamp(),editAllowedByAdmin:false}); await writeAudit('create_sale','تسجيل مبيع مندوب'); ['saleSyp','saleUsd','saleNotes'].forEach(id=>{localStorage.removeItem('arsel_draft_'+id);$(id).value=id.includes('Usd')?0:''}); setUsdMode('sale',false); updateLives(); msg($("saleMsg"),'ok','تم حفظ المبيع.'); await loadData();}catch(e){msg($("saleMsg"),'error',e.message)}}
