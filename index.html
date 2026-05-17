@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>أرسل Command Center v22 Theme Scroll Fix</title>
+  <title>Arsel Command Center v28 Premium Cashbox</title>
   <style>
     :root{
       --bg:#050711;--bg2:#0d1424;--glass:rgba(255,255,255,.085);--glass2:rgba(255,255,255,.13);
@@ -130,6 +130,18 @@
   
     #cashboxPanel{outline:1px solid rgba(125,211,252,.22);box-shadow:0 24px 80px rgba(56,189,248,.10), var(--shadow)}
     #cashboxPanel h3::after{content:' — صندوق سوري / صندوق دولار';font-size:12px;color:var(--muted);font-weight:800;margin-inline-start:8px}
+    #cashboxLedgerCard{scroll-margin-top:96px}
+    body:not([data-role="admin"]) #cashboxPanel,
+    body:not([data-role="admin"]) #cashboxLedgerCard{display:none!important}
+    .diagnosticsGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+    .diagnosticsGrid .miniCard{min-height:92px}
+    @media (max-width:900px){.diagnosticsGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media (max-width:620px){.diagnosticsGrid{grid-template-columns:1fr}}
+    .logo,.miniLogo{background-image:none!important;background:linear-gradient(145deg,rgba(232,244,255,.32),rgba(125,211,252,.10))!important;color:var(--text)!important;border:1px solid rgba(125,211,252,.22)!important;box-shadow:0 18px 48px rgba(56,189,248,.12),inset 0 1px 0 rgba(255,255,255,.20)!important;font-size:0!important}
+    .logo::before{content:"Rcell";font-size:34px;line-height:1;font-weight:950;letter-spacing:0;color:var(--text)}
+    .miniLogo::before{content:"Rcell";font-size:19px;line-height:1;font-weight:950;letter-spacing:0;color:var(--text)}
+    .brand .subtitle::before{display:none!important}
+    .topTitle h2::after{content:"Arsel Command Center"!important;font-size:22px;line-height:1.15;font-weight:950;color:var(--text)}
 
 
     /* v22: وضع فاتح زجاجي مريح + إصلاح تموضع قسم الصندوق */
@@ -195,13 +207,74 @@
       body.theme-auto th{background:rgba(204,219,238,.62)!important;color:#24354c!important}body.theme-auto td{border-bottom-color:rgba(43,77,114,.13)!important}
     }
 
-</style>
+
+
+    /* v23 Cashbox Independent + AI Max polish */
+    #cashboxSec{scroll-margin-top:96px}
+    .cashboxIntro{background:linear-gradient(135deg,rgba(125,211,252,.13),rgba(192,132,252,.10));border-color:rgba(125,211,252,.28)}
+    .cashboxIntro h2{margin:0 0 8px;font-size:30px}
+    .cashboxIntro p{margin:0;color:var(--muted);line-height:1.9}
+    .cashboxQuick{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:14px}
+    .cashboxQuick .miniCard{background:rgba(255,255,255,.075);min-height:105px}
+    .cashboxQuick .v{font-size:24px;font-weight:950;direction:ltr;text-align:right;margin-top:8px}
+    #cashboxSec #cashboxPanel,#cashboxSec #cashboxLedgerCard{margin-top:18px}
+    .aiPreset.aiPresetWide{grid-template-columns:repeat(4,minmax(0,1fr))}
+    .aiAnswer{white-space:pre-wrap}
+    @media(max-width:900px){.cashboxQuick,.aiPreset.aiPresetWide{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media(max-width:620px){.cashboxQuick,.aiPreset.aiPresetWide{grid-template-columns:1fr}.cashboxIntro h2{font-size:24px}}
+
+  
+
+    /* v28 Premium Cashbox + Soft Light Theme */
+    body.theme-light,
+    body.theme-auto.theme-soft-light{
+      --bg:#cfdbea;--bg2:#b9c9dc;--glass:rgba(225,236,248,.68);--glass2:rgba(239,246,252,.80);
+      --line:rgba(37,63,95,.20);--text:#112033;--muted:#52657e;--shadow:0 24px 65px rgba(28,45,70,.16);
+      background:
+        radial-gradient(circle at 14% 8%,rgba(56,189,248,.22),transparent 34%),
+        radial-gradient(circle at 86% 12%,rgba(124,58,237,.12),transparent 32%),
+        radial-gradient(circle at 40% 96%,rgba(20,184,166,.10),transparent 38%),
+        linear-gradient(145deg,#d6e1ef,#b8c9dc 58%,#aebfd3)!important;
+    }
+    body.theme-light::before,
+    body.theme-auto.theme-soft-light::before{display:block;background:linear-gradient(120deg,rgba(255,255,255,.22),transparent 45%,rgba(255,255,255,.10));mix-blend-mode:normal}
+    body.theme-light .topbar,
+    body.theme-auto.theme-soft-light .topbar{background:rgba(209,224,239,.82)!important;border-bottom-color:rgba(37,63,95,.18)!important;box-shadow:0 12px 32px rgba(28,45,70,.10)!important}
+    body.theme-light .card,
+    body.theme-light .stat,
+    body.theme-light .miniCard,
+    body.theme-light .cashboxCard,
+    body.theme-auto.theme-soft-light .card,
+    body.theme-auto.theme-soft-light .stat,
+    body.theme-auto.theme-soft-light .miniCard,
+    body.theme-auto.theme-soft-light .cashboxCard{background:linear-gradient(145deg,rgba(243,248,253,.66),rgba(215,229,244,.48))!important;border-color:rgba(37,63,95,.18)!important;box-shadow:0 18px 44px rgba(28,45,70,.12),inset 0 1px 0 rgba(255,255,255,.42)!important;backdrop-filter:blur(18px)}
+    body.theme-light input,body.theme-light select,body.theme-light textarea,
+    body.theme-auto.theme-soft-light input,body.theme-auto.theme-soft-light select,body.theme-auto.theme-soft-light textarea{background:rgba(232,241,250,.82)!important;color:#112033!important;border-color:rgba(37,63,95,.20)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.42)!important}
+    body.theme-light select option,body.theme-auto.theme-soft-light select option{background:#e6eff8!important;color:#112033!important}
+    body.theme-light .secondary,body.theme-auto.theme-soft-light .secondary{background:rgba(220,233,246,.82)!important;color:#112033!important;border-color:rgba(37,63,95,.20)!important;box-shadow:0 10px 24px rgba(28,45,70,.08)!important}
+    body.theme-light th,body.theme-auto.theme-soft-light th{background:rgba(205,220,237,.65)!important;color:#263a54!important}
+    body.theme-light td,body.theme-auto.theme-soft-light td{border-bottom-color:rgba(37,63,95,.13)!important}
+    body.theme-light .nav button,body.theme-auto.theme-soft-light .nav button{background:rgba(216,230,245,.56)!important;color:#112033!important;border-color:rgba(37,63,95,.13)!important}
+    body.theme-light .nav button.active,body.theme-auto.theme-soft-light .nav button.active{background:linear-gradient(135deg,rgba(56,189,248,.25),rgba(167,139,250,.20))!important;border-color:rgba(14,165,233,.38)!important}
+    .cashboxFilterGrid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;margin:10px 0 14px}
+    .cashboxFilterGrid input,.cashboxFilterGrid select,.cashboxFilterGrid button{max-width:none;width:100%;min-height:46px}
+    .cashboxInsight{border:1px solid rgba(125,211,252,.26);background:rgba(125,211,252,.08);border-radius:18px;padding:12px 14px;margin:10px 0;line-height:1.8;color:var(--muted)}
+    .advanceOpen{color:#fde68a}.advanceClear{color:#bbf7d0}.advanceDebt{color:#fecdd3}
+    @media (max-width:1050px){.cashboxFilterGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media (max-width:620px){.cashboxFilterGrid{grid-template-columns:1fr}.cashboxFilterGrid button{min-height:50px}}
+
+    @media (prefers-color-scheme: light){
+      body.theme-auto{--bg:#cfdbea;--bg2:#b9c9dc;--glass:rgba(225,236,248,.68);--glass2:rgba(239,246,252,.80);--line:rgba(37,63,95,.20);--text:#112033;--muted:#52657e;--shadow:0 24px 65px rgba(28,45,70,.16);background:radial-gradient(circle at 14% 8%,rgba(56,189,248,.22),transparent 34%),radial-gradient(circle at 86% 12%,rgba(124,58,237,.12),transparent 32%),linear-gradient(145deg,#d6e1ef,#b8c9dc 58%,#aebfd3)!important}
+      body.theme-auto .card,body.theme-auto .stat,body.theme-auto .miniCard,body.theme-auto .cashboxCard{background:linear-gradient(145deg,rgba(243,248,253,.66),rgba(215,229,244,.48))!important;border-color:rgba(37,63,95,.18)!important;box-shadow:0 18px 44px rgba(28,45,70,.12),inset 0 1px 0 rgba(255,255,255,.42)!important}
+    }
+
+  </style>
 </head>
 <body>
   <section class="page" id="loginPage">
     <main class="login">
       <section class="brand">
-        <div class="logo">أ</div><h1>أرسل</h1><p class="subtitle">Command Center v11 — دخول آمن حسب الدور</p>
+        <div class="logo">أ</div><h1>أرسل</h1><p class="subtitle">Command Center v28 — صندوق وذكاء إداري</p>
       </section>
       <section class="card">
         <label for="email">البريد الإلكتروني</label><input id="email" type="email" autocomplete="username" placeholder="name@rcell.app">
@@ -288,29 +361,6 @@
               <p class="smallText">الأرقام تظهر بفواصل، والسالب مسموح لأنه يعني أن اتجاه الدين انعكس.</p>
             </div>
           </div>
-          <div class="card accountingHero" id="cashboxPanel" style="margin-top:18px">
-            <h3>الصندوق</h3>
-            <p class="smallText">صندوق سوري وصندوق دولار. السحب من المكاتب يدخل هنا، والدفع أو الاستلام من أي شخص يسجل كحركة صندوق.</p>
-            <div class="cashboxGrid" id="adminCashboxSummary"></div>
-            <div class="accountingNote" id="cashboxSmartNote">الصندوق يتحدث من حركات المكاتب وحركات الأشخاص الخارجية.</div>
-            <div class="splitLine"></div>
-            <div class="formGrid">
-              <div><label>نوع الحركة</label><select id="cashboxOperation"><option value="cash_in_syp">إضافة سوري</option><option value="cash_in_usd">إضافة دولار</option><option value="person_pay_syp">دفعت سوري</option><option value="person_pay_usd">دفعت دولار</option><option value="person_receive_syp">استلمت سوري</option><option value="person_receive_usd">استلمت دولار</option><option value="convert_cash_syp_to_usd">تحويل سوري إلى دولار</option><option value="convert_cash_usd_to_syp">تحويل دولار إلى سوري</option></select></div>
-              <div><label>التاريخ</label><input type="date" id="cashboxDate"></div>
-              <div class="full"><label>اسم الشخص / الجهة</label><input id="cashboxPerson" placeholder="مثلاً: محمد / مصروف / حوالة خارجية"></div>
-              <div><label>مبلغ SYP</label><input type="text" id="cashboxSyp" class="smartMoney" inputmode="decimal" placeholder="0"></div>
-              <div><label>مبلغ USD</label><input type="text" id="cashboxUsd" class="smartMoney" inputmode="decimal" placeholder="0"></div>
-              <div><label>سعر الصرف</label><input type="number" id="cashboxRate" min="0" value="15000"></div>
-              <div class="full"><label>ملاحظات</label><textarea id="cashboxNotes" placeholder="سبب الحركة أو تفاصيلها"></textarea></div>
-              <div class="full cashboxPreview" id="cashboxPreview">اكتب الحركة وسيظهر الرصيد قبل وبعد.</div>
-              <button class="full" id="saveCashboxOpBtn">حفظ الحركة</button>
-            </div>
-            <div class="msg" id="cashboxMsg"></div>
-          </div>
-          <div class="card" style="margin-top:18px">
-            <h3>حركة الصندوق</h3>
-            <div class="tableWrap"><table><thead><tr><th>التاريخ</th><th>العملية</th><th>الجهة</th><th>SYP</th><th>USD</th><th>الصرف</th><th>بعد العملية</th><th>ملاحظات</th><th>إجراء</th></tr></thead><tbody id="cashboxLedgerBody"></tbody></table></div>
-          </div>
           <div class="card" style="margin-top:18px">
             <div class="toolbar"><input id="officeWalletSearch" placeholder="بحث باسم المكتب"><select id="officeWalletRegion"><option value="">كل المناطق</option><option>R1</option><option>R2</option><option>R3</option><option>R4</option></select></div>
             <div class="tableWrap"><table><thead><tr><th>المكتب</th><th>المنطقة</th><th>صندوق سوري</th><th>صندوق دولار</th><th>قيد المطابقة</th><th>فروقات</th><th>آخر عملية</th><th>الحالة</th><th>إجراء</th></tr></thead><tbody id="officeWalletBody"></tbody></table></div>
@@ -319,6 +369,62 @@
             <h3>حركة صناديق المكاتب</h3>
             <div class="tableWrap"><table><thead><tr><th>التاريخ</th><th>المكتب</th><th>العملية</th><th>SYP</th><th>USD</th><th>الصرف</th><th>بعد العملية</th><th>ملاحظات</th><th>إجراء</th></tr></thead><tbody id="officeWalletLedgerBody"></tbody></table></div>
           </div>
+        </section>
+
+
+        <section class="section" id="cashboxSec">
+          <div class="card cashboxIntro">
+            <h2>الصندوق</h2>
+            <p>صفحة مستقلة للإدارة فقط: صندوق سوري، صندوق دولار، قبض، صرف، تحويل، أشخاص، موردين، عهد، وسحوبات المكاتب.</p>
+            <div class="cashboxQuick" id="cashboxQuickStats"></div>
+          </div>
+          <div class="card accountingHero" id="cashboxPanel" style="margin-top:18px">
+            <h3>الصندوق</h3>
+            <p class="smallText">صندوق سوري وصندوق دولار بنظام محاسبي واضح: قبض / صرف / تحويل / أشخاص / موردين / عهد. السحب من المكاتب يدخل تلقائياً للصندوق الصحيح.</p>
+            <div class="cashboxGrid" id="adminCashboxSummary"></div>
+            <div class="accountingNote" id="cashboxSmartNote">الصندوق يتحدث من حركات المكاتب وحركات الأشخاص الخارجية.</div>
+            <div class="splitLine"></div>
+            <div class="formGrid">
+              <div><label>نوع الحركة</label><select id="cashboxOperation"><option value="cash_in_syp">قبض سوري / رصيد افتتاحي</option><option value="cash_in_usd">قبض دولار / رصيد افتتاحي</option><option value="person_pay_syp">صرف سوري لشخص / مورد</option><option value="person_pay_usd">صرف دولار لشخص / مورد</option><option value="expense_syp">مصروف سوري</option><option value="expense_usd">مصروف دولار</option><option value="advance_give_syp">إعطاء سلفة سوري</option><option value="advance_give_usd">إعطاء سلفة دولار</option><option value="advance_return_syp">رجوع سلفة سوري</option><option value="advance_return_usd">رجوع سلفة دولار</option><option value="person_receive_syp">قبض سوري من شخص / مورد</option><option value="person_receive_usd">قبض دولار من شخص / مورد</option><option value="convert_cash_syp_to_usd">تحويل سوري إلى دولار</option><option value="convert_cash_usd_to_syp">تحويل دولار إلى سوري</option></select></div>
+              <div><label>التاريخ</label><input type="date" id="cashboxDate"></div>
+              <div class="full"><label>اسم الشخص / الجهة</label><input id="cashboxPerson" placeholder="مثلاً: محمد / مورد / عهدة / مصروف / حوالة خارجية"></div>
+              <div><label>تصنيف الجهة</label><select id="cashboxPartyType"><option value="person">شخص</option><option value="supplier">مورد</option><option value="advance">سلفة</option><option value="custody">عهدة</option><option value="expense">مصروف</option><option value="office">مكتب</option><option value="general">عام</option></select></div>
+              <div><label>تصنيف الحركة</label><select id="cashboxCategory"><option value="general">عام</option><option value="sales_cash">قبض مبيعات</option><option value="expense">مصروفات</option><option value="advance">سلف</option><option value="supplier">موردين</option><option value="custody">عهد</option><option value="exchange">تحويل عملة</option><option value="adjustment">تسوية</option></select></div>
+              <div><label>رقم سند / مرجع</label><input id="cashboxRef" placeholder="اختياري"></div>
+              <div><label>مبلغ SYP</label><input type="text" id="cashboxSyp" class="smartMoney" inputmode="decimal" placeholder="0"></div>
+              <div><label>مبلغ USD</label><input type="text" id="cashboxUsd" class="smartMoney" inputmode="decimal" placeholder="0"></div>
+              <div><label>سعر الصرف</label><input type="number" id="cashboxRate" min="0" value="15000"></div>
+              <div class="full"><label>ملاحظات</label><textarea id="cashboxNotes" placeholder="سبب الحركة أو تفاصيلها"></textarea></div>
+              <div class="full cashboxPreview" id="cashboxPreview">اكتب الحركة وسيظهر الرصيد قبل وبعد، مع أثرها على صندوق سوري وصندوق دولار.</div>
+              <button class="full" id="saveCashboxOpBtn">حفظ الحركة</button>
+            </div>
+            <div class="msg" id="cashboxMsg"></div>
+          </div>
+          <div class="card" id="cashboxLedgerCard" style="margin-top:18px">
+            <h3>حركة الصندوق</h3>
+            <div class="cashboxFilterGrid">
+              <input id="cashboxSearch" placeholder="بحث: اسم / ملاحظة / سند">
+              <select id="cashboxFilterType"><option value="">كل الحركات</option><option value="receive">قبض</option><option value="pay">صرف</option><option value="expense">مصروفات</option><option value="advance">سلف</option><option value="convert">تحويلات</option><option value="office">سحوبات مكاتب</option></select>
+              <select id="cashboxPartyFilter"><option value="">كل الجهات</option><option value="person">أشخاص</option><option value="supplier">موردين</option><option value="advance">سلف</option><option value="custody">عهد</option><option value="expense">مصروفات</option><option value="office">مكاتب</option></select>
+              <select id="cashboxFilterRange"><option value="today">اليوم</option><option value="yesterday">أمس</option><option value="7days">آخر 7 أيام</option><option value="this_month">هذا الشهر</option><option value="all">كل المدة</option><option value="custom">من / إلى</option></select>
+              <input type="date" id="cashboxFrom">
+              <input type="date" id="cashboxTo">
+              <button class="secondary" id="copyCashboxReportBtn">نسخ تقرير الصندوق</button>
+              <button class="secondary" id="exportCashboxCsvBtn">تصدير CSV</button>
+            </div>
+            <div class="cashboxInsight" id="cashboxInsight">اختر فلتر حتى يظهر ملخص الحركة.</div>
+            <div class="tableWrap"><table><thead><tr><th>التاريخ</th><th>العملية</th><th>الجهة</th><th>التصنيف</th><th>SYP</th><th>USD</th><th>الصرف</th><th>بعد العملية</th><th>سند/ملاحظات</th><th>إجراء</th></tr></thead><tbody id="cashboxLedgerBody"></tbody></table></div>
+          </div>
+          <div class="card" id="cashboxAdvancesCard" style="margin-top:18px">
+            <h3>السلف والذمم</h3>
+            <p class="smallText">أي سلفة تعطيها لشخص تظهر هنا حتى يرجعها. الرجوع ينقص رصيد السلفة تلقائياً.</p>
+            <div class="tableWrap"><table><thead><tr><th>الشخص / الجهة</th><th>التصنيف</th><th>سلفة مفتوحة SYP</th><th>سلفة مفتوحة USD</th><th>آخر حركة</th><th>الحالة</th></tr></thead><tbody id="cashboxAdvanceBody"></tbody></table></div>
+          </div>
+          <div class="card" id="cashboxReportsCard" style="margin-top:18px">
+            <h3>تقارير الصندوق السريعة</h3>
+            <div class="alertGrid" id="cashboxReportCards"></div>
+          </div>
+
         </section>
 
         <section class="section" id="issuesSec"><div class="card"><h3>مركز المشاكل والتنبيهات</h3><div class="alertGrid" id="issuesCards"></div><div class="toolbar"><button class="secondary" id="copyIssuesBtn">نسخ المشاكل</button><button class="secondary" id="enableSoundBtn">تشغيل صوت التنبيه</button></div><div class="tableWrap"><table><thead><tr><th>الخطورة</th><th>النوع</th><th>التفصيل</th><th>القيمة</th><th>الحالة</th></tr></thead><tbody id="issuesBody"></tbody></table></div></div></section>
@@ -333,7 +439,7 @@
 
         <section class="section" id="peopleSec"><div class="sectionGrid"><div class="card"><h3>المندوبين</h3><div class="tableWrap"><table><thead><tr><th>الاسم</th><th>المنطقة</th><th>البريد</th><th>الحالة</th></tr></thead><tbody id="repBody"></tbody></table></div></div><div class="card"><h3>المكاتب</h3><div class="tableWrap"><table><thead><tr><th>الاسم</th><th>المنطقة</th><th>البريد</th><th>الحالة</th></tr></thead><tbody id="officeBody"></tbody></table></div></div></div></section>
 
-        <section class="section" id="settingsSec"><div class="sectionGrid"><div class="card"><h3>إعدادات النظام</h3><div class="formGrid"><div><label>اسم التطبيق</label><input id="settingAppName"></div><div><label>العملة الأساسية</label><input id="settingCurrency"></div><div><label>اسم عماد</label><input id="settingOwner"></div><div><label>اسم فرهاد</label><input id="settingAssistant"></div><div><label>حد المبلغ الكبير SYP</label><input id="settingLargeAmount" type="number" value="5000000"></div><div><label>ساعات تأخير التسليم</label><input id="settingPendingHours" type="number" value="24"></div><div><label>وضع العرض الافتراضي</label><select id="settingTheme"><option value="auto">تلقائي</option><option value="dark">مظلم</option><option value="light">فاتح</option></select></div><button class="full" id="saveSettingsBtn">حفظ الإعدادات</button></div><div class="msg" id="settingsMsg"></div></div><div class="card"><h3>إدارة المكاتب والمندوبين</h3><p class="smallText">إضافة الاسم هنا تضيفه إلى Firestore. إنشاء حساب الدخول Auth يتم من سكريبت التهيئة.</p><div class="formGrid"><div><label>النوع</label><select id="entityType"><option value="representative">مندوب</option><option value="office">مكتب</option></select></div><div><label>المنطقة</label><select id="entityRegion"><option>R1</option><option>R2</option><option>R3</option><option>R4</option></select></div><div class="full"><label>الاسم</label><input id="entityName"></div><div class="full"><label>البريد</label><input id="entityEmail" type="email"></div><button class="full" id="addEntityBtn">إضافة إلى النظام</button></div><div class="msg" id="entityMsg"></div></div><div class="card full"><h3>حسابات النظام</h3><div class="tableWrap"><table><thead><tr><th>الاسم</th><th>البريد</th><th>الدور</th><th>المنطقة</th><th>الحالة</th></tr></thead><tbody id="usersBody"></tbody></table></div></div></div></section>
+        <section class="section" id="settingsSec"><div class="sectionGrid"><div class="card"><h3>إعدادات النظام</h3><div class="formGrid"><div><label>اسم التطبيق</label><input id="settingAppName"></div><div><label>العملة الأساسية</label><input id="settingCurrency"></div><div><label>اسم المدير</label><input id="settingOwner"></div><div><label>اسم مساعد الإدارة</label><input id="settingAssistant"></div><div><label>حد المبلغ الكبير SYP</label><input id="settingLargeAmount" type="number" value="5000000"></div><div><label>ساعات تأخير التسليم</label><input id="settingPendingHours" type="number" value="24"></div><div><label>وضع العرض الافتراضي</label><select id="settingTheme"><option value="auto">تلقائي</option><option value="dark">مظلم</option><option value="light">فاتح</option></select></div><button class="full" id="saveSettingsBtn">حفظ الإعدادات</button></div><div class="msg" id="settingsMsg"></div></div><div class="card"><h3>إدارة المكاتب والمندوبين</h3><p class="smallText">إضافة الاسم هنا تضيفه إلى Firestore. إنشاء حساب الدخول Auth يتم من سكريبت التهيئة.</p><div class="formGrid"><div><label>النوع</label><select id="entityType"><option value="representative">مندوب</option><option value="office">مكتب</option></select></div><div><label>المنطقة</label><select id="entityRegion"><option>R1</option><option>R2</option><option>R3</option><option>R4</option></select></div><div class="full"><label>الاسم</label><input id="entityName"></div><div class="full"><label>البريد</label><input id="entityEmail" type="email"></div><button class="full" id="addEntityBtn">إضافة إلى النظام</button></div><div class="msg" id="entityMsg"></div></div><div class="card full"><h3>حسابات النظام</h3><div class="tableWrap"><table><thead><tr><th>الاسم</th><th>البريد</th><th>الدور</th><th>المنطقة</th><th>الحالة</th></tr></thead><tbody id="usersBody"></tbody></table></div></div></div></section>
 
         <section class="section" id="exportSec"><div class="sectionGrid"><div class="card"><h3>تصدير PDF احترافي</h3><p class="smallText">تقارير مختلفة فعلاً: شامل، مندوبين، مكاتب، مشاكل، وإقفال.</p><div class="formGrid"><div><label>نوع التقرير</label><select id="pdfReportType"><option value="full">تقرير شامل</option><option value="reps">مطابقة المندوبين</option><option value="offices">مطابقة المكاتب</option><option value="issues">مشاكل اليوم</option><option value="closing">إقفال اليوم</option></select></div><div><label>التاريخ</label><input type="date" id="pdfDate"></div><div class="full"><label>عنوان اختياري</label><input id="pdfTitleInput" placeholder="مثلاً: تقرير إقفال اليوم"></div><button class="full" id="exportPdfBtn">تصدير PDF</button></div><div class="msg" id="pdfMsg"></div></div><div class="card"><h3>خيارات سريعة</h3><div class="quickAmounts" style="grid-template-columns:repeat(2,1fr)"><button id="quickFullPdf">شامل</button><button class="secondary" id="quickRepPdf">مندوبين</button><button class="secondary" id="quickOfficePdf">مكاتب</button><button class="secondary" id="quickIssuesPdf">مشاكل</button></div><div class="splitLine"></div><button class="secondary" id="copyManagerWhatsapp" style="width:100%">نسخ تقرير واتساب للإدارة</button></div></div><div id="pdfHiddenArea"></div></section>
 
@@ -375,7 +481,7 @@
 
           <div class="card" style="margin-top:18px">
             <h3>اسأل عن البيانات</h3>
-            <div class="aiPreset">
+            <div class="aiPreset aiPresetWide">
               <button class="secondary" onclick="aiPreset('شو مبيع اليوم؟')">مبيع اليوم</button>
               <button class="secondary" onclick="aiPreset('مين أفضل 3 مندوبين هذا الشهر؟')">أفضل 3</button>
               <button class="secondary" onclick="aiPreset('مبيع Region 1 و Region 2 و Region 3 هذا الشهر؟')">Regions 1-3</button>
@@ -392,6 +498,12 @@
               <button class="secondary" onclick="aiPreset('قارن اليوم مع أمس')">مقارنة</button>
               <button class="secondary" onclick="aiPreset('توقع بكرا حسب آخر 7 أيام')">توقع</button>
               <button class="secondary" onclick="aiPreset('تقرير يومي كامل')">تقرير كامل</button>
+              <button class="secondary" onclick="aiPreset('كم موجود بالصندوق؟')">الصندوق</button>
+              <button class="secondary" onclick="aiPreset('حركة الصندوق اليوم')">حركة اليوم</button>
+              <button class="secondary" onclick="aiPreset('شو دفعت لأشخاص هذا الشهر؟')">مدفوعات أشخاص</button>
+              <button class="secondary" onclick="aiPreset('شو استلمت من أشخاص هذا الشهر؟')">استلامات أشخاص</button>
+              <button class="secondary" onclick="aiPreset('تحويلات الصندوق هذا الشهر')">تحويلات</button>
+              <button class="secondary" onclick="aiPreset('اعطيني ملخص صندوق مع خطة متابعة')">خطة الصندوق</button>
             </div>
             <div class="aiAskBox">
               <textarea id="aiQuestion" placeholder="اسأل بحرية: إيراد الأحد والاثنين والثلاثاء؟ مبيع جفان شهر 5؟ رصيدي عند مكتب؟ أفضل 3؟ قارن اليوم وأمس؟"></textarea>
@@ -406,7 +518,7 @@
                 <button class="secondary" id="aiSaveKeyBtn">حفظ المفتاح</button>
                 <button class="secondary" id="aiTestKeyBtn">اختبار ChatGPT</button>
               </div>
-              <div class="aiHintLine" id="aiApiStatus">ChatGPT الحقيقي هو الافتراضي. إذا كان المفتاح/الرصيد فيه مشكلة، سيظهر السبب الواضح هنا.</div>
+              <div class="aiHintLine" id="aiApiStatus">ChatGPT الحقيقي هو الافتراضي عند وجود مفتاح OpenAI API. اشتراك ChatGPT Plus منفصل عن رصيد OpenAI API.</div>
             </div>
             <div class="aiAnswer" id="aiAnswer">اكتب سؤال أو اختر سؤال جاهز. أمثلة: مبيع علي شهر 5؟ رصيد مكتب هوكر؟ أفضل 3 مندوبين هذا الشهر؟</div>
           </div>
@@ -453,7 +565,7 @@
               </select>
               <select id="auditRole">
                 <option value="">كل الأدوار</option>
-                <option value="admin">عماد</option>
+                <option value="admin">إدارة</option>
                 <option value="assistant_manager">فرهاد</option>
                 <option value="representative">مندوب</option>
                 <option value="office">مكتب</option>
@@ -486,6 +598,14 @@
             <div class="auditPager"><span class="smallText" id="auditPageInfo">—</span><div class="pagerBtns"><button class="secondary" id="auditPrev">السابق</button><button class="secondary" id="auditNext">التالي</button></div></div>
           </div>
         </section>
+
+        <section class="section" id="diagnosticsSec">
+          <div class="card">
+            <h3>تشخيص النظام</h3>
+            <p class="smallText">لوحة تشخيص للإدارة فقط، تعرض حالة الدخول والقراءة والتكاملات بدون كشف أي مفاتيح.</p>
+            <div class="diagnosticsGrid" id="diagnosticsGrid"></div>
+          </div>
+        </section>
       </main>
     </div>
   </section>
@@ -501,7 +621,8 @@
 
   const firebaseConfig={apiKey:"AIzaSyDoVPtyKtuY5LBRw6plvwDVJv4TDIk0Klk",authDomain:"mandob-app-82843.firebaseapp.com",projectId:"mandob-app-82843",storageBucket:"mandob-app-82843.firebasestorage.app",messagingSenderId:"749939721927",appId:"1:749939721927:web:4c1c63aacca39ec41fe0e2",measurementId:"G-40ZG8YVETG"};
   const app=initializeApp(firebaseConfig); const auth=getAuth(app); const db=getFirestore(app);
-  const state={user:null,profile:null,reps:[],offices:[],users:[],sales:[],deliveries:[],withdrawals:[],manual:[],cashbox:[],closings:[],audit:[],settings:{},tab:"dashboardSec",filters:{from:"",to:"",region:""},sound:false,auditPage:1,_auditFiltered:[]};
+  const APP_VERSION='v27 Login Stable Cashbox';
+  const state={user:null,profile:null,reps:[],offices:[],users:[],sales:[],deliveries:[],withdrawals:[],manual:[],cashbox:[],closings:[],audit:[],settings:{},tab:"dashboardSec",filters:{from:"",to:"",region:""},sound:false,auditPage:1,_auditFiltered:[],firebaseReadStatus:"لم تبدأ القراءة بعد",firebaseReadErrors:[],lastOpenAiError:"",appVersion:APP_VERSION,aiBusy:false};
   const $=id=>document.getElementById(id); const today=new Date().toISOString().slice(0,10);
   ["saleDate","deliveryDate","manualDate","closingDate","pdfDate","cmdFrom","cmdTo","walletDate","cashboxDate","aiDate"].forEach(id=>setTimeout(()=>{if($(id))$(id).value=today},0));
   const ar="٠١٢٣٤٥٦٧٨٩", fa="۰۱۲۳۴۵۶۷۸۹";
@@ -542,7 +663,7 @@
       officeName:p.officeName||p.maktabName||p.name||p.displayName||""
     };
   }
-  function roleLabel(r){return ({admin:"عماد",assistant_manager:"فرهاد",representative:"مندوب",office:"مكتب"})[normalizeRole(r)]||r||"غير محدد"} function isManager(){return ["admin","assistant_manager"].includes(state.profile?.role)} function isAdmin(){return state.profile?.role==="admin"}
+  function roleLabel(r){return ({admin:"إدارة",assistant_manager:"مساعد إدارة",representative:"مندوب",office:"مكتب"})[normalizeRole(r)]||r||"غير محدد"} function isManager(){return ["admin","assistant_manager"].includes(state.profile?.role)} function isAdmin(){return state.profile?.role==="admin"}
   function isPendingStatus(s){return ["pending_admin","pending_office"].includes(s)}
   function isConfirmedStatus(x){const s=typeof x==="string"?x:x?.status;return ["admin_confirmed","approved","office_confirmed"].includes(s)}
   function statusLabel(s){return ({pending_admin:"قيد المطابقة",pending_office:"قيد المطابقة",admin_confirmed:"مؤكد",office_confirmed:"مؤكد سابق",difference:"يوجد فرق",approved:"معتمد",closed:"مغلق",needs_review:"يحتاج مراجعة",rejected:"مرفوض"})[s]||s||"غير محدد"} function statusClass(s){if(["approved","admin_confirmed","office_confirmed","closed"].includes(s))return"ok";if(s==="difference"||s==="rejected")return"danger";if(s==="needs_review")return"warn";return"warn"}
@@ -551,7 +672,7 @@
   async function withBusy(btn,text,fn){const b=typeof btn==='string'?$(btn):btn;if(!b)return fn();const old=b.textContent;b.disabled=true;b.dataset.busy='1';b.textContent=text||'جاري التنفيذ...';try{return await fn()}finally{b.disabled=false;b.dataset.busy='0';b.textContent=old}}
   function loadScriptOnce(src,globalName){return new Promise((resolve,reject)=>{if(globalName&&window[globalName])return resolve(); if(document.querySelector(`script[data-src="${src}"]`)){const check=()=>globalName&&window[globalName]?resolve():setTimeout(check,80);return check()} const s=document.createElement('script');s.src=src;s.async=true;s.dataset.src=src;s.onload=resolve;s.onerror=()=>reject(new Error('فشل تحميل مكتبة مطلوبة. تأكد من الإنترنت ثم حاول مرة ثانية.'));document.head.appendChild(s)})}
   async function ensurePdfLibs(){await loadScriptOnce('https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js','html2canvas');await loadScriptOnce('https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js','jspdf')}
-  function buildMobileDock(items){const dock=$('mobileDock');if(!dock)return;const role=state.profile?.role;const preferred=role==="representative"?['entrySec','recordsSec']:role==="office"?['recordsSec','closingSec']:(role==='admin'?['dashboardSec','adminAiSec','officeWalletSec','cashboxSec']:['dashboardSec','commandSec','officeWalletSec','exportSec']);const picked=preferred.map(id=>items.find(x=>x[0]===id)).filter(Boolean).slice(0,4);dock.innerHTML=picked.map(x=>`<button data-sec="${x[0]}">${x[1].replace('لوحة القيادة','الرئيسية').replace('إدخال المندوب','إدخال').replace('التسليمات','تأكيد').replace('إقفال المكتب','إقفال').replace('مركز القيادة','قيادة').replace('ذكاء الإدارة','ذكاء').replace('رصيد المكاتب','رصيد').replace('مطابقة المندوبين','مطابقة').replace('PDF/واتساب','PDF')}</button>`).join('');dock.querySelectorAll('button').forEach(btn=>btn.onclick=()=>showSec(btn.dataset.sec));refreshMobileDock()}
+  function buildMobileDock(items){const dock=$('mobileDock');if(!dock)return;const role=state.profile?.role;const preferred=role==="representative"?['entrySec','recordsSec']:role==="office"?['recordsSec','closingSec']:(role==='admin'?['dashboardSec','adminAiSec','officeWalletSec','cashboxSec']:['dashboardSec','commandSec','officeWalletSec','exportSec']);const picked=preferred.map(id=>items.find(x=>x[0]===id)).filter(Boolean).slice(0,4);dock.innerHTML=picked.map(x=>`<button data-sec="${x[0]}">${x[1].replace('لوحة القيادة','الرئيسية').replace('إدخال المندوب','إدخال').replace('التسليمات','تأكيد').replace('إقفال المكتب','إقفال').replace('مركز القيادة','قيادة').replace('ذكاء الإدارة','ذكاء').replace('رصيد المكاتب','رصيد').replace('الصندوق','صندوق').replace('مطابقة المندوبين','مطابقة').replace('PDF/واتساب','PDF')}</button>`).join('');dock.querySelectorAll('button').forEach(btn=>btn.onclick=()=>showSec(btn.dataset.sec));refreshMobileDock()}
   function refreshMobileDock(){const dock=$('mobileDock');if(!dock)return;dock.querySelectorAll('button').forEach(b=>b.classList.toggle('active',b.dataset.sec===state.tab))}
 
   async function writeAudit(action,title,extra={}){try{await addDoc(collection(db,"audit_logs"),{action,title,extra,actorUid:state.user?.uid||"",actorName:state.profile?.displayName||state.profile?.name||state.user?.email||"",actorRole:state.profile?.role||"",createdAt:serverTimestamp()})}catch(e){console.warn(e)}}
@@ -562,7 +683,7 @@
     if(!qy.empty){const d=qy.docs[0];return normalizeProfile({id:d.id,...d.data()},user)}
     throw new Error("هذا الحساب موجود في Authentication لكن لا يوجد له ملف داخل users في Firestore.")
   }
-  async function loadCollection(name,constraints=[]){try{const qy=constraints.length?query(collection(db,name),...constraints):query(collection(db,name),limit(800)); const s=await getDocs(qy); return s.docs.map(d=>({id:d.id,...d.data()}))}catch(e){console.error("load",name,e);return[]}}
+  async function loadCollection(name,constraints=[]){try{const qy=constraints.length?query(collection(db,name),...constraints):query(collection(db,name),limit(800)); const s=await getDocs(qy); const rows=s.docs.map(d=>({id:d.id,...d.data()})); state.firebaseReadStatus=`نجحت قراءة ${name}: ${rows.length} سجل`; return rows}catch(e){const err=`${name}: ${e.message||e}`; state.firebaseReadErrors.push(err); state.firebaseReadStatus=`فشلت قراءة ${err}`;console.error("load",name,e);return[]}}
   function hydrateProfileLinks(){
     const p=state.profile||{};
     const email=String(p.email||state.user?.email||"").toLowerCase();
@@ -577,8 +698,16 @@
     state.profile=p;
   }
   async function loadBase(){ state.offices=await loadCollection("offices"); state.reps=await loadCollection("representatives"); hydrateProfileLinks(); if(isManager()){state.users=await loadCollection("users")} else {state.users=[]} try{const s=await getDoc(doc(db,"app_settings","main")); state.settings=s.exists()?s.data():{} }catch(_){state.settings={}} if(!localStorage.getItem("arsel_theme"))setTheme(state.settings.theme||"auto",false); fillSelects(); }
-  async function loadData(){ const p=state.profile||{}; const role=p.role; if(role==="representative"){state.sales=await loadCollection("sales_reports",[where("representativeId","==",p.representativeId||""),limit(300)]); state.deliveries=await loadCollection("deliveries",[where("representativeId","==",p.representativeId||""),limit(300)]); state.withdrawals=[]; state.manual=[]; state.cashbox=[]; state.closings=[]; state.audit=[];} else if(role==="office"){state.sales=[]; state.deliveries=await loadCollection("deliveries",[where("officeId","==",p.officeId||""),limit(300)]); state.withdrawals=await loadCollection("office_withdrawals",[where("officeId","==",p.officeId||""),limit(300)]); state.manual=[]; state.cashbox=[]; state.closings=await loadCollection("day_closings",[where("officeId","==",p.officeId||""),limit(200)]); state.audit=[];} else if(isManager()){state.sales=await loadCollection("sales_reports"); state.deliveries=await loadCollection("deliveries"); state.withdrawals=await loadCollection("office_withdrawals"); state.manual=await loadCollection("manual_amounts"); state.cashbox=live(state.manual).filter(m=>m.targetType==="cashbox"||m.type==="cashbox"); state.closings=await loadCollection("day_closings"); state.audit=await loadCollection("audit_logs");} renderAll(); }
+  async function loadData(){ state.firebaseReadStatus='جاري القراءة من Firebase...'; state.firebaseReadErrors=[]; const p=state.profile||{}; const role=p.role; if(role==="representative"){state.sales=await loadCollection("sales_reports",[where("representativeId","==",p.representativeId||""),limit(300)]); state.deliveries=await loadCollection("deliveries",[where("representativeId","==",p.representativeId||""),limit(300)]); state.withdrawals=[]; state.manual=[]; state.cashbox=[]; state.closings=[]; state.audit=[];} else if(role==="office"){state.sales=[]; state.deliveries=await loadCollection("deliveries",[where("officeId","==",p.officeId||""),limit(300)]); state.withdrawals=await loadCollection("office_withdrawals",[where("officeId","==",p.officeId||""),limit(300)]); state.manual=[]; state.cashbox=[]; state.closings=await loadCollection("day_closings",[where("officeId","==",p.officeId||""),limit(200)]); state.audit=[];} else if(isManager()){state.sales=await loadCollection("sales_reports"); state.deliveries=await loadCollection("deliveries"); state.withdrawals=await loadCollection("office_withdrawals"); state.manual=await loadCollection("manual_amounts"); state.cashbox=live(state.manual).filter(m=>m.targetType==="cashbox"||m.type==="cashbox"); state.closings=await loadCollection("day_closings"); state.audit=await loadCollection("audit_logs");} state.firebaseReadStatus=state.firebaseReadErrors.length?`فشل جزئي: ${state.firebaseReadErrors.join(' | ')}`:`آخر قراءة ناجحة: ${new Date().toLocaleTimeString('ar')}`; renderAll(); }
   function officeNameKey(v){return String(v||"").toLowerCase().replace(/[\s_\-ـ]+/g,"").replace(/[أإآا]/g,"ا").replace(/ة/g,"ه").replace(/ى/g,"ي");}
+  function normalizeRegionValue(v){
+    const s=String(v||"").trim();
+    if(!s)return "";
+    const low=s.toLowerCase().replace(/[٠-٩]/g,d=>String(ar.indexOf(d))).replace(/[۰-۹]/g,d=>String(fa.indexOf(d))).replace(/[_\-ـ]+/g," ");
+    const m=low.match(/(?:^|\s)(?:r|region|reg|ريجن|منطقة|منطقه)?\s*([1-4])(?:\s|$)/);
+    return m?`R${m[1]}`:s;
+  }
+  function sameRegion(a,b){return normalizeRegionValue(a)===normalizeRegionValue(b)}
   function isAdminOnlyOffice(o){
     const key=officeNameKey([o?.name,o?.displayName,o?.officeName,o?.email,o?.id].filter(Boolean).join(" "));
     return key.includes("انسالعويد") || key.includes("راميالعويد") || key.includes("anasalawid") || key.includes("ramialawid") || key.includes("ramialoeid") || key.includes("alouid");
@@ -589,7 +718,7 @@
     let list=state.offices.filter(o=>!isAdminOnlyOffice(o));
     if(role==="representative"){
       const region=String(state.profile?.region||"").trim();
-      return list.filter(o=>String(o.region||"").trim()===region);
+      return list.filter(o=>sameRegion(o.region,region));
     }
     if(role==="office"){
       return list.filter(o=>o.id===state.profile.officeId||o.name===state.profile.officeName);
@@ -608,16 +737,19 @@
     const role=state.profile?.role;
     if(role==="representative")return [["entrySec","إدخال المندوب"],["recordsSec","سجلي"]];
     if(role==="office")return [["recordsSec","التسليمات"],["closingSec","إقفال المكتب"]];
-    const menu=[["dashboardSec","لوحة القيادة"],["commandSec","مركز القيادة"],["recordsSec","السجلات"],["repMatchSec","مطابقة المندوبين"],["officeMatchSec","مطابقة المكاتب"],["officeWalletSec","رصيد المكاتب"],["cashboxSec","الصندوق"],["issuesSec","المشاكل"],["amountsSec","إضافة مبالغ"],["closingSec","إقفال يومي"],["balancesSec","الأرصدة"],["peopleSec","المندوبين والمكاتب"],["exportSec","PDF/واتساب"],["auditSec","سجل العمليات"]];
-    if(isAdmin())menu.splice(2,0,["adminAiSec","ذكاء الإدارة"]);
-    if(isAdmin())menu.splice(10,0,["trashSec","سلة المحذوفات"]),menu.splice(13,0,["settingsSec","الإعدادات"]);
+    const menu=[["dashboardSec","لوحة القيادة"],["commandSec","مركز القيادة"],["recordsSec","السجلات"],["repMatchSec","مطابقة المندوبين"],["officeMatchSec","مطابقة المكاتب"],["officeWalletSec","رصيد المكاتب"],["issuesSec","المشاكل"],["amountsSec","إضافة مبالغ"],["closingSec","إقفال يومي"],["balancesSec","الأرصدة"],["peopleSec","المندوبين والمكاتب"],["exportSec","PDF/واتساب"],["auditSec","سجل العمليات"]];
+    if(isAdmin()){
+      menu.splice(2,0,["adminAiSec","ذكاء الإدارة"]);
+      menu.splice(7,0,["cashboxSec","الصندوق"]);
+      menu.splice(menu.length-1,0,["trashSec","سلة المحذوفات"],["settingsSec","الإعدادات"],["diagnosticsSec","التشخيص"]);
+    }
     return menu;
   }
   function canOpenSec(id){return menuForRole().some(x=>x[0]===id)}
   function firstSec(){const role=state.profile?.role;return role==="representative"?"entrySec":role==="office"?"recordsSec":"dashboardSec"}
   function setNav(){ const role=state.profile?.role; document.body.dataset.role=role||"unknown"; if($("quickCopyBtn"))$("quickCopyBtn").style.display=isManager()?"":"none"; const all=menuForRole(); $("nav").innerHTML=all.map(x=>`<button data-sec="${x[0]}">${x[1]}</button>`).join(""); document.querySelectorAll("#nav button").forEach(btn=>btn.onclick=()=>showSec(btn.dataset.sec)); buildMobileDock(all); showSec(firstSec()); }
   function scrollToSectionAnchor(id,targetSec){
-    const anchor=id==='cashboxSec'?$('cashboxPanel'):$(targetSec);
+    const anchor=$(targetSec||id);
     if(!anchor)return;
     const topbar=document.querySelector('.topbar');
     const offset=(topbar?.offsetHeight||72)+14;
@@ -626,7 +758,7 @@
   }
   function showSec(id){
     if(!canOpenSec(id))id=firstSec();
-    const targetSec=id==='cashboxSec'?'officeWalletSec':id;
+    const targetSec=id;
     state.tab=id;
     document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
     if($(targetSec))$(targetSec).classList.add("active");
@@ -717,17 +849,17 @@
   window.selectWalletOffice=(id)=>{if($('walletOffice'))$('walletOffice').value=id; showSec('officeWalletSec'); updateWalletPreview(); const el=$('walletOffice'); if(el)el.scrollIntoView({behavior:'smooth',block:'center'});}
   window.openOfficeWallet=(id)=>{const row=officeWalletRows().find(x=>x.id===id); if(!row)return; $('modalTitle').textContent=`تفاصيل ${row.name}`; $('modalBody').innerHTML=`<div class="grid3"><div class="stat"><div class="k">صندوق سوري</div><div class="v ${row.sypBalance<0?'dangerText':'okText'}">${fmt(row.sypBalance)}</div></div><div class="stat"><div class="k">صندوق دولار</div><div class="v ${row.usdBalance<0?'dangerText':'okText'}">${fmt(row.usdBalance)}</div></div><div class="stat"><div class="k">الحالة</div><div style="margin-top:10px">${walletBadge(row)}</div></div></div><div class="splitLine"></div><p class="smallText">وصل مؤكد: ${fmt(row.confirmedSyp)} SYP / ${fmt(row.confirmedUsd)} USD<br>سحوبات: ${fmt(row.withdrawSyp)} SYP / ${fmt(row.withdrawUsd)} USD<br>تحويلات إلى دولار: ${fmt(row.convertedSyp)} SYP → ${fmt(row.convertedUsd)} USD</p>`; $('modal').classList.add('show');}
 
-  function cashboxOpLabel(op){return ({cash_in_syp:'إضافة سوري',cash_in_usd:'إضافة دولار',person_pay_syp:'دفعت سوري',person_pay_usd:'دفعت دولار',person_receive_syp:'استلمت سوري',person_receive_usd:'استلمت دولار',convert_cash_syp_to_usd:'تحويل سوري إلى دولار',convert_cash_usd_to_syp:'تحويل دولار إلى سوري',office_withdraw_syp:'سحب من مكتب SYP',office_withdraw_usd:'سحب من مكتب USD'})[op]||op||'حركة صندوق'}
+  function cashboxOpLabel(op){return ({cash_in_syp:'قبض سوري',cash_in_usd:'قبض دولار',person_pay_syp:'صرف سوري لشخص / مورد',person_pay_usd:'صرف دولار لشخص / مورد',expense_syp:'مصروف سوري',expense_usd:'مصروف دولار',advance_give_syp:'إعطاء سلفة سوري',advance_give_usd:'إعطاء سلفة دولار',advance_return_syp:'رجوع سلفة سوري',advance_return_usd:'رجوع سلفة دولار',person_receive_syp:'قبض سوري من شخص / مورد',person_receive_usd:'قبض دولار من شخص / مورد',convert_cash_syp_to_usd:'تحويل سوري إلى دولار',convert_cash_usd_to_syp:'تحويل دولار إلى سوري',office_withdraw_syp:'سحب سوري من مكتب',office_withdraw_usd:'سحب دولار من مكتب'})[op]||op||'حركة الصندوق'}
   function cashboxEffect(row){
     const op=row.cashboxOperation||row.operationType||row.type;
     let syp=0,usd=0;
     const aSyp=n(row.amountSyp||row.sourceSyp), aUsd=n(row.amountUsd||row.convertedUsd), rate=n(row.exchangeRate);
     if(op==='office_withdraw_syp'||op==='withdraw_syp'){syp+=aSyp}
     else if(op==='office_withdraw_usd'||op==='withdraw_usd'){usd+=aUsd}
-    else if(op==='cash_in_syp'||op==='person_receive_syp'){syp+=aSyp}
-    else if(op==='cash_in_usd'||op==='person_receive_usd'){usd+=aUsd}
-    else if(op==='person_pay_syp'){syp-=aSyp}
-    else if(op==='person_pay_usd'){usd-=aUsd}
+    else if(op==='cash_in_syp'||op==='person_receive_syp'||op==='advance_return_syp'){syp+=aSyp}
+    else if(op==='cash_in_usd'||op==='person_receive_usd'||op==='advance_return_usd'){usd+=aUsd}
+    else if(op==='person_pay_syp'||op==='expense_syp'||op==='advance_give_syp'){syp-=aSyp}
+    else if(op==='person_pay_usd'||op==='expense_usd'||op==='advance_give_usd'){usd-=aUsd}
     else if(op==='convert_cash_syp_to_usd'){const out=aSyp; const got=aUsd || (rate>0?out/rate:0); syp-=out; usd+=got}
     else if(op==='convert_cash_usd_to_syp'){const out=aUsd; const got=aSyp || (rate>0?out*rate:0); usd-=out; syp+=got}
     return {syp,usd};
@@ -742,37 +874,106 @@
     cashboxRows().slice().reverse().forEach(row=>{const e=cashboxEffect(row); syp+=e.syp; usd+=e.usd; ledger.push({...row,effectSyp:e.syp,effectUsd:e.usd,afterSyp:syp,afterUsd:usd});});
     return {syp,usd,ledger:ledger.reverse()};
   }
+
+  function cashboxTypeOf(op){
+    op=String(op||'');
+    if(op.includes('advance'))return 'advance';
+    if(op.includes('expense'))return 'expense';
+    if(op.includes('convert_cash'))return 'convert';
+    if(op.includes('office_withdraw'))return 'office';
+    if(op.includes('pay'))return 'pay';
+    if(op.includes('receive')||op.includes('cash_in'))return 'receive';
+    return 'other';
+  }
+  function cashboxRange(){
+    const mode=$('cashboxFilterRange')?.value||'today';
+    if(mode==='all')return {from:'',to:'',label:'كل المدة'};
+    if(mode==='custom')return {from:$('cashboxFrom')?.value||'',to:$('cashboxTo')?.value||'',label:'فترة مخصصة'};
+    if(typeof advRangeFromQuestion==='function')return advRangeFromQuestion(mode==='7days'?'آخر 7 أيام':mode==='this_month'?'هذا الشهر':mode==='yesterday'?'أمس':'اليوم');
+    return {from:today,to:today,label:'اليوم'};
+  }
+  function cashboxLedgerFiltered(){
+    const c=cashboxCalc(), term=advText($('cashboxSearch')?.value||''), type=$('cashboxFilterType')?.value||'', party=$('cashboxPartyFilter')?.value||'', r=cashboxRange();
+    return c.ledger.filter(x=>{
+      const op=v23Op? v23Op(x):(x.cashboxOperation||x.operationType||x.type||'');
+      const d=advDateOf? advDateOf(x):(x.date||'');
+      const hay=advText([x.personName,x.targetName,x.officeName,x.notes,x.voucherRef,x.referenceNo,cashboxOpLabel(op)].filter(Boolean).join(' '));
+      return (!r.from||d>=r.from)&&(!r.to||d<=r.to)&&(!type||cashboxTypeOf(op)===type)&&(!party||String(x.partyType||'general')===party)&&(!term||hay.includes(term));
+    });
+  }
+  function cashboxAdvanceRows(){
+    const map={};
+    cashboxCalc().ledger.forEach(x=>{
+      const op=String(v23Op? v23Op(x):(x.cashboxOperation||''));
+      if(!op.includes('advance'))return;
+      const key=(x.personName||x.targetName||'غير محدد').trim()||'غير محدد';
+      if(!map[key])map[key]={name:key,partyType:x.partyType||'سلفة',syp:0,usd:0,lastDate:'',lastOp:''};
+      if(op==='advance_give_syp')map[key].syp+=Math.abs(n(x.amountSyp||x.effectSyp));
+      if(op==='advance_return_syp')map[key].syp-=Math.abs(n(x.amountSyp||x.effectSyp));
+      if(op==='advance_give_usd')map[key].usd+=Math.abs(n(x.amountUsd||x.effectUsd));
+      if(op==='advance_return_usd')map[key].usd-=Math.abs(n(x.amountUsd||x.effectUsd));
+      const d=advDateOf?advDateOf(x):(x.date||''); if(!map[key].lastDate||d>map[key].lastDate){map[key].lastDate=d;map[key].lastOp=cashboxOpLabel(op)};
+    });
+    return Object.values(map).sort((a,b)=>(Math.abs(b.syp)+Math.abs(b.usd))-(Math.abs(a.syp)+Math.abs(a.usd)));
+  }
+  function cashboxReportText(){
+    const c=cashboxCalc(), rows=cashboxLedgerFiltered(), r=cashboxRange();
+    const sum=(list,key)=>list.reduce((a,x)=>a+Math.abs(n(x[key]||0)),0);
+    const byType=t=>rows.filter(x=>cashboxTypeOf(v23Op? v23Op(x):(x.cashboxOperation||''))===t);
+    const adv=cashboxAdvanceRows().filter(x=>Math.abs(x.syp)>0.0001||Math.abs(x.usd)>0.0001);
+    return `تقرير الصندوق — ${advRangeLabel(r)}\nصندوق سوري: ${fmt(c.syp)} SYP\nصندوق دولار: ${fmt(c.usd)} USD\n\nحركة الفترة: ${rows.length}\nقبض: ${fmt(sum(byType('receive'),'effectSyp'))} SYP / ${fmt(sum(byType('receive'),'effectUsd'))} USD\nصرف: ${fmt(sum(byType('pay'),'effectSyp'))} SYP / ${fmt(sum(byType('pay'),'effectUsd'))} USD\nمصروفات: ${fmt(sum(byType('expense'),'effectSyp'))} SYP / ${fmt(sum(byType('expense'),'effectUsd'))} USD\nسلف مفتوحة: ${adv.length}\n`+adv.slice(0,10).map((x,i)=>`${i+1}) ${x.name}: ${fmt(x.syp)} SYP / ${fmt(x.usd)} USD`).join('\n');
+  }
+  function exportCashboxCsv(){downloadCsv('cashbox_filtered.csv',cashboxLedgerFiltered().map(x=>({date:advDateOf?advDateOf(x):(x.date||''),operation:cashboxOpLabel(v23Op? v23Op(x):x.cashboxOperation),party:x.personName||x.targetName||x.officeName||'',partyType:x.partyType||'',syp:x.effectSyp||0,usd:x.effectUsd||0,rate:x.exchangeRate||0,afterSyp:x.afterSyp||0,afterUsd:x.afterUsd||0,reference:x.voucherRef||x.referenceNo||'',notes:x.notes||''})))}
+  function copyCashboxReport(){copyText(cashboxReportText())}
   function updateCashboxPreview(){
     const prev=$('cashboxPreview'); if(!prev)return; const c=cashboxCalc(); const op=$('cashboxOperation')?.value||'cash_in_syp', syp=n($('cashboxSyp')?.value), usd=n($('cashboxUsd')?.value), rate=n($('cashboxRate')?.value);
     const temp={cashboxOperation:op,amountSyp:syp,amountUsd:usd,exchangeRate:rate}; const e=cashboxEffect(temp); const afterSyp=c.syp+e.syp, afterUsd=c.usd+e.usd;
-    prev.innerHTML=`قبل: <b>${fmt(c.syp)} SYP</b> / <b>${fmt(c.usd)} USD</b><br>${cashboxOpLabel(op)} — أثر الحركة: <b class="${e.syp<0?'dangerText':'okText'}">${fmt(e.syp)} SYP</b> / <b class="${e.usd<0?'dangerText':'okText'}">${fmt(e.usd)} USD</b><br>بعد: <b class="${afterSyp<0?'dangerText':'okText'}">${fmt(afterSyp)} SYP</b> / <b class="${afterUsd<0?'dangerText':'okText'}">${fmt(afterUsd)} USD</b>`;
+    prev.innerHTML=`قبل صندوق سوري: <b>${fmt(c.syp)} SYP</b> / صندوق دولار: <b>${fmt(c.usd)} USD</b><br>${cashboxOpLabel(op)} — أثر الحركة: <b class="${e.syp<0?'dangerText':'okText'}">${fmt(e.syp)} SYP</b> / <b class="${e.usd<0?'dangerText':'okText'}">${fmt(e.usd)} USD</b><br>بعد صندوق سوري: <b class="${afterSyp<0?'dangerText':'okText'}">${fmt(afterSyp)} SYP</b> / صندوق دولار: <b class="${afterUsd<0?'dangerText':'okText'}">${fmt(afterUsd)} USD</b>`;
   }
   function renderCashbox(){
-    const c=cashboxCalc();
+    const c=cashboxCalc(), filtered=cashboxLedgerFiltered();
+    const monthRange=typeof advRangeFromQuestion==='function'?advRangeFromQuestion('هذا الشهر'):{from:'',to:''};
+    const monthLedger=c.ledger.filter(x=>!monthRange.from||(advDateOf(x)>=monthRange.from&&advDateOf(x)<=monthRange.to));
+    const typeRows=t=>filtered.filter(x=>cashboxTypeOf(v23Op(x))===t);
+    const sum=(list,key)=>list.reduce((a,x)=>a+Math.abs(n(x[key]||0)),0);
+    const paid=typeRows('pay'), expense=typeRows('expense'), recv=typeRows('receive'), advRows=cashboxAdvanceRows(), openAdv=advRows.filter(x=>Math.abs(x.syp)>0.0001||Math.abs(x.usd)>0.0001);
+    const paidMonth=monthLedger.filter(x=>cashboxTypeOf(v23Op(x))==='pay'||cashboxTypeOf(v23Op(x))==='expense');
+    const recvMonth=monthLedger.filter(x=>cashboxTypeOf(v23Op(x))==='receive');
+    if($('cashboxQuickStats')){
+      $('cashboxQuickStats').innerHTML=`<div class="miniCard"><div class="k">صندوق سوري</div><div class="v ${c.syp<0?'dangerText':'okText'}">${fmt(c.syp)}</div></div><div class="miniCard"><div class="k">صندوق دولار</div><div class="v ${c.usd<0?'dangerText':'okText'}">${fmt(c.usd)}</div></div><div class="miniCard"><div class="k">مدفوعات هذا الشهر</div><div class="v dangerText">${fmt(sum(paidMonth,'effectSyp'))} SYP<br>${fmt(sum(paidMonth,'effectUsd'))} USD</div></div><div class="miniCard"><div class="k">سلف مفتوحة</div><div class="v warnText">${openAdv.length}<br>${fmt(openAdv.reduce((a,x)=>a+Math.max(0,x.syp),0))} SYP</div></div>`;
+    }
     if($('adminCashboxSummary'))$('adminCashboxSummary').innerHTML=`<div class="cashboxCard"><div class="k">صندوق سوري</div><div class="v ${c.syp<0?'dangerText':'okText'}">${fmt(c.syp)}</div></div><div class="cashboxCard"><div class="k">صندوق دولار</div><div class="v ${c.usd<0?'dangerText':'okText'}">${fmt(c.usd)}</div></div>`;
-    if($('cashboxSmartNote'))$('cashboxSmartNote').innerHTML=`آخر ${fmt(c.ledger.length)} حركة. السالب يعني الصندوق عليه التزام ويحتاج تسوية.`;
-    if($('cashboxLedgerBody'))$('cashboxLedgerBody').innerHTML=c.ledger.slice(0,180).map(r=>`<tr><td>${esc(r.date||'')}</td><td>${cashboxOpLabel(r.cashboxOperation||r.operationType||r.type)}</td><td>${esc(r.personName||r.targetName||r.officeName||'')}</td><td class="amount ${n(r.effectSyp)<0?'dangerText':'okText'}">${fmt(r.effectSyp)}</td><td class="amount ${n(r.effectUsd)<0?'dangerText':'okText'}">${fmt(r.effectUsd)}</td><td class="amount">${fmt(r.exchangeRate)}</td><td class="amount ${n(r.afterSyp)<0||n(r.afterUsd)<0?'dangerText':'okText'}">${fmt(r.afterSyp)} SYP / ${fmt(r.afterUsd)} USD</td><td>${esc(r.notes||'')}</td><td>${isAdmin()&&r.source==='manual_amounts'?`<button class="danger" onclick="appDelete('manual_amounts','${r.id}','حذف حركة صندوق')">حذف</button>`:'—'}</td></tr>`).join('')||`<tr><td colspan="9" class="empty">لا توجد حركات صندوق</td></tr>`;
+    if($('cashboxSmartNote'))$('cashboxSmartNote').innerHTML=`آخر ${fmt(c.ledger.length)} حركة. السلف المفتوحة: ${fmt(openAdv.length)}. أي سالب بالصندوق يحتاج تغطية أو تسوية.`;
+    if($('cashboxInsight'))$('cashboxInsight').innerHTML=`الفترة المعروضة: <b>${advRangeLabel(cashboxRange())}</b> — الحركات: <b>${fmt(filtered.length)}</b> — قبض: <b class="okText">${fmt(sum(recv,'effectSyp'))} SYP / ${fmt(sum(recv,'effectUsd'))} USD</b> — صرف: <b class="dangerText">${fmt(sum(paid,'effectSyp')+sum(expense,'effectSyp'))} SYP / ${fmt(sum(paid,'effectUsd')+sum(expense,'effectUsd'))} USD</b>`;
+    if($('cashboxLedgerBody'))$('cashboxLedgerBody').innerHTML=filtered.slice(0,220).map(r=>`<tr><td>${esc(advDateOf(r)||'')}</td><td>${cashboxOpLabel(v23Op(r))}</td><td>${esc(v23Party(r))}</td><td>${esc(r.partyType||r.category||'—')}</td><td class="amount ${n(r.effectSyp)<0?'dangerText':'okText'}">${fmt(r.effectSyp)}</td><td class="amount ${n(r.effectUsd)<0?'dangerText':'okText'}">${fmt(r.effectUsd)}</td><td class="amount">${fmt(r.exchangeRate)}</td><td class="amount ${n(r.afterSyp)<0||n(r.afterUsd)<0?'dangerText':'okText'}">${fmt(r.afterSyp)} SYP / ${fmt(r.afterUsd)} USD</td><td>${esc([r.voucherRef||r.referenceNo||'',r.notes||''].filter(Boolean).join(' — '))}</td><td>${isAdmin()&&r.source==='manual_amounts'?`<button class="danger" onclick="appDelete('manual_amounts','${r.id}','حذف حركة صندوق')">حذف</button>`:'—'}</td></tr>`).join('')||`<tr><td colspan="10" class="empty">لا توجد حركات ضمن الفلتر</td></tr>`;
+    if($('cashboxAdvanceBody'))$('cashboxAdvanceBody').innerHTML=advRows.map(a=>`<tr><td>${esc(a.name)}</td><td>${esc(a.partyType||'سلفة')}</td><td class="amount ${a.syp>0?'advanceOpen':a.syp<0?'advanceDebt':'advanceClear'}">${fmt(a.syp)}</td><td class="amount ${a.usd>0?'advanceOpen':a.usd<0?'advanceDebt':'advanceClear'}">${fmt(a.usd)}</td><td>${esc(a.lastDate||'—')} — ${esc(a.lastOp||'—')}</td><td>${Math.abs(a.syp)<0.0001&&Math.abs(a.usd)<0.0001?'<span class="pill ok">مسددة</span>':a.syp>0||a.usd>0?'<span class="pill warn">سلفة مفتوحة</span>':'<span class="pill danger">تحتاج مراجعة</span>'}</td></tr>`).join('')||`<tr><td colspan="6" class="empty">لا توجد سلف</td></tr>`;
+    if($('cashboxReportCards')){
+      const expMonth=monthLedger.filter(x=>cashboxTypeOf(v23Op(x))==='expense');
+      $('cashboxReportCards').innerHTML=`<div class="alertCard ok"><strong>${fmt(c.syp)}</strong><span>رصيد صندوق سوري</span></div><div class="alertCard ok"><strong>${fmt(c.usd)}</strong><span>رصيد صندوق دولار</span></div><div class="alertCard warn"><strong>${fmt(openAdv.length)}</strong><span>سلف مفتوحة</span></div><div class="alertCard danger"><strong>${fmt(sum(expMonth,'effectSyp'))}</strong><span>مصروفات هذا الشهر SYP</span></div>`;
+    }
     updateCashboxPreview();
   }
   async function saveCashboxOp(){
     try{
       if(!isAdmin())throw new Error('حركة الصندوق للإدارة فقط.');
-      const op=$('cashboxOperation').value, date=$('cashboxDate').value||today, person=($('cashboxPerson').value||'').trim(), rate=n($('cashboxRate').value), inSyp=n($('cashboxSyp').value), inUsd=n($('cashboxUsd').value);
+      const op=$('cashboxOperation').value, date=$('cashboxDate').value||today, person=($('cashboxPerson').value||'').trim(), partyType=$('cashboxPartyType')?.value||'person', category=$('cashboxCategory')?.value||'general', voucherRef=($('cashboxRef')?.value||'').trim(), rate=n($('cashboxRate').value), inSyp=n($('cashboxSyp').value), inUsd=n($('cashboxUsd').value);
       let amountSyp=0,amountUsd=0;
-      if(['cash_in_syp','person_pay_syp','person_receive_syp','convert_cash_syp_to_usd'].includes(op)){if(inSyp<=0)throw new Error('اكتب مبلغ SYP.'); amountSyp=inSyp;}
-      if(['cash_in_usd','person_pay_usd','person_receive_usd','convert_cash_usd_to_syp'].includes(op)){if(inUsd<=0)throw new Error('اكتب مبلغ USD.'); amountUsd=inUsd;}
+      const needsSyp=['cash_in_syp','person_pay_syp','expense_syp','advance_give_syp','advance_return_syp','person_receive_syp','convert_cash_syp_to_usd'].includes(op);
+      const needsUsd=['cash_in_usd','person_pay_usd','expense_usd','advance_give_usd','advance_return_usd','person_receive_usd','convert_cash_usd_to_syp'].includes(op);
+      if(needsSyp){if(inSyp<=0)throw new Error('اكتب مبلغ SYP.'); amountSyp=inSyp;}
+      if(needsUsd){if(inUsd<=0)throw new Error('اكتب مبلغ USD.'); amountUsd=inUsd;}
       if(['convert_cash_syp_to_usd','convert_cash_usd_to_syp'].includes(op)&&rate<=0)throw new Error('اكتب سعر الصرف.');
+      if(['person_pay_syp','person_pay_usd','expense_syp','expense_usd','advance_give_syp','advance_give_usd','advance_return_syp','advance_return_usd','person_receive_syp','person_receive_usd'].includes(op)&&!person)throw new Error('اكتب اسم الشخص / الجهة.');
       if(op==='convert_cash_syp_to_usd')amountUsd=rate>0?amountSyp/rate:0;
       if(op==='convert_cash_usd_to_syp')amountSyp=rate>0?amountUsd*rate:0;
       const before=cashboxCalc(); const effect=cashboxEffect({cashboxOperation:op,amountSyp,amountUsd,exchangeRate:rate});
-      await addDoc(collection(db,'manual_amounts'),{type:'cashbox',targetType:'cashbox',targetId:'admin_cashbox',targetName:person||'الصندوق',cashboxOperation:op,personName:person,date,amountSyp,amountUsd,exchangeRate:rate,notes:$('cashboxNotes').value.trim(),beforeSyp:before.syp,beforeUsd:before.usd,afterSyp:before.syp+effect.syp,afterUsd:before.usd+effect.usd,actorUid:state.user.uid,actorName:state.profile.name||state.profile.displayName||'',createdAt:serverTimestamp()});
-      await writeAudit('cashbox_op',cashboxOpLabel(op),{person,amountSyp,amountUsd});
-      ['cashboxPerson','cashboxSyp','cashboxUsd','cashboxNotes'].forEach(id=>{if($(id))$(id).value=''});
-      msg($('cashboxMsg'),'ok','تم حفظ الحركة.');
+      await addDoc(collection(db,'manual_amounts'),{type:'cashbox',targetType:'cashbox',targetId:'admin_cashbox',targetName:person||'الصندوق',cashboxOperation:op,personName:person,partyType,category,voucherRef,date,amountSyp,amountUsd,exchangeRate:rate,notes:$('cashboxNotes').value.trim(),beforeSyp:before.syp,beforeUsd:before.usd,afterSyp:before.syp+effect.syp,afterUsd:before.usd+effect.usd,actorUid:state.user.uid,actorName:state.profile.name||state.profile.displayName||'',createdAt:serverTimestamp()});
+      await writeAudit('cashbox_op',cashboxOpLabel(op),{person,partyType,category,voucherRef,amountSyp,amountUsd});
+      ['cashboxPerson','cashboxSyp','cashboxUsd','cashboxNotes','cashboxRef'].forEach(id=>{if($(id))$(id).value=''});
+      msg($('cashboxMsg'),'ok','تم حفظ حركة الصندوق.');
       await loadData();
     }catch(e){msg($('cashboxMsg'),'error',e.message)}
   }
-
 
   function aiDay(offset=0){const d=new Date();d.setDate(d.getDate()+offset);return d.toISOString().slice(0,10)}
   function aiMonthStart(){const d=new Date();return new Date(d.getFullYear(),d.getMonth(),1).toISOString().slice(0,10)}
@@ -1041,7 +1242,7 @@
   }
   function advOfficeSummary(office){const rows=officeWalletRows(); return rows.find(o=>o.id===office.id||advText(o.name)===advText(office.name)||advText(o.name).includes(advText(office.name)))||officeWalletCalc(office)}
   function advOfficeLedger(office,r){return live(state.withdrawals).filter(w=>advInRange(w,r)&&(w.officeId===office.id||advText(w.officeName)===advText(office.name)||advText(w.officeName).includes(advText(office.name)))).sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));}
-  function advFriendly(q){const low=advText(q); if(['كيفك','مرحبا','اهلا','هلا','هاي','السلام عليكم','شلونك','شو اخبارك'].some(x=>low.includes(advText(x))))return 'تمام يا عماد، جاهز أحلل لك المندوبين والمكاتب والأرصدة. اسألني عن يوم محدد، شهر، مندوب، مكتب، منطقة، مقارنة، فروقات، أو خطة متابعة.'; return ''}
+  function advFriendly(q){const low=advText(q); if(['كيفك','مرحبا','اهلا','هلا','هاي','السلام عليكم','شلونك','شو اخبارك'].some(x=>low.includes(advText(x))))return 'تمام، جاهز أحلل لك المندوبين والمكاتب والأرصدة. اسألني عن يوم محدد، شهر، مندوب، مكتب، منطقة، مقارنة، فروقات، أو خطة متابعة.'; return ''}
   function advDailyBreakdown(q,ranges){
     const reps=advFindReps(q), regs=advFindRegions(q), low=advText(q); let title='تفصيل الأيام';
     const lines=[]; let totalSale=0,totalConf=0,totalPending=0,totalDiff=0;
@@ -1110,6 +1311,9 @@
   }
   function advSetApiStatus(txt,kind='info'){
     const el=$('aiApiStatus'); if(el){el.textContent=txt; el.className='aiHintLine '+kind;}
+    if(kind==='danger')state.lastOpenAiError=String(txt||'');
+    if(kind==='ok')state.lastOpenAiError='';
+    if(state.tab==='diagnosticsSec')renderDiagnostics();
   }
   function advDelay(ms){return new Promise(r=>setTimeout(r,ms));}
   async function advReadOpenAiError(res){
@@ -1136,11 +1340,16 @@
       max_output_tokens:420,
       store:false
     };
-    const res=await fetch('https://api.openai.com/v1/responses',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
-      body:JSON.stringify(payload)
-    });
+    let res;
+    try{
+      res=await fetch('https://api.openai.com/v1/responses',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+        body:JSON.stringify(payload)
+      });
+    }catch(e){
+      throw new Error('مشكلة شبكة أو CORS');
+    }
     if(!res.ok){
       const err=await advReadOpenAiError(res);
       if(res.status===429 && retry && err.code!=='insufficient_quota'){
@@ -1149,11 +1358,10 @@
         return advOpenAiRequest(q,local,{test,retry:false});
       }
       let human=`OpenAI رفض الطلب: ${err.status} — ${err.message}`;
-      if(err.status===429 && err.code==='insufficient_quota') human='المفتاح صحيح غالباً، لكن لا يوجد رصيد/حصة API كافية في حساب OpenAI.';
-      else if(err.status===429) human='وصل حد الطلبات مؤقتاً. انتظر دقيقة أو خفف الأسئلة المتكررة.';
-      else if(err.status===401) human='المفتاح غير صحيح أو لم يعد صالحاً.';
-      else if(err.status===403) human='المفتاح لا يملك صلاحية لهذا الطلب أو المشروع.';
-      else if(err.status===404) human='الموديل المختار غير متاح لهذا المفتاح. جرّب gpt-4o-mini.';
+      if(err.status===401) human='مفتاح غير صحيح';
+      else if(err.status===403 || err.code==='insufficient_quota') human='لا يوجد رصيد أو صلاحية API كافية';
+      else if(err.status===429) human='تم تجاوز الحد مؤقتاً';
+      else if(err.status===404 || String(err.code||'').includes('model') || String(err.message||'').toLowerCase().includes('model')) human='الموديل غير متاح';
       throw new Error(human);
     }
     const data=await res.json();
@@ -1162,7 +1370,9 @@
   }
   async function advChatGptAnswer(q,local){
     const mode=$('aiMode')?.value||'chatgpt';
-    if(mode!=='chatgpt')return local;
+    const key=localStorage.getItem('arsel_openai_key')||'';
+    if(mode!=='chatgpt'){advSetApiStatus('التحليل الداخلي مفعل. لم يتم إرسال طلب إلى OpenAI.', 'info');return local;}
+    if(!key){advSetApiStatus('لا يوجد مفتاح OpenAI محفوظ؛ تم استخدام الذكاء الداخلي القوي.', 'warn');return local;}
     try{
       advSetApiStatus('ChatGPT الحقيقي يعمل الآن...', 'info');
       const txt=await advOpenAiRequest(q,local);
@@ -1181,16 +1391,60 @@
   async function runAiAsk(){
     const q=($('aiQuestion')?.value||'').trim();
     if(!$('aiAnswer'))return;
+    if(state.aiBusy)return;
+    state.aiBusy=true;
     const btn=$('aiAskBtn');
     try{
       if(btn){btn.disabled=true;btn.textContent='عم يجاوب...';}
-      $('aiAnswer').textContent='عم يحلل البيانات ويشغّل ChatGPT الحقيقي...';
+      $('aiAnswer').textContent=($('aiMode')?.value||'chatgpt')==='chatgpt'?'عم يحلل البيانات ويشغّل ChatGPT الحقيقي...':'عم يحلل البيانات داخلياً...';
       const local=advLocalAnswer(q||'تقرير سريع');
       $('aiAnswer').textContent=await advChatGptAnswer(q||'تقرير سريع',local);
     }finally{
       if(btn){btn.disabled=false;btn.textContent='اسأل';}
+      state.aiBusy=false;
     }
   }
+
+  /* v23 AI Max — internal accounting/cashbox intelligence */
+  const v23BaseAdvLocalAnswer = advLocalAnswer;
+  function v23Range(q){try{return advRangeFromQuestion(q||'اليوم')}catch(_){return {from:today,to:today,label:'اليوم'}}}
+  function v23In(row,range){try{return advInRange(row,range)}catch(_){const d=advDateOf(row);return (!range.from||d>=range.from)&&(!range.to||d<=range.to)}}
+  function v23CashboxRows(q=''){const r=v23Range(q);return cashboxCalc().ledger.filter(x=>v23In(x,r));}
+  function v23Op(row){return row.cashboxOperation||row.operationType||row.type||''}
+  function v23Party(row){return row.personName||row.targetName||row.officeName||'—'}
+  function v23CashLine(row){return `${advDateOf(row)||'—'} — ${cashboxOpLabel(v23Op(row))} — ${v23Party(row)}: ${fmt(row.effectSyp||0)} SYP / ${fmt(row.effectUsd||0)} USD — بعده ${fmt(row.afterSyp||0)} SYP / ${fmt(row.afterUsd||0)} USD${row.notes?' — '+row.notes:''}`}
+  function v23CashboxAnswer(q){
+    const low=advText(q), c=cashboxCalc(), rows=v23CashboxRows(q), range=v23Range(q);
+    const wantsCash=aiHas(low,['صندوق','كاش','cash','كم معي','موجود عندي','موجود بالصندوق','رصيد الصندوق','سلف','سلفة','ذمم','عهد']);
+    if(!wantsCash && !aiHas(low,['دفعت','استلمت','قبضت','حركة','تحويلات','تحويل','سلف','سلفة','ذمم','عهد','مصروف','مصروفات']))return '';
+    const paid=rows.filter(x=>['person_pay_syp','person_pay_usd'].includes(v23Op(x)));
+    const rec=rows.filter(x=>['person_receive_syp','person_receive_usd','cash_in_syp','cash_in_usd'].includes(v23Op(x)));
+    const conv=rows.filter(x=>String(v23Op(x)).includes('convert_cash'));
+    const office=rows.filter(x=>String(v23Op(x)).includes('office_withdraw'));
+    const advRows=cashboxAdvanceRows(); const openAdv=advRows.filter(x=>Math.abs(x.syp)>0.0001||Math.abs(x.usd)>0.0001);
+    const advances=rows.filter(x=>String(v23Op(x)).includes('advance'));
+    const expenses=rows.filter(x=>cashboxTypeOf(v23Op(x))==='expense');
+    const sum=(list,key)=>list.reduce((a,x)=>a+Math.abs(n(x[key]||0)),0);
+    const netSyp=rows.reduce((a,x)=>a+n(x.effectSyp),0), netUsd=rows.reduce((a,x)=>a+n(x.effectUsd),0);
+    if(aiHas(low,['دفعت','مدفوعات','مصروف','مصروفات']))return `مدفوعات الصندوق — ${advRangeLabel(range)}\nالمجموع: ${fmt(sum(paid,'effectSyp'))} SYP / ${fmt(sum(paid,'effectUsd'))} USD\n`+advLineRows(paid.slice(0,40),v23CashLine,'لا توجد مدفوعات ضمن الفترة.');
+    if(aiHas(low,['استلمت','قبضت','استلامات','دخل الصندوق']))return `استلامات الصندوق — ${advRangeLabel(range)}\nالمجموع: ${fmt(sum(rec,'effectSyp'))} SYP / ${fmt(sum(rec,'effectUsd'))} USD\n`+advLineRows(rec.slice(0,40),v23CashLine,'لا توجد استلامات ضمن الفترة.');
+    if(aiHas(low,['تحويل','تحويلات']))return `تحويلات الصندوق — ${advRangeLabel(range)}\nالعدد: ${conv.length}\n`+advLineRows(conv.slice(0,40),v23CashLine,'لا توجد تحويلات ضمن الفترة.');
+    if(aiHas(low,['مكتب','المكاتب','سحبت من مكتب']))return `سحوبات المكاتب الداخلة للصندوق — ${advRangeLabel(range)}\nالمجموع: ${fmt(sum(office,'effectSyp'))} SYP / ${fmt(sum(office,'effectUsd'))} USD\n`+advLineRows(office.slice(0,40),v23CashLine,'لا توجد سحوبات مكاتب ضمن الفترة.');
+    if(aiHas(low,['حركة','حركات','سجل']))return `حركة الصندوق — ${advRangeLabel(range)}\nعدد الحركات: ${rows.length}\nصافي الفترة: ${fmt(netSyp)} SYP / ${fmt(netUsd)} USD\n`+advLineRows(rows.slice(0,50),v23CashLine,'لا توجد حركات ضمن الفترة.');
+    return `ملخص الصندوق\nصندوق سوري: ${fmt(c.syp)} SYP ${c.syp<0?'— يحتاج تغطية':'— جيد'}\nصندوق دولار: ${fmt(c.usd)} USD ${c.usd<0?'— يحتاج تغطية':'— جيد'}\n\nالفترة: ${advRangeLabel(range)}\nصافي حركة الفترة: ${fmt(netSyp)} SYP / ${fmt(netUsd)} USD\nدفعت: ${fmt(sum(paid,'effectSyp'))} SYP / ${fmt(sum(paid,'effectUsd'))} USD\nاستلمت: ${fmt(sum(rec,'effectSyp'))} SYP / ${fmt(sum(rec,'effectUsd'))} USD\nتحويلات: ${conv.length}\nسحوبات من مكاتب: ${office.length}\nسلف مفتوحة: ${openAdv.length}\n\nخطة متابعة: ${c.syp<0||c.usd<0?'غطّي الصندوق السالب أو سجّل تسوية واضحة.':'راجع آخر الحركات فقط وتأكد من الإقفال.'}`;
+  }
+  advLocalAnswer = function(q){
+    if(!isAdmin())return 'هذا القسم للإدارة فقط.';
+    const cash=v23CashboxAnswer(q||'');
+    if(cash)return cash;
+    let base=v23BaseAdvLocalAnswer(q);
+    if(aiHas(advText(q||''),['تقرير شامل','تقرير كامل','تقرير يومي','خطة'])){
+      const c=cashboxCalc();
+      base += `\n\nالصندوق\nصندوق سوري: ${fmt(c.syp)} SYP\nصندوق دولار: ${fmt(c.usd)} USD\nآخر حركة: ${c.ledger[0]?v23CashLine(c.ledger[0]):'لا توجد حركات'}`;
+    }
+    return base;
+  };
+
 
 function buildIssues(){
     if(!isManager())return [];
@@ -1343,7 +1597,22 @@ function buildIssues(){
     toast('تم حذف السجلات من سجل العمليات.');
   }
 
-  function renderSettings(){ if(!$("settingAppName"))return; $("settingAppName").value=state.settings.appName||'أرسل'; $("settingCurrency").value=state.settings.currency||'SYP'; $("settingOwner").value=state.settings.ownerName||'عماد'; $("settingAssistant").value=state.settings.assistantName||'فرهاد'; $("settingLargeAmount").value=state.settings.largeAmount||5000000; $("settingPendingHours").value=state.settings.pendingHours||24; if($("settingTheme"))$("settingTheme").value=state.settings.theme||localStorage.getItem("arsel_theme")||"auto"; }
+  function renderSettings(){ if(!$("settingAppName"))return; $("settingAppName").value=state.settings.appName||'أرسل'; $("settingCurrency").value=state.settings.currency||'SYP'; $("settingOwner").value=state.settings.ownerName||'المدير'; $("settingAssistant").value=state.settings.assistantName||'مساعد الإدارة'; $("settingLargeAmount").value=state.settings.largeAmount||5000000; $("settingPendingHours").value=state.settings.pendingHours||24; if($("settingTheme"))$("settingTheme").value=state.settings.theme||localStorage.getItem("arsel_theme")||"auto"; }
+  function renderDiagnostics(){
+    if(!isAdmin()||!$("diagnosticsGrid"))return;
+    const current=(menuForRole().find(x=>x[0]===state.tab)||[])[1]||state.tab||'—';
+    const rows=[
+      ['Auth status',state.user?'مسجل الدخول':'غير مسجل'],
+      ['current user email',state.user?.email||state.profile?.email||'—'],
+      ['current role',roleLabel(state.profile?.role)],
+      ['current section',current],
+      ['Firebase read status',state.firebaseReadStatus||'—'],
+      ['OpenAI key saved',localStorage.getItem('arsel_openai_key')?'نعم':'لا'],
+      ['last OpenAI error',state.lastOpenAiError||'لا يوجد'],
+      ['app version',state.appVersion||APP_VERSION]
+    ];
+    $("diagnosticsGrid").innerHTML=rows.map(x=>`<div class="miniCard"><div class="k">${esc(x[0])}</div><div class="v" style="font-size:18px;line-height:1.55;direction:auto;text-align:right">${esc(x[1])}</div></div>`).join('');
+  }
   function renderAll(){
     renderStats();renderDashboard();renderMySummary();
     const tab=state.tab;
@@ -1352,7 +1621,8 @@ function buildIssues(){
     if(tab==='recordsSec')renderRecords();
     if(tab==='repMatchSec')renderRepMatch();
     if(tab==='officeMatchSec')renderOfficeMatch();
-    if(tab==='officeWalletSec'||tab==='cashboxSec')renderOfficeWallet();
+    if(tab==='officeWalletSec')renderOfficeWallet();
+    if(tab==='cashboxSec')renderCashbox();
     if(tab==='issuesSec')renderIssues();
     if(tab==='amountsSec')renderManual();
     if(tab==='closingSec')renderClosing();
@@ -1360,15 +1630,17 @@ function buildIssues(){
     if(tab==='trashSec')renderTrash();
     if(tab==='peopleSec')renderPeople();
     if(tab==='auditSec')renderAudit();
+    if(tab==='diagnosticsSec')renderDiagnostics();
   }
   async function softDelete(col,id,title,reason){await updateDoc(doc(db,col,id),{deleted:true,deletedAt:serverTimestamp(),deletedBy:state.user.uid,deletedByName:state.profile.displayName||state.profile.name||'',deleteReason:reason||''}); await writeAudit('soft_delete',title,{col,id,reason}); await loadData();}
-  window.appDelete=async(col,id,title)=>{const r=prompt('سبب النقل إلى سلة المحذوفات:'); if(r===null)return; await softDelete(col,id,title,r)};
-  window.restoreItem=async(col,id)=>{await updateDoc(doc(db,col,id),{deleted:false,restoredAt:serverTimestamp(),restoredBy:state.user.uid,restoredByName:state.profile.displayName||state.profile.name||''}); await writeAudit('restore','استعادة من السلة',{col,id}); await loadData();}
+  window.appDelete=async(col,id,title)=>{if(!isAdmin()){toast('الحذف للإدارة فقط.');return;} const r=prompt('سبب النقل إلى سلة المحذوفات:'); if(r===null)return; await softDelete(col,id,title,r)};
+  window.restoreItem=async(col,id)=>{if(!isAdmin()){toast('استعادة المحذوفات للإدارة فقط.');return;} if(!trashItems().some(x=>x.col===col&&x.id===id)){toast('العنصر غير موجود في السلة.');return;} await updateDoc(doc(db,col,id),{deleted:false,restoredAt:serverTimestamp(),restoredBy:state.user.uid,restoredByName:state.profile.displayName||state.profile.name||''}); await writeAudit('restore','استعادة من السلة',{col,id}); await loadData();}
   
   window.permanentDelete=async(col,id,title='')=>{
     if(!isAdmin()){toast('الحذف النهائي للإدارة فقط.');return;}
     const ok=confirm(`حذف نهائي؟\n${title||col}\nلا يمكن الاستعادة بعد هذا الإجراء.`);
     if(!ok)return;
+    if(!trashItems().some(x=>x.col===col&&x.id===id)){toast('لا يمكن حذف عنصر غير موجود في السلة.');return;}
     try{await deleteDoc(doc(db,col,id));}
     catch(e){
       console.warn('deleteDoc failed, hiding permanently instead',e);
@@ -1395,7 +1667,7 @@ function buildIssues(){
   function getEditableItem(col,id){return (col==='deliveries'?state.deliveries:state.sales).find(x=>x.id===id)}
   function canEditItem(col,item){if(!item)return false; return col==='deliveries'?deliveryEditAllowed(item):saleEditAllowed(item)}
   window.grantEdit=async(col,id)=>{if(!isAdmin()){toast('إذن التعديل للإدارة فقط.');return;} await updateDoc(doc(db,col,id),{editAllowedByAdmin:true,editPermissionAt:serverTimestamp(),editPermissionBy:state.user.uid,editPermissionByName:state.profile.name||state.profile.displayName||''}); await writeAudit('grant_edit','فتح تعديل بإذن الإدارة',{col,id}); await loadData(); toast('تم فتح التعديل.');}
-  window.openEdit=(col,id)=>{const item=getEditableItem(col,id); if(!canEditItem(col,item)){toast('التعديل مقفول. يحتاج إذن الإدارة.');return;} const isDel=col==='deliveries'; const officeOpts=`<option value="">اختر المكتب</option>`+officesForCurrentRole().map(o=>`<option value="${esc(o.id)}" ${item.officeId===o.id?'selected':''}>${esc(o.name)} — ${esc(o.region)}</option>`).join(''); $("modalTitle").textContent=isDel?'تعديل التسليم':'تعديل المبيع'; $("modalBody").innerHTML=`<div class="formGrid"><div><label>التاريخ</label><input type="date" id="editDate" value="${esc(item.date||today)}"></div>${isDel?`<div><label>المكتب</label><select id="editOffice" ${!isPendingStatus(item.status)&&!item.editAllowedByAdmin?'disabled':''}>${officeOpts}</select></div>`:''}<div class="sypFocus"><label>المبلغ السوري</label><input type="text" id="editSyp" class="moneyInput" inputmode="numeric" value="${fmt(item.amountSyp)}"></div><div><label>USD</label><input type="number" id="editUsd" min="0" value="${n(item.amountUsd)}"></div><div><label>سعر الصرف</label><input type="number" id="editRate" min="0" value="${n(item.exchangeRate)||15000}"></div><div class="full"><label>ملاحظات</label><textarea id="editNotes">${esc(item.notes||'')}</textarea></div><div class="full editHint">إذا كان التسليم مؤكداً، أول تعديل بإذن عماد يرجّعه لقيد المطابقة حتى يراجعه عماد من جديد.</div><button class="full" onclick="saveEdit('${col}','${id}')">حفظ التعديل</button></div><div class="msg" id="editMsg"></div>`; $("modal").classList.add('show'); const e=$("editSyp"); if(e)e.addEventListener('input',()=>{e.value=n(e.value)?fmt(n(e.value)):''});}
+  window.openEdit=(col,id)=>{const item=getEditableItem(col,id); if(!canEditItem(col,item)){toast('التعديل مقفول. يحتاج إذن الإدارة.');return;} const isDel=col==='deliveries'; const officeOpts=`<option value="">اختر المكتب</option>`+officesForCurrentRole().map(o=>`<option value="${esc(o.id)}" ${item.officeId===o.id?'selected':''}>${esc(o.name)} — ${esc(o.region)}</option>`).join(''); $("modalTitle").textContent=isDel?'تعديل التسليم':'تعديل المبيع'; $("modalBody").innerHTML=`<div class="formGrid"><div><label>التاريخ</label><input type="date" id="editDate" value="${esc(item.date||today)}"></div>${isDel?`<div><label>المكتب</label><select id="editOffice" ${!isPendingStatus(item.status)&&!item.editAllowedByAdmin?'disabled':''}>${officeOpts}</select></div>`:''}<div class="sypFocus"><label>المبلغ السوري</label><input type="text" id="editSyp" class="moneyInput" inputmode="numeric" value="${fmt(item.amountSyp)}"></div><div><label>USD</label><input type="number" id="editUsd" min="0" value="${n(item.amountUsd)}"></div><div><label>سعر الصرف</label><input type="number" id="editRate" min="0" value="${n(item.exchangeRate)||15000}"></div><div class="full"><label>ملاحظات</label><textarea id="editNotes">${esc(item.notes||'')}</textarea></div><div class="full editHint">إذا كان التسليم مؤكداً، أول تعديل بإذن الإدارة يرجّعه لقيد المطابقة حتى تتم مراجعته من جديد.</div><button class="full" onclick="saveEdit('${col}','${id}')">حفظ التعديل</button></div><div class="msg" id="editMsg"></div>`; $("modal").classList.add('show'); const e=$("editSyp"); if(e)e.addEventListener('input',()=>{e.value=n(e.value)?fmt(n(e.value)):''});}
   window.saveEdit=async(col,id)=>{try{const item=getEditableItem(col,id); if(!canEditItem(col,item))throw new Error('التعديل مقفول. يحتاج إذن الإدارة.'); const data={date:$("editDate").value||today,amountSyp:n($("editSyp").value),amountUsd:n($("editUsd").value),exchangeRate:n($("editUsd").value)>0?n($("editRate").value):0,notes:$("editNotes").value.trim(),editedAt:serverTimestamp(),editedBy:state.user.uid,editedByName:state.profile.name||state.profile.displayName||'',editCount:n(item.editCount)+1}; if(data.amountSyp<=0&&data.amountUsd<=0)throw new Error('اكتب المبلغ.'); if(col==='deliveries'){const office=state.offices.find(o=>o.id===$("editOffice")?.value)||state.offices.find(o=>o.id===item.officeId); if(office){data.officeId=office.id;data.officeName=office.name;} if(!isPendingStatus(item.status)){data.previousStatus=item.status;data.status="pending_admin";data.reopenedByEdit=true;data.officeConfirmedSyp=0;data.differenceSyp=0;} } if(item.editAllowedByAdmin){data.editAllowedByAdmin=false;data.editUsedAt=serverTimestamp();} await updateDoc(doc(db,col,id),data); await writeAudit('edit_record','تعديل عملية',{col,id}); $("modal").classList.remove('show'); await loadData(); toast('تم حفظ التعديل.');}catch(e){msg($("editMsg"),'error',e.message)}}
   function isMyOfficeDelivery(d){return state.profile?.role==="office"&&(d.officeId===state.profile.officeId||d.officeName===state.profile.officeName)}
   window.deliveryAction=async(act,id)=>{const d=state.deliveries.find(x=>x.id===id); if(!d)return; if(['confirm','diff','approve','delete'].includes(act)&&!isAdmin()){toast('هذا الإجراء للإدارة فقط.');return;} if(act==='confirm')await updateDoc(doc(db,'deliveries',id),{status:'admin_confirmed',adminConfirmedSyp:n(d.amountSyp),officeConfirmedSyp:n(d.amountSyp),adminConfirmedAt:serverTimestamp(),adminConfirmedBy:state.user.uid,adminConfirmedByName:'',matchedByAdmin:true}); if(act==='diff'){const val=prompt('اكتب المبلغ الصحيح SYP بعد المطابقة:'); if(val===null)return; await updateDoc(doc(db,'deliveries',id),{status:'difference',adminConfirmedSyp:n(val),officeConfirmedSyp:n(val),differenceSyp:n(d.amountSyp)-n(val),adminConfirmedAt:serverTimestamp(),adminConfirmedBy:state.user.uid,adminConfirmedByName:'',matchedByAdmin:true});} if(act==='approve')await updateDoc(doc(db,'deliveries',id),{status:'approved',approvedAt:serverTimestamp(),approvedBy:state.user.uid,approvedByName:''}); if(act==='delete'){const r=prompt('سبب نقل التسليم إلى السلة:'); if(r===null)return; await softDelete('deliveries',id,`حذف تسليم ${d.representativeName}`,r); return;} await writeAudit('delivery_action',`إجراء تسليم من الإدارة: ${act}`,{id,office:d.officeName,representative:d.representativeName}); await loadData();}
@@ -1404,7 +1676,7 @@ function buildIssues(){
   function updateLives(){ if($("saleLive"))$("saleLive").textContent=`${fmt(n($("saleSyp").value))} SYP`; if($("deliveryLive"))$("deliveryLive").textContent=`${fmt(n($("deliverySyp").value))} SYP`; }
   function saveDrafts(){ ['saleSyp','saleNotes','deliverySyp','deliveryNotes'].forEach(id=>{if($(id))localStorage.setItem('arsel_draft_'+id,$(id).value||'')})} function restoreDrafts(){ ['saleSyp','saleNotes','deliverySyp','deliveryNotes'].forEach(id=>{if($(id)){const v=localStorage.getItem('arsel_draft_'+id); if(v)$(id).value=v}}); updateLives(); }
   function setUsdMode(kind,on){const box=$(kind+'UsdBox'),wrap=$(kind+'RateWrap'),btn=$(kind==='sale'?'toggleSaleUsd':'toggleDeliveryUsd'),usd=$(kind+'Usd'); if(!box||!btn)return; box.classList.toggle('show',!!on); if(wrap)wrap.classList.toggle('hide',!on); btn.textContent=on?'إخفاء العملة الثانية':'إضافة عملة ثانية'; if(!on&&usd)usd.value=0;}
-  function setupUi(){ const smartRender=debounce(renderAll,160); $("toggleSaleUsd").onclick=()=>setUsdMode('sale',!$("saleUsdBox").classList.contains('show')); $("toggleDeliveryUsd").onclick=()=>setUsdMode('delivery',!$("deliveryUsdBox").classList.contains('show')); ["salesSearch","deliveriesSearch","repMatchSearch","officeMatchSearch","officeWalletSearch"].forEach(id=>{if($(id))$(id).oninput=smartRender}); ["repMatchRegion","officeMatchRegion","officeWalletRegion"].forEach(id=>{if($(id))$(id).onchange=renderAll});
+  function setupUi(){ const smartRender=debounce(renderAll,160); $("toggleSaleUsd").onclick=()=>setUsdMode('sale',!$("saleUsdBox").classList.contains('show')); $("toggleDeliveryUsd").onclick=()=>setUsdMode('delivery',!$("deliveryUsdBox").classList.contains('show')); ["salesSearch","deliveriesSearch","repMatchSearch","officeMatchSearch","officeWalletSearch","cashboxSearch","cashboxFrom","cashboxTo"].forEach(id=>{if($(id))$(id).oninput=smartRender}); ["repMatchRegion","officeMatchRegion","officeWalletRegion","cashboxFilterType","cashboxPartyFilter","cashboxFilterRange"].forEach(id=>{if($(id))$(id).onchange=renderAll});
     ["auditSearch","auditFrom","auditTo"].forEach(id=>{if($(id))$(id).oninput=()=>{state.auditPage=1;renderAudit()}});
     ["auditRange","auditType","auditRole","auditSort","auditPageSize"].forEach(id=>{if($(id))$(id).onchange=()=>{state.auditPage=1;renderAudit()}});
     if($("auditPrev"))$("auditPrev").onclick=()=>{state.auditPage=Math.max(1,(state.auditPage||1)-1);renderAudit()};
@@ -1414,8 +1686,8 @@ function buildIssues(){
     if($("auditDeleteVisibleLogins"))$("auditDeleteVisibleLogins").onclick=()=>deleteVisibleAuditLogs('login');
     if($("auditDeleteVisible"))$("auditDeleteVisible").onclick=()=>deleteVisibleAuditLogs('visible');
 
-    ["aiRange","aiDate"].forEach(id=>{if($(id))$(id).onchange=()=>{renderAdminAI();runAiAsk();}});
-    if($('aiRefreshBtn'))$('aiRefreshBtn').onclick=()=>{renderAdminAI();runAiAsk();toast('تم تحديث التحليل')};
+    ["aiRange","aiDate"].forEach(id=>{if($(id))$(id).onchange=()=>{renderAdminAI();}});
+    if($('aiRefreshBtn'))$('aiRefreshBtn').onclick=()=>{renderAdminAI();toast('تم تحديث التحليل')};
     if($('aiAskBtn'))$('aiAskBtn').onclick=runAiAsk;
     if($('aiQuestion'))$('aiQuestion').addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();runAiAsk();}});
     if($('aiCopyBtn'))$('aiCopyBtn').onclick=()=>copyText($('aiAnswer')?.textContent||'');
@@ -1423,8 +1695,10 @@ function buildIssues(){
     if($('aiModel')){$('aiModel').value=localStorage.getItem('arsel_openai_model')||'gpt-4o-mini'; $('aiModel').onchange=()=>{localStorage.setItem('arsel_openai_model',$('aiModel').value); advSetApiStatus('تم اختيار الموديل: '+$('aiModel').value,'info');};}
     if($('aiSaveKeyBtn'))$('aiSaveKeyBtn').onclick=()=>{localStorage.setItem('arsel_openai_key',($('aiOpenAiKey')?.value||'').trim());toast('تم حفظ المفتاح على هذا الجهاز فقط');advSetApiStatus('تم حفظ المفتاح. اضغط اختبار ChatGPT للتأكد.','ok')};
     if($('aiTestKeyBtn'))$('aiTestKeyBtn').onclick=testOpenAiKey;
+    if($('copyCashboxReportBtn'))$('copyCashboxReportBtn').onclick=copyCashboxReport;
+    if($('exportCashboxCsvBtn'))$('exportCashboxCsvBtn').onclick=exportCashboxCsv;
 
-    $("applyCmdFilter").onclick=()=>{state.filters={from:$("cmdFrom").value,to:$("cmdTo").value,region:$("cmdRegion").value}; renderAll()}; $("resetCmdFilter").onclick=()=>{state.filters={from:'',to:'',region:''};["cmdFrom","cmdTo","cmdRegion"].forEach(id=>$(id).value='');renderAll()}; $("manualTargetType").onchange=()=>{$("manualOfficeWrap").classList.toggle('hide',$("manualTargetType").value!=='office');$("manualRepWrap").classList.toggle('hide',$("manualTargetType").value!=='representative')}; $("closeModal").onclick=()=>$("modal").classList.remove('show'); if($("themeSelect"))$("themeSelect").onchange=()=>setTheme($("themeSelect").value,true); if($("emptyTrashBtn"))$("emptyTrashBtn").onclick=()=>emptyTrash(); if($("refreshTrashBtn"))$("refreshTrashBtn").onclick=()=>loadData(); ["walletOffice","walletOperation","walletSyp","walletUsd","walletRate","cashboxOperation","cashboxSyp","cashboxUsd","cashboxRate"].forEach(id=>{if($(id)){const ev=id==="walletOffice"||id==="walletOperation"||id==="cashboxOperation"?"change":"input";$(id).addEventListener(ev,()=>{updateWalletPreview();updateCashboxPreview();})}}); $("refreshBtn").onclick=()=>withBusy('refreshBtn','جاري التحديث...',async()=>{await loadBase();await loadData();toast('تم التحديث')}); $("quickCopyBtn").onclick=copyWhatsappSummary; $("copyManagerWhatsapp").onclick=copyWhatsappSummary; $("copyIssuesBtn").onclick=()=>copyText(buildIssuesText()); $("enableSoundBtn").onclick=()=>{state.sound=!state.sound;toast(state.sound?'تم تشغيل صوت التنبيه':'تم إيقاف صوت التنبيه')}; $("exportSalesCsv").onclick=()=>downloadCsv('sales.csv',live(state.sales)); $("exportDeliveriesCsv").onclick=()=>downloadCsv('deliveries.csv',live(state.deliveries)); $("exportPdfBtn").onclick=()=>withBusy('exportPdfBtn','جاري تجهيز PDF...',()=>exportPdf($("pdfReportType").value)); $("quickFullPdf").onclick=()=>withBusy('quickFullPdf','تجهيز...',()=>exportPdf('full')); $("quickRepPdf").onclick=()=>withBusy('quickRepPdf','تجهيز...',()=>exportPdf('reps')); $("quickOfficePdf").onclick=()=>withBusy('quickOfficePdf','تجهيز...',()=>exportPdf('offices')); $("quickIssuesPdf").onclick=()=>withBusy('quickIssuesPdf','تجهيز...',()=>exportPdf('issues')); }
+    $("applyCmdFilter").onclick=()=>{state.filters={from:$("cmdFrom").value,to:$("cmdTo").value,region:$("cmdRegion").value}; renderAll()}; $("resetCmdFilter").onclick=()=>{state.filters={from:'',to:'',region:''};["cmdFrom","cmdTo","cmdRegion"].forEach(id=>$(id).value='');renderAll()}; $("manualTargetType").onchange=()=>{$("manualOfficeWrap").classList.toggle('hide',$("manualTargetType").value!=='office');$("manualRepWrap").classList.toggle('hide',$("manualTargetType").value!=='representative')}; $("closeModal").onclick=()=>$("modal").classList.remove('show'); if($("themeSelect"))$("themeSelect").onchange=()=>setTheme($("themeSelect").value,true); if($("emptyTrashBtn"))$("emptyTrashBtn").onclick=()=>emptyTrash(); if($("refreshTrashBtn"))$("refreshTrashBtn").onclick=()=>loadData(); ["walletOffice","walletOperation","walletSyp","walletUsd","walletRate","cashboxOperation","cashboxSyp","cashboxUsd","cashboxRate","cashboxPartyType","cashboxCategory"].forEach(id=>{if($(id)){const ev=id==="walletOffice"||id==="walletOperation"||id==="cashboxOperation"?"change":"input";$(id).addEventListener(ev,()=>{updateWalletPreview();updateCashboxPreview();})}}); $("refreshBtn").onclick=()=>withBusy('refreshBtn','جاري التحديث...',async()=>{await loadBase();await loadData();toast('تم التحديث')}); $("quickCopyBtn").onclick=copyWhatsappSummary; $("copyManagerWhatsapp").onclick=copyWhatsappSummary; $("copyIssuesBtn").onclick=()=>copyText(buildIssuesText()); $("enableSoundBtn").onclick=()=>{state.sound=!state.sound;toast(state.sound?'تم تشغيل صوت التنبيه':'تم إيقاف صوت التنبيه')}; $("exportSalesCsv").onclick=()=>downloadCsv('sales.csv',live(state.sales)); $("exportDeliveriesCsv").onclick=()=>downloadCsv('deliveries.csv',live(state.deliveries)); $("exportPdfBtn").onclick=()=>withBusy('exportPdfBtn','جاري تجهيز PDF...',()=>exportPdf($("pdfReportType").value)); $("quickFullPdf").onclick=()=>withBusy('quickFullPdf','تجهيز...',()=>exportPdf('full')); $("quickRepPdf").onclick=()=>withBusy('quickRepPdf','تجهيز...',()=>exportPdf('reps')); $("quickOfficePdf").onclick=()=>withBusy('quickOfficePdf','تجهيز...',()=>exportPdf('offices')); $("quickIssuesPdf").onclick=()=>withBusy('quickIssuesPdf','تجهيز...',()=>exportPdf('issues')); }
   async function saveSale(){try{if(state.profile.role!=="representative")throw new Error('هذا الإجراء للمندوب فقط.'); const syp=n($("saleSyp").value), usd=n($("saleUsd").value), rate=usd>0?n($("saleRate").value):0; if(syp<=0&&usd<=0)throw new Error('اكتب المبلغ السوري.'); if(usd>0&&rate<=0)throw new Error('اكتب سعر الصرف.'); await addDoc(collection(db,'sales_reports'),{representativeId:state.profile.representativeId,representativeName:state.profile.representativeName||state.profile.name,region:state.profile.region,date:$("saleDate").value||today,amountSyp:syp,amountUsd:usd,exchangeRate:rate,notes:$("saleNotes").value.trim(),createdBy:state.user.uid,createdAt:serverTimestamp(),editAllowedByAdmin:false}); await writeAudit('create_sale','تسجيل مبيع مندوب'); ['saleSyp','saleUsd','saleNotes'].forEach(id=>{localStorage.removeItem('arsel_draft_'+id);$(id).value=id.includes('Usd')?0:''}); setUsdMode('sale',false); updateLives(); msg($("saleMsg"),'ok','تم حفظ المبيع.'); await loadData();}catch(e){msg($("saleMsg"),'error',e.message)}}
   async function saveDelivery(){try{if(state.profile.role!=="representative")throw new Error('هذا الإجراء للمندوب فقط.'); const office=state.offices.find(o=>o.id===$("deliveryOffice").value); if(!office)throw new Error('اختر المكتب.'); if(!officesForCurrentRole().some(o=>o.id===office.id))throw new Error('هذا المكتب غير متاح لهذا الحساب.'); const syp=n($("deliverySyp").value), usd=n($("deliveryUsd").value), rate=usd>0?n($("deliveryRate").value):0; if(syp<=0&&usd<=0)throw new Error('اكتب المبلغ السوري.'); if(usd>0&&rate<=0)throw new Error('اكتب سعر الصرف.'); await addDoc(collection(db,'deliveries'),{representativeId:state.profile.representativeId,representativeName:state.profile.representativeName||state.profile.name,representativeUid:state.user.uid,region:state.profile.region,officeId:office.id,officeName:office.name,date:$("deliveryDate").value||today,amountSyp:syp,amountUsd:usd,exchangeRate:rate,notes:$("deliveryNotes").value.trim(),status:'pending_admin',createdBy:state.user.uid,createdAt:serverTimestamp(),editAllowedByAdmin:false}); await writeAudit('create_delivery',`تسليم من ${state.profile.name} إلى ${office.name}`); ['deliverySyp','deliveryUsd','deliveryNotes'].forEach(id=>{localStorage.removeItem('arsel_draft_'+id);$(id).value=id.includes('Usd')?0:''}); setUsdMode('delivery',false); updateLives(); msg($("deliveryMsg"),'ok','تم حفظ التسليم ودخل على حساب المكتب قيد المطابقة.'); await loadData();}catch(e){msg($("deliveryMsg"),'error',e.message)}}
   async function saveManual(){try{if(!isManager())throw new Error('الصلاحية غير كافية.'); let targetType=$("manualTargetType").value,targetId='',targetName='عام'; if(targetType==='office'){const o=state.offices.find(x=>x.id===$("manualOffice").value); if(!o)throw new Error('اختر المكتب.'); targetId=o.id; targetName=o.name;} if(targetType==='representative'){const r=state.reps.find(x=>x.id===$("manualRep").value); if(!r)throw new Error('اختر المندوب.'); targetId=r.id; targetName=r.name;} await addDoc(collection(db,'manual_amounts'),{type:$("manualType").value,targetType,targetId,targetName,date:$("manualDate").value||today,amountSyp:n($("manualSyp").value),amountUsd:n($("manualUsd").value),exchangeRate:n($("manualRate").value),notes:$("manualNotes").value.trim(),actorUid:state.user.uid,actorName:state.profile.name||state.profile.displayName||'',createdAt:serverTimestamp()}); await writeAudit('manual_amount','إضافة مبلغ يدوي'); ['manualSyp','manualUsd','manualNotes'].forEach(id=>$(id).value=''); msg($("manualMsg"),'ok','تم حفظ المبلغ.'); await loadData();}catch(e){msg($("manualMsg"),'error',e.message)}}
@@ -1461,20 +1735,32 @@ function buildIssues(){
     }catch(e){msg($('walletMsg'),'error',e.message)}
   }
   async function saveClosing(){try{if(!isManager()&&state.profile.role!=='office')throw new Error('الصلاحية غير كافية.'); let office=state.offices.find(o=>o.id===$("closingOffice").value); if(state.profile.role==='office'){office=state.offices.find(o=>o.id===state.profile.officeId||o.name===state.profile.officeName)||office; if(!office)throw new Error('حساب المكتب غير مربوط بمكتب داخل Firestore.'); if($("closingOffice"))$("closingOffice").value=office.id;} if(!office)throw new Error('اختر المكتب.'); const date=$("closingDate").value||today; const od=live(state.deliveries).filter(d=>(d.officeId===office.id||d.officeName===office.name)&&d.date===date); const total=od.reduce((a,x)=>a+n(x.amountSyp),0), confirmed=od.filter(d=>isConfirmedStatus(d)).reduce((a,x)=>a+n(x.officeConfirmedSyp||x.amountSyp),0), pending=od.filter(d=>isPendingStatus(d.status)).reduce((a,x)=>a+n(x.amountSyp),0), diff=od.filter(d=>d.status==='difference').reduce((a,x)=>a+Math.abs(n(x.differenceSyp||0)),0); const status=(pending>0||diff>0)?'needs_review':'created'; await addDoc(collection(db,'day_closings'),{date,officeId:office.id,officeName:office.name,region:office.region,totalSyp:total,confirmedSyp:confirmed,pendingSyp:pending,differenceSyp:diff,status,matchOk:pending<=0&&diff<=0,notes:$("closingNotes").value.trim(),createdBy:state.user.uid,createdByName:state.profile.name||'',createdAt:serverTimestamp()}); await writeAudit('day_closing','إنشاء إقفال يومي',{office:office.name,date,status,pending,diff}); $("closingNotes").value=''; msg($("closingMsg"),status==='needs_review'?'warn':'ok',status==='needs_review'?'تم إنشاء الإقفال وفيه بنود تحتاج مراجعة.':'تم إنشاء الإقفال.'); await loadData();}catch(e){msg($("closingMsg"),'error',e.message)}}
-  async function saveSettings(){try{if(!isAdmin())throw new Error('هذه الصفحة للإدارة فقط.'); const data={appName:$("settingAppName").value||'أرسل',currency:$("settingCurrency").value||'SYP',ownerName:$("settingOwner").value||'عماد',assistantName:$("settingAssistant").value||'فرهاد',largeAmount:n($("settingLargeAmount").value)||5000000,pendingHours:n($("settingPendingHours").value)||24,theme:$("settingTheme")?.value||state.settings.theme||"auto",updatedAt:serverTimestamp(),updatedBy:state.user.uid}; await setDoc(doc(db,'app_settings','main'),data,{merge:true}); state.settings={...state.settings,...data}; await writeAudit('settings','تعديل الإعدادات'); msg($("settingsMsg"),'ok','تم حفظ الإعدادات.'); renderAll();}catch(e){msg($("settingsMsg"),'error',e.message)}}
+  async function saveSettings(){try{if(!isAdmin())throw new Error('هذه الصفحة للإدارة فقط.'); const data={appName:$("settingAppName").value||'أرسل',currency:$("settingCurrency").value||'SYP',ownerName:$("settingOwner").value||'المدير',assistantName:$("settingAssistant").value||'مساعد الإدارة',largeAmount:n($("settingLargeAmount").value)||5000000,pendingHours:n($("settingPendingHours").value)||24,theme:$("settingTheme")?.value||state.settings.theme||"auto",updatedAt:serverTimestamp(),updatedBy:state.user.uid}; await setDoc(doc(db,'app_settings','main'),data,{merge:true}); state.settings={...state.settings,...data}; await writeAudit('settings','تعديل الإعدادات'); msg($("settingsMsg"),'ok','تم حفظ الإعدادات.'); renderAll();}catch(e){msg($("settingsMsg"),'error',e.message)}}
   async function addEntity(){try{if(!isAdmin())throw new Error('هذه الصلاحية للإدارة فقط.'); const type=$("entityType").value, name=$("entityName").value.trim(), email=$("entityEmail").value.trim(), region=$("entityRegion").value; if(!name)throw new Error('اكتب الاسم.'); const col=type==='office'?'offices':'representatives'; const data={name,email,region,createdAt:serverTimestamp(),createdBy:state.user.uid}; await addDoc(collection(db,col),data); await writeAudit('add_entity',`إضافة ${type==='office'?'مكتب':'مندوب'} ${name}`); $("entityName").value='';$("entityEmail").value=''; msg($("entityMsg"),'ok','تمت الإضافة.'); await loadBase(); await loadData();}catch(e){msg($("entityMsg"),'error',e.message)}}
   function buildIssuesText(){const list=buildIssues(); return list.length?list.map((i,idx)=>`${idx+1}) ${i[1]} — ${i[2]} — ${i[3]}`).join('\n'):'لا توجد مشاكل حالياً.'}
   function buildWhatsappSummary(){const c=calc(); return `تقرير أرسل — ${today}\nالمبيع اليوم: ${fmt(c.totalSalesToday)} SYP\nالتسليم المؤكد اليوم: ${fmt(c.confirmedToday)} SYP\nقيد المطابقة: ${fmt(c.pending)} SYP (${c.pendingCount})\nالفروقات: ${c.diffCount}\nالمتبقي الكلي: ${fmt(c.remain)} SYP`}
   async function copyText(t){try{await navigator.clipboard.writeText(t);toast('تم النسخ')}catch(_){prompt('انسخ النص:',t)}} function copyWhatsappSummary(){copyText(buildWhatsappSummary())}
   function downloadCsv(name,rows){const keys=[...new Set(rows.flatMap(o=>Object.keys(o).filter(k=>typeof o[k]!=='object')))], csv=[keys.join(',')].concat(rows.map(r=>keys.map(k=>`"${String(r[k]??'').replace(/"/g,'""')}"`).join(','))).join('\n'); const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'})); a.download=name; a.click(); URL.revokeObjectURL(a.href)}
   function pdfTable(title,headers,rows){return `<div class="pdfSection"><div class="pdfTitle">${title}</div><table class="pdfTable"><thead><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.length?rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join(''):`<tr><td colspan="${headers.length}">لا توجد بيانات</td></tr>`}</tbody></table></div>`}
-  async function exportPdf(type='full'){try{await ensurePdfLibs(); if(!window.html2canvas||!window.jspdf)throw new Error('مكتبات PDF لم تحمل بعد.'); const c=calc(); const title=$("pdfTitleInput").value||({full:'تقرير شامل',reps:'مطابقة المندوبين',offices:'مطابقة المكاتب',issues:'مشاكل اليوم',closing:'إقفال اليوم'}[type]||'تقرير'); let body=`<div class="pdfHead"><div><div class="pdfBrand">أرسل</div><div class="pdfSub">${title}<br>تقرير مولد من Command Center v20 Cashbox Fix</div></div><div class="pdfMeta">Date: ${$("pdfDate").value||today}<br>User: ${esc(state.profile.name||state.user.email)}<br>Project: mandob-app-82843</div></div><div class="pdfGrid">${[['مبيع اليوم',fmt(c.totalSalesToday)],['المؤكد اليوم',fmt(c.confirmedToday)],['قيد المطابقة',fmt(c.pending)],['المتبقي',fmt(c.remain)]].map(x=>`<div class="pdfKpi"><div class="k">${x[0]}</div><div class="v">${x[1]}</div></div>`).join('')}</div>`; if(type==='full'||type==='reps') body+=pdfTable('مطابقة المندوبين',['المندوب','المنطقة','المبيع','المؤكد','المتبقي'],state.reps.map(r=>{const rs=live(state.sales).filter(s=>s.representativeId===r.id||s.representativeName===r.name),rd=live(state.deliveries).filter(d=>d.representativeId===r.id||d.representativeName===r.name);const s=rs.reduce((a,x)=>a+n(x.amountSyp),0),co=rd.filter(d=>isConfirmedStatus(d)).reduce((a,x)=>a+n(x.officeConfirmedSyp||x.amountSyp),0);return[esc(r.name),esc(r.region),fmt(s),fmt(co),fmt(s-co)]})); if(type==='full'||type==='offices') body+=pdfTable('مطابقة المكاتب',['المكتب','المنطقة','المؤكد','السحوبات','الرصيد'],state.offices.map(o=>{const od=live(state.deliveries).filter(d=>d.officeId===o.id||d.officeName===o.name),ow=live(state.withdrawals).filter(w=>w.officeId===o.id||w.officeName===o.name);const co=od.filter(d=>isConfirmedStatus(d)).reduce((a,x)=>a+n(x.officeConfirmedSyp||x.amountSyp),0),wd=ow.reduce((a,x)=>a+n(x.amountSyp),0);return[esc(o.name),esc(o.region),fmt(co),fmt(wd),fmt(co-wd)]})); if(type==='full'||type==='issues') body+=pdfTable('المشاكل والتنبيهات',['الخطورة','النوع','التفصيل','القيمة','الحالة'],buildIssues().map(i=>[i[0],i[1],esc(i[2]),i[3],i[4]])); if(type==='closing') body+=pdfTable('إقفالات اليوم',['التاريخ','المكتب','الحالة','المبلغ'],live(state.closings).filter(x=>x.date===($("pdfDate").value||today)).map(x=>[x.date,esc(x.officeName),esc(x.status),fmt(x.totalSyp)])); const div=document.createElement('div'); div.className='pdfReport'; div.innerHTML=body+`<div class="pdfFoot">أرسل — تقرير داخلي</div>`; $("pdfHiddenArea").innerHTML=''; $("pdfHiddenArea").appendChild(div); const canvas=await html2canvas(div,{scale:window.innerWidth<760?1.35:2,backgroundColor:'#f8fafc',useCORS:true}); const img=canvas.toDataURL('image/jpeg',0.95); const {jsPDF}=window.jspdf; const pdf=new jsPDF('p','mm','a4'); const pageW=210,pageH=297; const imgH=canvas.height*pageW/canvas.width; let y=0; pdf.addImage(img,'JPEG',0,y,pageW,imgH); let left=imgH-pageH; while(left>0){pdf.addPage(); y-=pageH; pdf.addImage(img,'JPEG',0,y,pageW,imgH); left-=pageH;} pdf.save(`arsel_${type}_${today}.pdf`); msg($("pdfMsg"),'ok','تم تصدير PDF.');}catch(e){msg($("pdfMsg"),'error',e.message)}}
+  async function exportPdf(type='full'){try{await ensurePdfLibs(); if(!window.html2canvas||!window.jspdf)throw new Error('مكتبات PDF لم تحمل بعد.'); const c=calc(); const title=$("pdfTitleInput").value||({full:'تقرير شامل',reps:'مطابقة المندوبين',offices:'مطابقة المكاتب',issues:'مشاكل اليوم',closing:'إقفال اليوم'}[type]||'تقرير'); let body=`<div class="pdfHead"><div><div class="pdfBrand">أرسل</div><div class="pdfSub">${title}<br>تقرير مولد من Command Center v23 Cashbox AI Max</div></div><div class="pdfMeta">Date: ${$("pdfDate").value||today}<br>User: ${esc(state.profile.name||state.user.email)}<br>Project: mandob-app-82843</div></div><div class="pdfGrid">${[['مبيع اليوم',fmt(c.totalSalesToday)],['المؤكد اليوم',fmt(c.confirmedToday)],['قيد المطابقة',fmt(c.pending)],['المتبقي',fmt(c.remain)]].map(x=>`<div class="pdfKpi"><div class="k">${x[0]}</div><div class="v">${x[1]}</div></div>`).join('')}</div>`; if(type==='full'||type==='reps') body+=pdfTable('مطابقة المندوبين',['المندوب','المنطقة','المبيع','المؤكد','المتبقي'],state.reps.map(r=>{const rs=live(state.sales).filter(s=>s.representativeId===r.id||s.representativeName===r.name),rd=live(state.deliveries).filter(d=>d.representativeId===r.id||d.representativeName===r.name);const s=rs.reduce((a,x)=>a+n(x.amountSyp),0),co=rd.filter(d=>isConfirmedStatus(d)).reduce((a,x)=>a+n(x.officeConfirmedSyp||x.amountSyp),0);return[esc(r.name),esc(r.region),fmt(s),fmt(co),fmt(s-co)]})); if(type==='full'||type==='offices') body+=pdfTable('مطابقة المكاتب',['المكتب','المنطقة','المؤكد','السحوبات','الرصيد'],state.offices.map(o=>{const od=live(state.deliveries).filter(d=>d.officeId===o.id||d.officeName===o.name),ow=live(state.withdrawals).filter(w=>w.officeId===o.id||w.officeName===o.name);const co=od.filter(d=>isConfirmedStatus(d)).reduce((a,x)=>a+n(x.officeConfirmedSyp||x.amountSyp),0),wd=ow.reduce((a,x)=>a+n(x.amountSyp),0);return[esc(o.name),esc(o.region),fmt(co),fmt(wd),fmt(co-wd)]})); if(type==='full'||type==='issues') body+=pdfTable('المشاكل والتنبيهات',['الخطورة','النوع','التفصيل','القيمة','الحالة'],buildIssues().map(i=>[i[0],i[1],esc(i[2]),i[3],i[4]])); if(type==='closing') body+=pdfTable('إقفالات اليوم',['التاريخ','المكتب','الحالة','المبلغ'],live(state.closings).filter(x=>x.date===($("pdfDate").value||today)).map(x=>[x.date,esc(x.officeName),esc(x.status),fmt(x.totalSyp)])); const div=document.createElement('div'); div.className='pdfReport'; div.innerHTML=body+`<div class="pdfFoot">أرسل — تقرير داخلي</div>`; $("pdfHiddenArea").innerHTML=''; $("pdfHiddenArea").appendChild(div); const canvas=await html2canvas(div,{scale:window.innerWidth<760?1.35:2,backgroundColor:'#f8fafc',useCORS:true}); const img=canvas.toDataURL('image/jpeg',0.95); const {jsPDF}=window.jspdf; const pdf=new jsPDF('p','mm','a4'); const pageW=210,pageH=297; const imgH=canvas.height*pageW/canvas.width; let y=0; pdf.addImage(img,'JPEG',0,y,pageW,imgH); let left=imgH-pageH; while(left>0){pdf.addPage(); y-=pageH; pdf.addImage(img,'JPEG',0,y,pageW,imgH); left-=pageH;} pdf.save(`arsel_${type}_${today}.pdf`); msg($("pdfMsg"),'ok','تم تصدير PDF.');}catch(e){msg($("pdfMsg"),'error',e.message)}}
 
   $("loginBtn").onclick=()=>withBusy('loginBtn','جاري الدخول...',async()=>{try{msg($("loginMsg"),'warn','جاري الدخول...'); await setPersistence(auth,browserLocalPersistence); const res=await signInWithEmailAndPassword(auth,$("email").value.trim(),$("password").value.trim()); state.user=res.user; state.profile=await getUserProfile(res.user); $("loginPage").style.display='none'; $("appPage").classList.add('show'); $("whoText").textContent=`${state.profile.name||state.profile.displayName||res.user.email} — ${roleLabel(state.profile.role)}`; setNav(); await loadBase(); await loadData(); restoreDrafts(); await writeAudit('login','تسجيل دخول');}catch(e){msg($("loginMsg"),'error',e.message)}});
   ["email","password"].forEach(id=>$(id).addEventListener('keydown',e=>{if(e.key==='Enter')$("loginBtn").click()})); $("logoutBtn").onclick=()=>withBusy('logoutBtn','خروج...',async()=>{await signOut(auth); location.reload()});
   $("saveSaleBtn").onclick=()=>withBusy('saveSaleBtn','جاري حفظ المبيع...',saveSale); $("saveDeliveryBtn").onclick=()=>withBusy('saveDeliveryBtn','جاري حفظ التسليم...',saveDelivery); $("saveManualBtn").onclick=()=>withBusy('saveManualBtn','جاري الحفظ...',saveManual); $("saveClosingBtn").onclick=()=>withBusy('saveClosingBtn','جاري الإقفال...',saveClosing); $("saveSettingsBtn").onclick=()=>withBusy('saveSettingsBtn','جاري الحفظ...',saveSettings); $("addEntityBtn").onclick=()=>withBusy('addEntityBtn','جاري الإضافة...',addEntity); if($("saveWalletOpBtn"))$("saveWalletOpBtn").onclick=()=>withBusy('saveWalletOpBtn','جاري حفظ العملية...',saveOfficeWalletOp); if($("saveCashboxOpBtn"))$("saveCashboxOpBtn").onclick=()=>withBusy('saveCashboxOpBtn','جاري حفظ الحركة...',saveCashboxOp);
   onAuthStateChanged(auth,async user=>{ if(!user||state.user)return; try{state.user=user;state.profile=await getUserProfile(user);$("loginPage").style.display='none';$("appPage").classList.add('show');$("whoText").textContent=`${state.profile.name||state.profile.displayName||user.email} — ${roleLabel(state.profile.role)}`;setNav();await loadBase();await loadData();restoreDrafts();}catch(e){console.warn(e)} });
   setupInputs(); setupUi();
+</script>
+
+<script>
+(function(){
+  setTimeout(function(){
+    var btn=document.getElementById('loginBtn'), msg=document.getElementById('loginMsg');
+    if(btn && !btn.onclick && msg){
+      msg.className='msg error show';
+      msg.textContent='لم يكتمل تحميل كود الدخول. اعمل تحديث قوي للصفحة أو تأكد أن الرابط HTTPS والإنترنت شغال.';
+    }
+  },3000);
+})();
 </script>
 </body>
 </html>
