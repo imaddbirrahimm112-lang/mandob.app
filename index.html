@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <!-- v31: restored pre-royal-blue visual style from v28; no Firebase/account changes -->
-  <title>Arsel Command Center v38 Factory Reset Ledger</title>
+  <title>Arsel Command Center v45 Remove Daily Summary Cards</title>
   <style>
     :root{
       --bg:#050711;--bg2:#0d1424;--glass:rgba(255,255,255,.085);--glass2:rgba(255,255,255,.13);
@@ -376,13 +376,69 @@
     body.theme-light .sidebarToggleBtn,body.theme-auto.theme-soft-light .sidebarToggleBtn{color:#112033!important;background:rgba(255,255,255,.60)!important;border-color:rgba(37,63,95,.18)!important}
 
 
-  </style>
+
+    /* v41 Clean Dashboard: إخفاء مربعات اليوم القديمة خارج لوحة القيادة + كروت مكاتب صغيرة */
+    #statsGrid{display:none!important}
+    .v41OfficeStrip{margin-top:14px}
+    .v41OfficeMiniGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:12px}
+    .v41OfficeMini{border:1px solid var(--line);background:rgba(255,255,255,.065);border-radius:18px;padding:11px 12px;min-height:86px;display:grid;gap:5px;box-shadow:0 8px 24px rgba(0,0,0,.12)}
+    .v41OfficeMini .name{font-weight:900;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .v41OfficeMini .money{font-size:18px;font-weight:950;direction:ltr;text-align:right;white-space:nowrap}
+    .v41OfficeMini small{color:var(--muted);font-size:11px;line-height:1.45}
+    .v41OfficeMini.good{border-color:rgba(74,222,128,.26);background:rgba(74,222,128,.075)}
+    .v41OfficeMini.bad{border-color:rgba(251,113,133,.32);background:rgba(251,113,133,.085)}
+    .v41OfficeMini.zero{opacity:.78}
+    .v41OfficeTotalBadge{display:inline-flex;align-items:center;gap:7px;border-radius:999px;border:1px solid rgba(125,211,252,.28);background:rgba(125,211,252,.10);padding:7px 11px;color:#bae6fd;font-size:12px;font-weight:900;direction:ltr}
+    .v41DashboardGrid .stat{min-height:112px}
+    @media(max-width:1050px){.v41OfficeMiniGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media(max-width:620px){.v41OfficeMiniGrid{grid-template-columns:1fr}.v41DashboardGrid{grid-template-columns:1fr!important}.v41OfficeMini .money{font-size:17px}}
+
+
+    /* v42 Section Scoped Fix: الفلاتر والكروت داخل قسمها فقط */
+    .v42DashboardClean{display:grid;gap:14px}.v42DashboardClean .v42CleanHint{border:1px solid rgba(125,211,252,.24);background:rgba(125,211,252,.08);border-radius:20px;padding:13px 15px;line-height:1.8;color:var(--muted)}
+    .v42SectionHead{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap;margin-bottom:12px}.v42SectionHead h3{margin:0 0 6px}
+    .v42CommandPanel{border:1px solid rgba(125,211,252,.24);background:linear-gradient(135deg,rgba(125,211,252,.09),rgba(255,255,255,.045));border-radius:24px;padding:14px;margin:14px 0}
+    .v42CommandToolbar{display:grid;grid-template-columns:repeat(5,minmax(150px,1fr));gap:10px;align-items:end;margin-top:10px}.v42CommandToolbar button{width:100%}
+    .v42CompactGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:12px}.v42CompactStat{border:1px solid var(--line);background:rgba(255,255,255,.065);border-radius:18px;padding:12px;min-height:94px;display:grid;gap:5px}.v42CompactStat .k{font-size:12px;color:var(--muted);line-height:1.45}.v42CompactStat .v{font-size:20px;font-weight:950;direction:ltr;text-align:right}.v42CompactStat .s{font-size:11px;color:var(--muted);line-height:1.45}
+    .v42OfficeBlock{margin-top:14px;border:1px solid rgba(255,255,255,.13);background:rgba(255,255,255,.045);border-radius:22px;padding:14px}.v42OfficeHead{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:8px}.v42OfficeHead h4{margin:0}.v42MiniBadge{display:inline-flex;align-items:center;border-radius:999px;border:1px solid rgba(125,211,252,.28);background:rgba(125,211,252,.10);padding:7px 11px;color:#bae6fd;font-size:12px;font-weight:900;direction:ltr}
+    .v42OfficeMiniGrid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:9px;margin-top:10px}.v42OfficeMini{border:1px solid var(--line);background:rgba(255,255,255,.06);border-radius:16px;padding:10px 11px;min-height:78px;display:grid;gap:4px}.v42OfficeMini .name{font-weight:900;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.v42OfficeMini .money{font-size:16px;font-weight:950;direction:ltr;text-align:right;white-space:nowrap}.v42OfficeMini small{font-size:10.5px;color:var(--muted);line-height:1.4}.v42OfficeMini.good{border-color:rgba(74,222,128,.25);background:rgba(74,222,128,.075)}.v42OfficeMini.bad{border-color:rgba(251,113,133,.30);background:rgba(251,113,133,.08)}.v42OfficeMini.zero{opacity:.78}
+    @media(max-width:1050px){.v42CommandToolbar{grid-template-columns:repeat(2,minmax(0,1fr))}.v42CompactGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.v42OfficeMiniGrid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+    @media(max-width:620px){.v42CommandToolbar,.v42CompactGrid,.v42OfficeMiniGrid{grid-template-columns:1fr}.v42CompactStat .v{font-size:18px}}
+
+  
+
+    /* v43 Section Clean: dashboard, representative records, office balances */
+    .v43CoreGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:14px 0}
+    .v43FilterPanel{border:1px solid var(--line);background:rgba(255,255,255,.06);border-radius:24px;padding:14px;margin-top:14px}
+    .v43FilterBar{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;align-items:end}
+    .v43SmallGrid{display:grid;grid-template-columns:repeat(2,minmax(0,220px));gap:10px;margin:12px 0}
+    .v43MiniStat,.v43OfficeCard{background:rgba(255,255,255,.075);border:1px solid var(--line);border-radius:18px;padding:12px;box-shadow:0 10px 28px rgba(0,0,0,.14)}
+    .v43MiniStat .k,.v43OfficeCard .k{color:var(--muted);font-size:12px;line-height:1.5}
+    .v43MiniStat .v,.v43OfficeCard .v{font-size:20px;font-weight:950;direction:ltr;text-align:right;margin-top:6px}
+    .v43OfficeGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px;margin-top:12px}
+    .v43OfficeCard{min-height:86px}
+    .v43OfficeCard.good{border-color:rgba(74,222,128,.32);background:rgba(74,222,128,.08)}
+    .v43OfficeCard.bad{border-color:rgba(251,113,133,.32);background:rgba(251,113,133,.08)}
+    .v43OfficeCard.zero{opacity:.88}
+    @media(max-width:760px){.v43CoreGrid,.v43FilterBar,.v43SmallGrid{grid-template-columns:1fr}.v43OfficeGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+  
+
+    /* v44 Clean Fix: إخفاء بقايا لوحة السيطرة القديمة والتنبيهات العامة نهائياً */
+    #statsGrid,#v33Deck,#v33RecordsPulse,.v33CommandDeck,.v33RecordsPulse{display:none!important}
+    #issuesSec,#amountsSec,#diagnosticsSec{display:none!important}
+    .v44HiddenOldPanel{display:none!important}
+
+    /* v45: hide removed daily summary cards if old cached DOM appears */
+    #dailyLedgerSummary{display:none!important}
+
+</style>
 </head>
 <body>
   <section class="page" id="loginPage">
     <main class="login">
       <section class="brand">
-        <div class="logo">أ</div><h1>أرسل</h1><p class="subtitle">Command Center v36 — Cashbox USD + Transfer Commission</p>
+        <div class="logo">أ</div><h1>أرسل</h1><p class="subtitle">Command Center v42 — Section Scoped Filters</p>
       </section>
       <section class="card">
         <label for="email">البريد الإلكتروني</label><input id="email" type="email" autocomplete="username" placeholder="name@rcell.app">
@@ -406,11 +462,24 @@
         <section class="grid" id="statsGrid"></section>
 
         <section class="section active" id="dashboardSec">
-          <div class="hero">
-            <div class="card"><h2 class="bigTitle" id="dashTitle">لوحة القيادة</h2><p class="muted" style="line-height:1.9;margin-top:0" id="dashText"></p><div class="grid3" id="todayMiniGrid"></div></div>
-            <div class="card"><div class="healthBox"><div class="ring" id="healthRing" style="--score:0"><span id="healthScore">0</span></div><div><h3>صحة اليوم</h3><p class="smallText" id="healthText">يتم الحساب من الفروقات، قيد المطابقة، والإقفالات.</p><div id="healthTags" style="display:flex;gap:8px;flex-wrap:wrap"></div></div></div></div>
+          <div class="card v43DashboardSimple">
+            <h2 class="bigTitle">لوحة القيادة</h2>
+            <p class="smallText">لوحة مختصرة: المجموعة الكلية، صندوق السوري، صندوق الدولار، وفلتر سجلات الإيراد حسب التاريخ فقط.</p>
+            <section class="v43CoreGrid" id="dashboardCoreGrid"></section>
+            <div class="v43FilterPanel">
+              <div class="v43FilterBar">
+                <div><label>من تاريخ</label><input type="date" id="dashFilterFrom"></div>
+                <div><label>إلى تاريخ</label><input type="date" id="dashFilterTo"></div>
+                <button class="secondary" id="dashFilterClear" type="button">مسح الفلتر</button>
+              </div>
+              <div class="tableWrap" style="margin-top:12px">
+                <table>
+                  <thead><tr><th>اسم المندوب</th><th>الإيراد / المبلغ</th><th>التاريخ</th><th>المنطقة</th><th>العملة</th></tr></thead>
+                  <tbody id="dashboardRevenueBody"></tbody>
+                </table>
+              </div>
+            </div>
           </div>
-          <div class="sectionGrid" style="margin-top:18px"><div class="card"><h3>أفضل المندوبين اليوم</h3><div class="barList" id="topRepsBars"></div></div><div class="card"><h3>توزيع المناطق اليوم</h3><div class="barList" id="regionBars"></div></div></div>
         </section>
 
         <section class="section" id="dailyEntrySec">
@@ -455,7 +524,6 @@
               <div><h3>سجل يومي للمندوبين</h3><p class="smallText">اختَر تاريخ وشوف كل مندوب: المبيع، المسلّم، المتبقي، والمكاتب التي استلمت.</p></div>
               <div class="toolbar"><input type="date" id="dailyLedgerDate"><select id="dailyLedgerRep"><option value="">كل المندوبين</option></select><button class="secondary" id="refreshDailyLedger">تحديث</button><button class="secondary" id="exportDailyLedgerExcel">تصدير Excel</button></div>
             </div>
-            <div class="grid3" id="dailyLedgerSummary" style="margin:14px 0"></div>
             <div class="tableWrap"><table><thead><tr><th>المندوب</th><th>المنطقة</th><th>المبيع SYP</th><th>التسليم SYP</th><th>المتبقي SYP</th><th>المكاتب</th><th>الحالة</th></tr></thead><tbody id="dailyLedgerBody"></tbody></table></div>
           </div>
         </section>
@@ -484,7 +552,30 @@
           </div>
         </section>
 
-        <section class="section" id="commandSec"><div class="card"><h3>سجلات المندوبين</h3><p class="smallText">عرض يومي واضح لكل مندوب: التاريخ، المبيع، التسليم، المكتب، والمتبقي. آخر كل يوم يظهر مجموع اليوم كامل.</p><div class="toolbar"><input type="date" id="cmdFrom"><input type="date" id="cmdTo"><select id="cmdRegion"><option value="">كل المناطق</option><option>R1</option><option>R2</option><option>R3</option><option>R4</option></select><button class="secondary" id="applyCmdFilter">تطبيق</button><button class="secondary" id="resetCmdFilter">إعادة ضبط</button></div><div class="grid" id="commandGrid"></div><div class="card" style="margin-top:18px"><h3>سجل المندوبين حسب اليوم</h3><p class="smallText">كل سطر هو مجموع مندوب في يوم محدد. لا يوجد تحويل دولار تلقائي؛ الدولار يظهر فقط إذا كان مسجلاً كدولار فعلي.</p><div class="tableWrap"><table><thead><tr><th>التاريخ</th><th>المندوب</th><th>المنطقة</th><th>المكاتب</th><th>المبيع SYP</th><th>التسليم SYP</th><th>المتبقي SYP</th><th>ملاحظات</th></tr></thead><tbody id="commandRepLedgerBody"></tbody></table></div></div><div class="sectionGrid" style="margin-top:18px"><div><h3>مراقبة اليوم</h3><div class="tableWrap"><table><thead><tr><th>المؤشر</th><th>القيمة</th><th>الحكم</th></tr></thead><tbody id="commandWatchBody"></tbody></table></div></div><div><h3>مقارنة المناطق</h3><div class="tableWrap"><table><thead><tr><th>المنطقة</th><th>المبيع</th><th>التسليم المؤكد</th><th>المتبقي</th><th>قيد المطابقة</th></tr></thead><tbody id="regionCompareBody"></tbody></table></div></div></div></div></section>
+        <section class="section" id="commandSec">
+          <div class="card">
+            <div class="v42SectionHead">
+              <div>
+                <h3>سجلات المندوبين</h3>
+                <p class="smallText">فلتر المنطقة يعرض مجموع المنطقة والمتبقي وسجلات المندوبين التابعة لها فقط.</p>
+              </div>
+              <span class="pill info" id="cmdActiveFilterBadge">الكل</span>
+            </div>
+            <div class="v43FilterPanel">
+              <div class="v43FilterBar" style="grid-template-columns:minmax(220px,340px) 1fr">
+                <div><label>فلتر المنطقة</label><select id="cmdRegion"><option value="">الكل</option><option value="R1">Region 1</option><option value="R2">Region 2</option><option value="R3">Region 3</option><option value="R4">Region 4</option></select></div>
+                <button class="secondary" id="resetCmdFilter" type="button">عرض الكل</button>
+              </div>
+              <div class="v43SmallGrid" id="commandGrid"></div>
+              <div class="tableWrap" style="margin-top:12px">
+                <table>
+                  <thead><tr><th>اسم المندوب</th><th>المبلغ / الإيراد</th><th>التاريخ</th><th>المنطقة</th><th>الملاحظات</th></tr></thead>
+                  <tbody id="commandRepLedgerBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
 
         <section class="section" id="recordsSec"><div class="sectionGrid"><div class="card"><h3>سجل المبيعات</h3><div class="toolbar"><input id="salesSearch" placeholder="بحث مندوب/منطقة"><button class="secondary" id="exportSalesCsv">CSV</button></div><div class="tableWrap"><table><thead><tr><th>التاريخ</th><th>المندوب</th><th>المنطقة</th><th>SYP</th><th>USD</th><th>ملاحظات</th><th>إجراء</th></tr></thead><tbody id="salesBody"></tbody></table></div></div><div class="card"><h3>سجل التسليمات</h3><div class="toolbar"><input id="deliveriesSearch" placeholder="بحث مندوب/مكتب"><button class="secondary" id="exportDeliveriesCsv">CSV</button></div><div class="tableWrap"><table><thead><tr><th>التاريخ</th><th>المندوب</th><th>المكتب</th><th>SYP</th><th>الحالة</th><th>إجراء</th></tr></thead><tbody id="deliveriesBody"></tbody></table></div></div></div></section>
 
@@ -493,40 +584,17 @@
         <section class="section" id="officeMatchSec"><div class="card"><h3>مطابقة المكاتب</h3><div class="toolbar"><input id="officeMatchSearch" placeholder="بحث باسم المكتب"><select id="officeMatchRegion"><option value="">كل المناطق</option><option>R1</option><option>R2</option><option>R3</option><option>R4</option></select><button class="secondary" id="refreshOfficeMatch">تحديث</button></div><div class="tableWrap"><table><thead><tr><th>المكتب</th><th>المنطقة</th><th>استلام مؤكد</th><th>سحوبات</th><th>مبالغ يدوية</th><th>قيد المطابقة</th><th>فروقات</th><th>رصيد تقريبي</th><th>الحالة</th></tr></thead><tbody id="officeMatchBody"></tbody></table></div></div></section>
 
         <section class="section" id="officeWalletSec">
-          <div class="sectionGrid">
-            <div class="card">
-              <h3>رصيد المكاتب</h3>
-              <p class="smallText">كل مكتب له رصيد سوري ورصيد دولار. إذا سحبت من المكتب، المبلغ يدخل تلقائياً في الصندوق حسب العملة. السحب فوق الرصيد مسموح ويظهر كدين للمكتب عندك.</p>
-              <div class="formGrid">
-                <div class="full"><label>المكتب</label><select id="walletOffice"></select></div>
-                <div><label>نوع العملية</label><select id="walletOperation"><option value="withdraw_syp">سحب سوري من المكتب</option><option value="withdraw_usd">سحب دولار من المكتب</option><option value="convert_syp_to_usd">تحويل من SYP إلى USD</option><option value="adjustment_syp_plus">إضافة تسوية SYP</option><option value="adjustment_usd_plus">إضافة تسوية USD</option><option value="transfer_office_syp">تحويل سوري إلى مكتب آخر</option><option value="transfer_office_usd">تحويل دولار إلى مكتب آخر</option></select></div>
-                <div id="walletToOfficeWrap"><label>إلى مكتب / للتحويل فقط</label><select id="walletToOffice"></select></div><div><label>التاريخ</label><input type="date" id="walletDate"></div>
-                <div><label>المبلغ SYP</label><input type="text" id="walletSyp" class="smartMoney" inputmode="decimal" placeholder="0"></div>
-                <div><label>المبلغ USD</label><input type="text" id="walletUsd" class="smartMoney" inputmode="decimal" placeholder="0"></div>
-                <div><label>سعر الصرف</label><input type="number" id="walletRate" min="0" value="15000"></div>
-                <div class="full v36CommissionBox"><label>عمولة المكتب عند التحويل بين المكاتب</label><div class="formGrid" style="margin-top:0"><div><input type="text" id="walletCommissionSyp" class="smartMoney" inputmode="decimal" placeholder="عمولة SYP اختياري"></div><div><input type="text" id="walletCommissionUsd" class="smartMoney" inputmode="decimal" placeholder="عمولة USD اختياري"></div></div><p class="smallText" style="margin:8px 0 0">العمولة تُخصم من المكتب المُرسل فقط، والمبلغ الأساسي يصل للمكتب الهدف. إذا ما في رصيد كافي يظهر السالب ولا تُرفض الحركة.</p></div>
-                <div class="full"><label>ملاحظات</label><textarea id="walletNotes" placeholder="مثلاً: سحب كاش / تحويل رصيد / تسوية"></textarea></div>
-                <div class="full walletPreview" id="walletPreview">اختر مكتب واكتب العملية حتى يظهر الرصيد قبل وبعد.</div>
-                <button class="full" id="saveWalletOpBtn">حفظ عملية المكتب/الصندوق</button>
-              </div>
-              <div class="msg" id="walletMsg"></div>
+          <div class="card">
+            <h3>رصيد المكاتب</h3>
+            <p class="smallText">عرض أرصدة المكاتب فقط بكروت صغيرة ومرتبة. اختر العملة لعرض الرصيد المطلوب.</p>
+            <div class="v43FilterBar" style="grid-template-columns:minmax(180px,260px) minmax(180px,260px) 1fr">
+              <div><label>العملة</label><select id="officeWalletCurrency"><option value="SYP">سوري SYP</option><option value="USD">دولار USD</option></select></div>
+              <div><label>المنطقة</label><select id="officeWalletRegion"><option value="">كل المناطق</option><option value="R1">Region 1</option><option value="R2">Region 2</option><option value="R3">Region 3</option><option value="R4">Region 4</option></select></div>
+              <div><label>بحث</label><input id="officeWalletSearch" placeholder="بحث باسم المكتب"></div>
             </div>
-            <div class="card">
-              <h3>ملخص المكتب المختار</h3>
-              <div class="walletPanel" id="selectedWalletBox"></div>
-              <p class="smallText">الأرقام تظهر بفواصل، والسالب مسموح لأنه يعني أن اتجاه الدين انعكس.</p>
-            </div>
-          </div>
-          <div class="card" style="margin-top:18px">
-            <div class="toolbar"><input id="officeWalletSearch" placeholder="بحث باسم المكتب"><select id="officeWalletRegion"><option value="">كل المناطق</option><option>R1</option><option>R2</option><option>R3</option><option>R4</option></select><button class="secondary" id="exportOfficeWalletExcel">تصدير Excel</button></div>
-            <div class="tableWrap"><table><thead><tr><th>المكتب</th><th>المنطقة</th><th>صندوق سوري</th><th>صندوق دولار</th><th>قيد المطابقة</th><th>فروقات</th><th>آخر عملية</th><th>الحالة</th><th>إجراء</th></tr></thead><tbody id="officeWalletBody"></tbody></table></div>
-          </div>
-          <div class="card" style="margin-top:18px">
-            <h3>حركة صناديق المكاتب</h3>
-            <div class="tableWrap"><table><thead><tr><th>التاريخ</th><th>المكتب</th><th>العملية</th><th>SYP</th><th>USD</th><th>الصرف</th><th>بعد العملية</th><th>ملاحظات</th><th>إجراء</th></tr></thead><tbody id="officeWalletLedgerBody"></tbody></table></div>
+            <div class="v43OfficeGrid" id="officeWalletCards"></div>
           </div>
         </section>
-
 
         <section class="section" id="cashboxSec">
           <div class="card cashboxIntro">
@@ -583,10 +651,6 @@
 
         </section>
 
-        <section class="section" id="issuesSec"><div class="card"><h3>مركز المشاكل والتنبيهات</h3><div class="alertGrid" id="issuesCards"></div><div class="toolbar"><button class="secondary" id="copyIssuesBtn">نسخ المشاكل</button><button class="secondary" id="enableSoundBtn">تشغيل صوت التنبيه</button></div><div class="tableWrap"><table><thead><tr><th>الخطورة</th><th>النوع</th><th>التفصيل</th><th>القيمة</th><th>الحالة</th></tr></thead><tbody id="issuesBody"></tbody></table></div></div></section>
-
-        <section class="section" id="amountsSec"><div class="sectionGrid"><div class="card"><h3>مركز إضافة مبلغ</h3><p class="smallText">للإدارة فقط: مبالغ تشغيلية، CCBS، صالات، وتسويات بدون خلطها مع مبيع المندوبين.</p><div class="formGrid"><div><label>نوع العملية</label><select id="manualType"><option value="operational_income">مبلغ تشغيلي</option><option value="ccbs">CCBS</option><option value="salon">صالة</option><option value="office_manual">مبلغ مرتبط بمكتب</option><option value="settlement_plus">تسوية زيادة</option><option value="settlement_minus">تسوية نقصان</option></select></div><div><label>الجهة</label><select id="manualTargetType"><option value="general">عام</option><option value="office">مكتب</option><option value="representative">مندوب</option></select></div><div class="full hide" id="manualOfficeWrap"><label>اختر المكتب</label><select id="manualOffice"></select></div><div class="full hide" id="manualRepWrap"><label>اختر المندوب</label><select id="manualRep"></select></div><div><label>المبلغ SYP</label><input type="text" id="manualSyp" class="smartMoney" inputmode="numeric"></div><div><label>المبلغ USD</label><input type="number" id="manualUsd" min="0"></div><div><label>سعر الصرف</label><input type="number" id="manualRate" min="0" value="15000"></div><div><label>التاريخ</label><input type="date" id="manualDate"></div><div class="full"><label>ملاحظات</label><textarea id="manualNotes"></textarea></div><button class="full" id="saveManualBtn">حفظ المبلغ</button></div><div class="msg" id="manualMsg"></div></div><div class="card"><h3>سجل المبالغ المضافة</h3><div class="tableWrap"><table><thead><tr><th>التاريخ</th><th>النوع</th><th>الجهة</th><th>SYP</th><th>USD</th><th>بواسطة</th><th>إجراء</th></tr></thead><tbody id="manualBody"></tbody></table></div></div></div></section>
-
         <section class="section" id="closingSec"><div class="sectionGrid"><div class="card"><h3>إقفال يومي</h3><div class="formGrid"><div><label>التاريخ</label><input type="date" id="closingDate"></div><div><label>المكتب</label><select id="closingOffice"></select></div><div class="full"><label>ملاحظات الإقفال</label><textarea id="closingNotes"></textarea></div><button class="full" id="saveClosingBtn">إنشاء إقفال اليوم</button></div><div class="msg" id="closingMsg"></div></div><div class="card"><h3>سجل الإقفالات</h3><div class="tableWrap"><table><thead><tr><th>التاريخ</th><th>المكتب</th><th>الحالة</th><th>فرهاد</th><th>الإدارة</th><th>إجراء</th></tr></thead><tbody id="closingBody"></tbody></table></div></div></div></section>
 
         <section class="section" id="balancesSec">
@@ -610,7 +674,7 @@
 
         <section class="section" id="settingsSec"><div class="sectionGrid"><div class="card"><h3>إعدادات النظام</h3><div class="formGrid"><div><label>اسم التطبيق</label><input id="settingAppName"></div><div><label>العملة الأساسية</label><input id="settingCurrency"></div><div><label>اسم المدير</label><input id="settingOwner"></div><div><label>اسم مساعد الإدارة</label><input id="settingAssistant"></div><div><label>حد المبلغ الكبير SYP</label><input id="settingLargeAmount" type="number" value="5000000"></div><div><label>سعر الصرف الافتراضي</label><input id="settingDefaultRate" type="number" value="15000"></div><div><label>ساعات تأخير التسليم</label><input id="settingPendingHours" type="number" value="24"></div><div><label>وضع العرض الافتراضي</label><select id="settingTheme"><option value="auto">تلقائي</option><option value="dark">مظلم</option><option value="light">فاتح</option></select></div><button class="full" id="saveSettingsBtn">حفظ الإعدادات</button></div><div class="msg" id="settingsMsg"></div></div><div class="card v38FactoryPanel"><h3>🧯 إعادة ضبط المصنع وإصلاح التكرار</h3><p class="smallText">هذا القسم يصلح مشكلة 80 مليون تصير 160 مليون، ويصفر الصندوق والمكاتب من السجلات الفعلية فقط. لا يحذف حسابات الدخول ولا أسماء المندوبين والمكاتب.</p><div class="v38FactoryGrid" id="v38FactorySummary"></div><div class="v38GoodNote" id="v38FactoryNote">الوضع الآمن: الأرصدة تُعاد حسابها من السجلات النشطة، وأي سجل مكرر بنفس البصمة خلال ثوانٍ لا يدخل بالحساب.</div><div class="v38FactoryActions"><button class="warn" id="v38FixDuplicatesBtn" type="button">إصلاح التكرار 80 → 160</button><button class="secondary" id="v38RecountBtn" type="button">إعادة حساب وفحص</button><button class="danger" id="v38FactoryResetBtn" type="button">إعادة ضبط مصنع للتطبيق</button></div><div class="v38DangerNote">إعادة ضبط المصنع تنقل المبيعات، التسليمات، حركات الصندوق، حركات المكاتب، والإقفالات إلى سلة المحذوفات. تبقى الحسابات، المندوبين، المكاتب، والإعدادات الأساسية كما هي.</div><div class="msg" id="v38FactoryMsg"></div></div><div class="card"><h3>إدارة المكاتب والمندوبين</h3><p class="smallText">إضافة الاسم هنا تضيفه إلى Firestore. إنشاء حساب الدخول Auth يتم من سكريبت التهيئة.</p><div class="formGrid"><div><label>النوع</label><select id="entityType"><option value="representative">مندوب</option><option value="office">مكتب</option></select></div><div><label>المنطقة</label><select id="entityRegion"><option>R1</option><option>R2</option><option>R3</option><option>R4</option></select></div><div class="full"><label>الاسم</label><input id="entityName"></div><div class="full"><label>البريد</label><input id="entityEmail" type="email"></div><button class="full" id="addEntityBtn">إضافة إلى النظام</button></div><div class="msg" id="entityMsg"></div></div><div class="card full"><h3>حسابات النظام</h3><div class="tableWrap"><table><thead><tr><th>الاسم</th><th>البريد</th><th>الدور</th><th>المنطقة</th><th>الحالة</th></tr></thead><tbody id="usersBody"></tbody></table></div></div></div></section>
 
-        <section class="section" id="exportSec"><div class="sectionGrid"><div class="card"><h3>تصدير PDF احترافي</h3><p class="smallText">تقارير مختلفة فعلاً: شامل، مندوبين، مكاتب، مشاكل، وإقفال.</p><div class="formGrid"><div><label>نوع التقرير</label><select id="pdfReportType"><option value="full">تقرير شامل</option><option value="reps">مطابقة المندوبين</option><option value="offices">مطابقة المكاتب</option><option value="issues">مشاكل اليوم</option><option value="closing">إقفال اليوم</option></select></div><div><label>التاريخ</label><input type="date" id="pdfDate"></div><div class="full"><label>عنوان اختياري</label><input id="pdfTitleInput" placeholder="مثلاً: تقرير إقفال اليوم"></div><button class="full" id="exportPdfBtn">تصدير PDF</button></div><div class="msg" id="pdfMsg"></div></div><div class="card"><h3>خيارات سريعة</h3><div class="quickAmounts" style="grid-template-columns:repeat(2,1fr)"><button id="quickFullPdf">شامل</button><button class="secondary" id="quickRepPdf">مندوبين</button><button class="secondary" id="quickOfficePdf">مكاتب</button><button class="secondary" id="quickIssuesPdf">مشاكل</button></div><div class="splitLine"></div><button class="secondary" id="copyManagerWhatsapp" style="width:100%">نسخ تقرير واتساب للإدارة</button></div></div><div id="pdfHiddenArea"></div></section>
+        <section class="section" id="exportSec"><div class="sectionGrid"><div class="card"><h3>تصدير PDF احترافي</h3><p class="smallText">تقارير مختلفة فعلاً: شامل، مندوبين، مكاتب، وإقفال.</p><div class="formGrid"><div><label>نوع التقرير</label><select id="pdfReportType"><option value="full">تقرير شامل</option><option value="reps">مطابقة المندوبين</option><option value="offices">مطابقة المكاتب</option><option value="closing">إقفال اليوم</option></select></div><div><label>التاريخ</label><input type="date" id="pdfDate"></div><div class="full"><label>عنوان اختياري</label><input id="pdfTitleInput" placeholder="مثلاً: تقرير إقفال اليوم"></div><button class="full" id="exportPdfBtn">تصدير PDF</button></div><div class="msg" id="pdfMsg"></div></div><div class="card"><h3>خيارات سريعة</h3><div class="quickAmounts" style="grid-template-columns:repeat(2,1fr)"><button id="quickFullPdf">شامل</button><button class="secondary" id="quickRepPdf">مندوبين</button><button class="secondary" id="quickOfficePdf">مكاتب</button></div><div class="splitLine"></div><button class="secondary" id="copyManagerWhatsapp" style="width:100%">نسخ تقرير واتساب للإدارة</button></div></div><div id="pdfHiddenArea"></div></section>
 
 
         <section class="section" id="adminAiSec">
@@ -768,13 +832,6 @@
           </div>
         </section>
 
-        <section class="section" id="diagnosticsSec">
-          <div class="card">
-            <h3>تشخيص النظام</h3>
-            <p class="smallText">لوحة تشخيص للإدارة فقط، تعرض حالة الدخول والقراءة والتكاملات بدون كشف أي مفاتيح.</p>
-            <div class="diagnosticsGrid" id="diagnosticsGrid"></div>
-          </div>
-        </section>
       </main>
     </div>
   </section>
@@ -790,10 +847,10 @@
 
   const firebaseConfig={apiKey:"AIzaSyDoVPtyKtuY5LBRw6plvwDVJv4TDIk0Klk",authDomain:"mandob-app-82843.firebaseapp.com",projectId:"mandob-app-82843",storageBucket:"mandob-app-82843.firebasestorage.app",messagingSenderId:"749939721927",appId:"1:749939721927:web:4c1c63aacca39ec41fe0e2",measurementId:"G-40ZG8YVETG"};
   const app=initializeApp(firebaseConfig); const auth=getAuth(app); const db=getFirestore(app);
-  const APP_VERSION='v38 Factory Reset Ledger';
+  const APP_VERSION='v45 Remove Daily Summary Cards';
   const state={user:null,profile:null,reps:[],offices:[],users:[],sales:[],deliveries:[],withdrawals:[],manual:[],cashbox:[],closings:[],audit:[],settings:{},tab:"dashboardSec",filters:{from:"",to:"",region:""},sound:false,auditPage:1,_auditFiltered:[],firebaseReadStatus:"لم تبدأ القراءة بعد",firebaseReadErrors:[],lastOpenAiError:"",appVersion:APP_VERSION,aiBusy:false};
   const $=id=>document.getElementById(id); const today=new Date().toISOString().slice(0,10);
-  ["saleDate","deliveryDate","manualDate","closingDate","pdfDate","cmdFrom","cmdTo","walletDate","cashboxDate","aiDate"].forEach(id=>setTimeout(()=>{if($(id))$(id).value=today},0));
+  ["saleDate","deliveryDate","manualDate","closingDate","pdfDate","dashFilterFrom","dashFilterTo","walletDate","cashboxDate","aiDate"].forEach(id=>setTimeout(()=>{if($(id))$(id).value=today},0));
   const ar="٠١٢٣٤٥٦٧٨٩", fa="۰۱۲۳۴۵۶۷۸۹";
   function n(v){ if(v===null||v===undefined)return 0; let s=String(v).trim().replace(/[٠-٩]/g,d=>String(ar.indexOf(d))).replace(/[۰-۹]/g,d=>String(fa.indexOf(d))).replace(/,/g,"").replace(/\s/g,"").replace(/[^\d.-]/g,""); return Number(s||0); }
   function fmt(v){return n(v).toLocaleString("en-US",{maximumFractionDigits:2})} function esc(v){return String(v??"").replace(/[&<>'"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[c]))}
@@ -883,6 +940,22 @@
   function officeIsTarget(o,rec){if(!o||!rec)return false; return String(rec.toOfficeId||'')===String(o.id||'') || sameKey(rec.toOfficeName,o.name)}
   function actualUsdFromDelivery(d){return (d?.currency==='USD'||d?.amountCurrency==='USD'||d?.hasActualUsd===true)?n(d.amountUsd):0}
   function actualUsdFromSale(s){return (s?.currency==='USD'||s?.amountCurrency==='USD'||s?.hasActualUsd===true)?n(s.amountUsd):0}
+  // v39: إجمالي الدولار في لوحة التحكم. يحسب الدولار الحقيقي إن وجد، وإلا يعطي المعادل حسب سعر السجل أو السعر الافتراضي.
+  function v39UsdEquivalent(row, sypField='amountSyp'){
+    const direct=n(row?.amountUsd||row?.convertedUsd);
+    if(direct>0)return direct;
+    const syp=n(row?.[sypField]||row?.amountSyp||row?.sourceSyp);
+    const rate=n(row?.exchangeRate)||defaultExchangeRate();
+    return syp>0&&rate>0?syp/rate:0;
+  }
+  function v39DashboardGrandTotals(){
+    const sales=live(state.sales);
+    const totalSyp=sales.reduce((a,x)=>a+n(x.amountSyp),0);
+    const totalUsd=sales.reduce((a,x)=>a+v39UsdEquivalent(x,'amountSyp'),0);
+    const todaySales=sales.filter(isToday);
+    const todayUsd=todaySales.reduce((a,x)=>a+v39UsdEquivalent(x,'amountSyp'),0);
+    return {totalSyp,totalUsd,todayUsd};
+  }
   function deliveryCountsInLedger(d){const s=String(d?.status||''); return deliveryHasActiveSource(d)&&!['rejected','cancelled','void'].includes(s)}
   function deliveryCountsAsConfirmed(d){return deliveryCountsInLedger(d)&&(isConfirmedStatus(d)||d?.createdByAdmin===true||d?.source==='admin_daily_entry'||d?.source==='admin_late_delivery')}
   function deliveryCountsAsPending(d){return deliveryCountsInLedger(d)&&isPendingStatus(d?.status)&&!deliveryCountsAsConfirmed(d)}
@@ -1199,17 +1272,27 @@
     const role=state.profile?.role;
     if(role==="representative")return [["entrySec","إدخال المندوب"],["recordsSec","سجلي"]];
     if(role==="office")return [["recordsSec","التسليمات"],["closingSec","إقفال المكتب"]];
-    const menu=[["dashboardSec","لوحة القيادة"],["dailyEntrySec","الإدخال اليومي"],["commandSec","سجلات المندوبين"],["recordsSec","السجلات"],["repMatchSec","مطابقة المندوبين"],["officeMatchSec","مطابقة المكاتب"],["officeWalletSec","رصيد المكاتب"],["issuesSec","المشاكل"],["amountsSec","إضافة مبالغ"],["closingSec","إقفال يومي"],["balancesSec","الأرصدة"],["peopleSec","المندوبين والمكاتب"],["exportSec","PDF/واتساب"],["auditSec","سجل العمليات"]];
-    if(isManager()){
-      menu.splice(2,0,["adminAiSec","ذكاء الإدارة"]);
-      menu.splice(7,0,["cashboxSec","الصندوق"]);
-      menu.splice(menu.length-1,0,["trashSec","سلة المحذوفات"],["settingsSec","الإعدادات"],["diagnosticsSec","التشخيص"]);
-    }
-    return menu;
+    return [
+      ["dashboardSec","لوحة القيادة"],
+      ["dailyEntrySec","الإدخال اليومي"],
+      ["commandSec","سجلات المندوبين"],
+      ["recordsSec","السجلات"],
+      ["repMatchSec","مطابقة المندوبين"],
+      ["officeMatchSec","مطابقة المكاتب"],
+      ["cashboxSec","الصندوق"],
+      ["officeWalletSec","رصيد المكاتب"],
+      ["closingSec","إقفال يومي"],
+      ["balancesSec","الأرصدة"],
+      ["peopleSec","المندوبين والمكاتب"],
+      ["exportSec","PDF/واتساب"],
+      ["trashSec","سلة المحذوفات"],
+      ["settingsSec","الإعدادات"],
+      ["auditSec","سجل العمليات"]
+    ];
   }
   function canOpenSec(id){return menuForRole().some(x=>x[0]===id)}
   function firstSec(){const role=state.profile?.role;return role==="representative"?"entrySec":role==="office"?"recordsSec":"dashboardSec"}
-  function setNav(){ const role=state.profile?.role; document.body.dataset.role=role||"unknown"; if($("quickCopyBtn"))$("quickCopyBtn").style.display=isManager()?"":"none"; const all=menuForRole(); const canSettings=all.some(x=>x[0]==='settingsSec'); if($("topSettingsBtn")){ $("topSettingsBtn").style.display=canSettings?"":"none"; $("topSettingsBtn").onclick=()=>showSec('settingsSec'); } if($("sideSettingsBtn")){ $("sideSettingsBtn").style.display=canSettings?"":"none"; $("sideSettingsBtn").onclick=()=>showSec('settingsSec'); } $("nav").innerHTML=all.map(x=>`<button data-sec="${x[0]}">${x[1]}</button>`).join(""); document.querySelectorAll("#nav button").forEach(btn=>btn.onclick=()=>showSec(btn.dataset.sec)); if($("sideHint"))$("sideHint").innerHTML=isManager()?"زر الإعدادات ظاهر في الشريط الجانبي وفوق، والتطبيق الآن بنسخة v38." : "جاهز."; buildMobileDock(all); showSec(firstSec()); }
+  function setNav(){ const role=state.profile?.role; document.body.dataset.role=role||"unknown"; if($("quickCopyBtn"))$("quickCopyBtn").style.display=isManager()?"":"none"; const all=menuForRole(); const canSettings=all.some(x=>x[0]==='settingsSec'); if($("topSettingsBtn")){ $("topSettingsBtn").style.display=canSettings?"":"none"; $("topSettingsBtn").onclick=()=>showSec('settingsSec'); } if($("sideSettingsBtn")){ $("sideSettingsBtn").style.display=canSettings?"":"none"; $("sideSettingsBtn").onclick=()=>showSec('settingsSec'); } $("nav").innerHTML=all.map(x=>`<button data-sec="${x[0]}">${x[1]}</button>`).join(""); document.querySelectorAll("#nav button").forEach(btn=>btn.onclick=()=>showSec(btn.dataset.sec)); if($("sideHint"))$("sideHint").innerHTML=isManager()?"زر الإعدادات ظاهر في الشريط الجانبي وفوق، والتطبيق الآن بنسخة v44." : "جاهز."; buildMobileDock(all); showSec(firstSec()); }
   function scrollToSectionAnchor(id,targetSec){
     const anchor=$(targetSec||id);
     if(!anchor)return;
@@ -1245,74 +1328,141 @@
     const remain=totalSales-confirmed;
     return {sales,del,withs,man,totalSales,totalSalesToday,confirmed,confirmedToday,pending,pendingCount,diffCount,withdraw,manual,remain};
   }function renderStats(){
-    if(!isManager()){if($("statsGrid"))$("statsGrid").innerHTML="";return;}
-    const c=calc();
-    const box=typeof cashboxCalc==='function'?cashboxCalc():{syp:0,usd:0,ledger:[]};
-    const stats=[
-      ['مبيع اليوم SYP',fmt(c.totalSalesToday),'حسب تاريخ اليوم'],
-      ['تسليم مؤكد اليوم',fmt(c.confirmedToday),'مطابق'],
-      ['صندوق سوري',fmt(box.syp),'رصيد الصندوق الحقيقي من صفحة الصندوق'],
-      ['صندوق دولار',fmt(box.usd),'رصيد صندوق الدولار الحقيقي — وليس مجموع سجلات المندوبين'],
-      ['قيد المطابقة',fmt(c.pending),`${c.pendingCount} عملية`],
-      ['المتبقي الكلي',fmt(c.remain),c.remain>0?'يحتاج متابعة':'مغلق تقريباً']
-    ];
-    $("statsGrid").innerHTML=stats.map(x=>`<div class="stat"><div class="k">${x[0]}</div><div class="v">${x[1]}</div><div class="s">${x[2]}</div></div>`).join("");
+    if($("statsGrid"))$("statsGrid").innerHTML="";
   }
-  function renderDashboard(){ if(!isManager())return; const c=calc(); $("dashTitle").textContent=isManager()?"لوحة القيادة — نظرة الإدارة":"لوحة القيادة"; $("dashText").textContent=isManager()?"ملخص حي للمبيعات والتسليمات والفروقات والمكاتب. أي رقم غير طبيعي يظهر في مركز المشاكل.":"ملخص عملياتك الحالية: مبيع، تسليم، والمتبقي."; const issueCount=buildIssues().length; const score=Math.max(0,100-(issueCount*12)-(c.diffCount*15)-Math.min(20,c.pendingCount*3)); $("healthRing").style.setProperty("--score",score); $("healthScore").textContent=score; $("healthText").textContent=score>=85?"الوضع نظيف ومريح.":score>=60?"في نقاط تحتاج متابعة قبل الإقفال.":"في مشاكل قوية لازم تنحل اليوم."; $("healthTags").innerHTML=[`<span class="pill ${issueCount?'warn':'ok'}">${issueCount} تنبيه</span>`,`<span class="pill ${c.diffCount?'danger':'ok'}">${c.diffCount} فرق</span>`,`<span class="pill ${c.pendingCount?'warn':'ok'}">${c.pendingCount} قيد المطابقة</span>`].join(""); $("todayMiniGrid").innerHTML=[['المبيع',fmt(c.totalSalesToday)],['التسليم',fmt(c.confirmedToday)],['المتبقي',fmt(c.totalSalesToday-c.confirmedToday)]].map(x=>`<div class="miniCard"><div class="k">${x[0]}</div><div class="stat"><div class="v">${x[1]}</div></div></div>`).join(""); renderBars(); }
-  function renderBars(){ const todaySales=live(state.sales).filter(isToday); const byRep={}; todaySales.forEach(s=>{const k=s.representativeName||s.representativeId||"غير محدد"; byRep[k]=(byRep[k]||0)+n(s.amountSyp)}); const max=Math.max(1,...Object.values(byRep)); $("topRepsBars").innerHTML=Object.entries(byRep).sort((a,b)=>b[1]-a[1]).slice(0,7).map(([k,v])=>`<div class="barRow"><b>${esc(k)}</b><div class="bar"><i style="--w:${Math.min(100,v/max*100)}%"></i></div><span class="amount">${fmt(v)}</span></div>`).join("")||`<p class="empty">لا يوجد مبيع اليوم</p>`; const regs={}; live(state.sales).forEach(s=>{if(isToday(s)){const k=s.region||"غير محدد"; regs[k]=(regs[k]||0)+n(s.amountSyp)}}); const rmax=Math.max(1,...Object.values(regs)); $("regionBars").innerHTML=Object.entries(regs).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<div class="barRow"><b>${esc(k)}</b><div class="bar"><i style="--w:${Math.min(100,v/rmax*100)}%"></i></div><span class="amount">${fmt(v)}</span></div>`).join("")||`<p class="empty">لا يوجد بيانات مناطق اليوم</p>`; }
+  function v40SaleRegion(row){
+    if(row?.region)return row.region;
+    const rep=state.reps.find(r=>repMatchesRecord(r,row));
+    return rep?.region||"غير محدد";
+  }
+  function v40DashboardRange(){
+    if($("dashFrom")&&!$("dashFrom").value)$("dashFrom").value=today;
+    if($("dashTo")&&!$("dashTo").value)$("dashTo").value=$("dashFrom")?.value||today;
+    return {from:$("dashFrom")?.value||today,to:$("dashTo")?.value||$("dashFrom")?.value||today,region:$("dashRegion")?.value||"",currency:$("dashOfficeCurrency")?.value||"SYP"};
+  }
+  function v41RecordRegion(row){
+    if(row?.region)return row.region;
+    const rep=state.reps.find(r=>repMatchesRecord(r,row));
+    if(rep?.region)return rep.region;
+    const office=state.offices.find(o=>officeIsMain(o,row)||officeIsTarget(o,row));
+    return office?.region||"غير محدد";
+  }
+  function v40SyncDashboardRegions(){
+    const el=$("dashRegion"); if(!el)return;
+    const current=el.value||"";
+    const values=[...new Set([
+      ...state.reps.map(r=>r.region).filter(Boolean),
+      ...state.offices.map(o=>o.region).filter(Boolean),
+      ...live(state.sales).map(v40SaleRegion).filter(Boolean),
+      ...live(state.deliveries).map(v41RecordRegion).filter(Boolean),
+      "R1","R2","R3","R4"
+    ])].filter(Boolean).sort((a,b)=>String(a).localeCompare(String(b),'ar'));
+    el.innerHTML='<option value="">كل المناطق</option>'+values.map(r=>`<option value="${esc(r)}">${esc(r)}</option>`).join('');
+    if(values.includes(current))el.value=current;
+  }
+  function v41InDashboardRange(row){
+    const r=v40DashboardRange();
+    const d=dateVal(row);
+    const reg=v41RecordRegion(row);
+    return (!r.from||d>=r.from)&&(!r.to||d<=r.to)&&(!r.region||reg===r.region);
+  }
+  function v40DashboardFilteredSales(){
+    return live(state.sales).filter(v41InDashboardRange);
+  }
+  function v41DashboardFilteredDeliveries(){
+    return live(state.deliveries).filter(d=>deliveryCountsInLedger(d)&&v41InDashboardRange(d));
+  }
+  function v41DashboardOfficeRows(){
+    const r=v40DashboardRange();
+    return officeWalletRows().filter(o=>!r.region||o.region===r.region);
+  }
+  function v40DashboardRows(){
+    const map=new Map();
+    v40DashboardFilteredSales().forEach(s=>{
+      const key=(s.representativeId||'')+'::'+(s.representativeName||s.repName||s.mandobName||'غير محدد');
+      if(!map.has(key))map.set(key,{name:s.representativeName||s.repName||s.mandobName||'غير محدد',region:v40SaleRegion(s),count:0,lastDate:'',syp:0,usd:0});
+      const row=map.get(key);
+      row.count+=1; row.syp+=n(s.amountSyp); row.usd+=v39UsdEquivalent(s,'amountSyp');
+      const d=dateVal(s)||''; if(d>row.lastDate)row.lastDate=d;
+      if(row.region==='غير محدد'&&v40SaleRegion(s)!=='غير محدد')row.region=v40SaleRegion(s);
+    });
+    return [...map.values()].sort((a,b)=>b.syp-a.syp);
+  }
+  function v41OfficeStatusForAmount(v){return v<0?'له عندي':v>0?'رصيدي عنده':'صفر'}
+  function v43DashboardDateFilter(row){
+    const from=$('dashFilterFrom')?.value||'';
+    const to=$('dashFilterTo')?.value||'';
+    const d=dateVal(row)||'';
+    return (!from||d>=from)&&(!to||d<=to);
+  }
+  function renderDashboard(){
+    if(!isManager())return;
+    const c=calc();
+    const g=typeof v39DashboardGrandTotals==='function'?v39DashboardGrandTotals():{totalSyp:c.totalSales,totalUsd:0};
+    const box=typeof cashboxCalc==='function'?cashboxCalc():{syp:0,usd:0};
+    if($('dashboardCoreGrid'))$('dashboardCoreGrid').innerHTML=[
+      ['المجموعة الكلية',fmt(g.totalSyp),'إجمالي إيراد المندوبين SYP'],
+      ['صندوق السوري',fmt(box.syp),'رصيد الصندوق السوري'],
+      ['صندوق الدولار',fmt(box.usd),'رصيد صندوق الدولار']
+    ].map(x=>`<div class="stat"><div class="k">${x[0]}</div><div class="v">${x[1]}</div><div class="s">${x[2]}</div></div>`).join('');
+    const rows=live(state.sales).filter(v43DashboardDateFilter).sort((a,b)=>(dateVal(b)||'').localeCompare(dateVal(a)||'')||(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
+    if($('dashboardRevenueBody'))$('dashboardRevenueBody').innerHTML=rows.map(s=>{
+      const usd=n(s.amountUsd||s.usd||0);
+      const cur=usd>0?'SYP + USD':'SYP';
+      const amount=usd>0?`${fmt(s.amountSyp)} SYP / ${fmt(usd)} USD`:`${fmt(s.amountSyp)} SYP`;
+      return `<tr><td>${esc(s.representativeName||s.repName||s.mandobName||'—')}</td><td class="amount">${amount}</td><td>${esc(dateVal(s)||s.date||'')}</td><td>${esc(v40SaleRegion(s)||s.region||'—')}</td><td>${cur}</td></tr>`;
+    }).join('')||`<tr><td colspan="5" class="empty">لا توجد سجلات إيراد ضمن التاريخ المحدد</td></tr>`;
+  }
+  function renderBars(){
+    const rows=typeof v40DashboardRows==='function'?v40DashboardRows():[];
+    const byRep=Object.fromEntries(rows.map(r=>[r.name,r.syp]));
+    const max=Math.max(1,...Object.values(byRep));
+    if($("topRepsBars"))$("topRepsBars").innerHTML=Object.entries(byRep).sort((a,b)=>b[1]-a[1]).slice(0,7).map(([k,v])=>`<div class="barRow"><b>${esc(k)}</b><div class="bar"><i style="--w:${Math.min(100,v/max*100)}%"></i></div><span class="amount">${fmt(v)}</span></div>`).join("")||`<p class="empty">لا يوجد مبيع ضمن الفلتر</p>`;
+    const regs={}; live(state.sales).filter(isToday).forEach(s=>{const k=v40SaleRegion(s)||"غير محدد"; regs[k]=(regs[k]||0)+n(s.amountSyp)});
+    const rmax=Math.max(1,...Object.values(regs));
+    if($("regionBars"))$("regionBars").innerHTML=Object.entries(regs).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<div class="barRow"><b>${esc(k)}</b><div class="bar"><i style="--w:${Math.min(100,v/rmax*100)}%"></i></div><span class="amount">${fmt(v)}</span></div>`).join("")||`<p class="empty">لا يوجد بيانات مناطق ضمن الفلتر</p>`;
+  }
   function saleEditAllowed(s){ const p=state.profile||{}; const mine=(s.representativeId===p.representativeId||s.createdBy===state.user?.uid); if(isAdmin())return true; if(p.role!=="representative"||!mine)return false; if(s.adminLocked&&!s.editAllowedByAdmin)return false; return !["closed","approved"].includes(s.status||"")||!!s.editAllowedByAdmin; }
   function deliveryEditAllowed(d){ const p=state.profile||{}; const mine=(d.representativeId===p.representativeId||d.createdBy===state.user?.uid); if(isAdmin())return true; if(p.role!=="representative"||!mine)return false; return isPendingStatus(d.status)||!!d.editAllowedByAdmin; }
   function editStateText(x,type){ if(type==='تسليم'&&x.status!=="pending_office"&&!x.editAllowedByAdmin)return '<div class="editLocked">مقفول بعد التأكيد — يحتاج إذن الإدارة</div>'; if(x.editAllowedByAdmin)return '<div class="editAllowed">مفتوح بإذن الإدارة</div>'; return ''; }
   function renderMySummary(){ if(!$("mySummaryBox"))return; const c=calc(); const todayDel=live(state.deliveries).filter(isToday); const confirmedToday=todayDel.filter(d=>isConfirmedStatus(d)).reduce((a,x)=>a+n(x.officeConfirmedSyp||x.amountSyp),0); const pendingToday=todayDel.filter(d=>isPendingStatus(d.status)).reduce((a,x)=>a+n(x.amountSyp),0); const remainToday=c.totalSalesToday-confirmedToday; $("mySummaryBox").innerHTML=[['مبيع اليوم',fmt(c.totalSalesToday)],['مؤكد اليوم',fmt(confirmedToday)],['قيد المطابقة',fmt(pendingToday)],['متبقي اليوم',fmt(remainToday)],['متبقي كلي',fmt(c.remain)],['فروقات',fmt(c.diffCount)]].map(x=>`<div class="stat"><div class="k">${x[0]}</div><div class="v">${x[1]}</div></div>`).join(""); const rows=[...live(state.sales).map(x=>({...x,type:'مبيع',col:'sales_reports'})),...live(state.deliveries).map(x=>({...x,type:'تسليم',col:'deliveries'}))].sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)).slice(0,8).map(x=>{const can=x.col==='deliveries'?deliveryEditAllowed(x):saleEditAllowed(x); return `<tr><td>${esc(x.date)}</td><td>${x.type}</td><td class="amount">${fmt(x.amountSyp)}</td><td>${x.status?statusLabel(x.status):'محفوظ'}${editStateText(x,x.type)}</td><td><div class="actions">${can?`<button class="secondary" onclick="openEdit('${x.col}','${x.id}')">تعديل</button>`:'—'}</div></td></tr>`}).join(""); $("myRecentBox").innerHTML=`<table><thead><tr><th>التاريخ</th><th>النوع</th><th>SYP</th><th>الحالة</th><th>إجراء</th></tr></thead><tbody>${rows||'<tr><td colspan="5" class="empty">لا توجد عمليات</td></tr>'}</tbody></table>`; }
+  function v42CommandRange(){
+    return {from:state.filters.from||$('cmdFrom')?.value||'',to:state.filters.to||$('cmdTo')?.value||'',region:state.filters.region||$('cmdRegion')?.value||'',currency:$('cmdCurrency')?.value||'SYP'};
+  }
+  function v42SyncCommandRegions(){
+    const el=$('cmdRegion'); if(!el)return;
+    const current=state.filters.region||el.value||'';
+    const values=[...new Set([...state.reps.map(r=>r.region).filter(Boolean),...state.offices.map(o=>o.region).filter(Boolean),...live(state.sales).map(v40SaleRegion).filter(Boolean),...live(state.deliveries).map(v41RecordRegion).filter(Boolean),'R1','R2','R3','R4'])].filter(Boolean).sort((a,b)=>String(a).localeCompare(String(b),'ar'));
+    el.innerHTML='<option value="">كل المناطق</option>'+values.map(r=>`<option value="${esc(r)}">${esc(r)}</option>`).join('');
+    if(values.includes(current))el.value=current; else el.value='';
+  }
+  function v42InCommandRange(row){
+    const r=v42CommandRange(), d=dateVal(row), reg=v41RecordRegion(row);
+    return (!r.from||d>=r.from)&&(!r.to||d<=r.to)&&(!r.region||reg===r.region);
+  }
+  function v42CommandOfficeRows(){
+    const r=v42CommandRange();
+    return officeWalletRows().filter(o=>!r.region||o.region===r.region);
+  }
+
+  function v43RegionLabel(v){return v44RegionLabel(v)}
+  function v43MatchesCommandRegion(row){return v44MatchesRegion(row,$('cmdRegion')?.value||'')}
   function renderCommand(){
-    if(!$("commandGrid"))return;
-    const sales=live(state.sales).filter(inFilter);
-    const del=live(state.deliveries).filter(inFilter).filter(deliveryCountsInLedger);
+    if(!$('commandGrid')&&!$('commandRepLedgerBody'))return;
+    const region=$('cmdRegion')?.value||state.filters.region||'';
+    const label=v44RegionLabel(region);
+    if($('cmdActiveFilterBadge'))$('cmdActiveFilterBadge').textContent=label;
+    const sales=live(state.sales).filter(s=>v44MatchesRegion(s,region));
+    const del=live(state.deliveries).filter(d=>deliveryCountsInLedger(d)&&v44MatchesRegion(d,region));
     const total=sales.reduce((a,x)=>a+n(x.amountSyp),0);
     const conf=del.filter(d=>deliveryCountsAsConfirmed(d)).reduce((a,x)=>a+n(x.officeConfirmedSyp||x.amountSyp),0);
-    const pend=del.filter(d=>deliveryCountsAsPending(d)).reduce((a,x)=>a+n(x.amountSyp),0);
-    const totalUsd=sales.reduce((a,x)=>a+actualUsdFromSale(x),0)+del.reduce((a,x)=>a+actualUsdFromDelivery(x),0);
-    const diff=del.filter(d=>d.status==="difference").length;
-    $("commandGrid").innerHTML=[
-      ['مجموع المندوبين SYP',fmt(total),'كل المبيع ضمن الفلتر'],
-      ['مجموع المندوبين USD',fmt(totalUsd),'دولار فعلي فقط'],
-      ['مجموع التسليم SYP',fmt(conf),'المسلم للمكاتب'],
-      ['المتبقي SYP',fmt(total-conf),total-conf>0?'على المندوبين':'مغلق'],
-      ['قيد المطابقة',fmt(pend),`${del.filter(deliveryCountsAsPending).length} عملية`],
-      ['الفروقات',fmt(diff),diff?'راجعها':'نظيف']
-    ].map(x=>`<div class="stat"><div class="k">${x[0]}</div><div class="v">${x[1]}</div><div class="s">${x[2]||''}</div></div>`).join("");
-
-    const byDayRep={};
-    function repKey(x){return String(x.representativeId||x.repId||x.representativeName||x.name||'غير محدد')}
-    sales.forEach(s=>{
-      const d=dateVal(s)||'بدون تاريخ', k=d+'__'+repKey(s);
-      if(!byDayRep[k])byDayRep[k]={date:d,rep:s.representativeName||'غير محدد',region:s.region||'',sale:0,delivered:0,offices:new Set(),notes:[]};
-      byDayRep[k].sale+=n(s.amountSyp);
-      if(s.notes)byDayRep[k].notes.push(s.notes);
-    });
-    del.forEach(dv=>{
-      const d=dateVal(dv)||'بدون تاريخ', k=d+'__'+repKey(dv);
-      if(!byDayRep[k])byDayRep[k]={date:d,rep:dv.representativeName||'غير محدد',region:dv.region||'',sale:0,delivered:0,offices:new Set(),notes:[]};
-      byDayRep[k].delivered+=n(dv.officeConfirmedSyp||dv.amountSyp);
-      if(dv.officeName)byDayRep[k].offices.add(dv.officeName);
-      if(dv.notes)byDayRep[k].notes.push(dv.notes);
-    });
-    const rows=Object.values(byDayRep).sort((a,b)=>(b.date||'').localeCompare(a.date||'')||String(a.rep||'').localeCompare(String(b.rep||''),'ar'));
-    const dayTotals={};
-    rows.forEach(r=>{if(!dayTotals[r.date])dayTotals[r.date]={sale:0,delivered:0}; dayTotals[r.date].sale+=r.sale; dayTotals[r.date].delivered+=r.delivered;});
-    let lastDay='', html='';
-    rows.forEach(r=>{
-      if(lastDay && lastDay!==r.date){const t=dayTotals[lastDay]; html+=`<tr style="background:rgba(125,211,252,.09);font-weight:900"><td colspan="4">مجموع يوم ${esc(lastDay)}</td><td class="amount">${fmt(t.sale)}</td><td class="amount">${fmt(t.delivered)}</td><td class="amount">${fmt(t.sale-t.delivered)}</td><td>—</td></tr>`;}
-      if(lastDay!==r.date)lastDay=r.date;
-      html+=`<tr><td>${esc(r.date)}</td><td>${esc(r.rep)}</td><td>${esc(r.region)}</td><td>${esc(Array.from(r.offices).join('، ')||'—')}</td><td class="amount">${fmt(r.sale)}</td><td class="amount">${fmt(r.delivered)}</td><td class="amount">${fmt(r.sale-r.delivered)}</td><td>${esc(r.notes.slice(0,2).join(' / ')||'—')}</td></tr>`;
-    });
-    if(lastDay){const t=dayTotals[lastDay]; html+=`<tr style="background:rgba(125,211,252,.09);font-weight:900"><td colspan="4">مجموع يوم ${esc(lastDay)}</td><td class="amount">${fmt(t.sale)}</td><td class="amount">${fmt(t.delivered)}</td><td class="amount">${fmt(t.sale-t.delivered)}</td><td>—</td></tr>`;}
-    $("commandRepLedgerBody").innerHTML=html||`<tr><td colspan="8" class="empty">لا توجد سجلات مندوبين ضمن الفلتر</td></tr>`;
-
-    const watch=[['نسبة التسليم المؤكد', total?((conf/total)*100).toFixed(1)+'%':'0%', conf>=total*.8?'جيدة':'تحتاج متابعة'],['عدد الفروقات',fmt(diff),diff?'راجع الفروقات':'نظيف'],['قيمة قيد المطابقة',fmt(pend),pend?'بانتظار الإدارة':'لا يوجد']];
-    $("commandWatchBody").innerHTML=watch.map(x=>`<tr><td>${x[0]}</td><td class="amount">${x[1]}</td><td>${x[2]}</td></tr>`).join("");
-    const regs=["R1","R2","R3","R4"];
-    $("regionCompareBody").innerHTML=regs.map(r=>{const rs=sales.filter(x=>x.region===r), rd=del.filter(x=>x.region===r); const s=rs.reduce((a,x)=>a+n(x.amountSyp),0); const c=rd.filter(d=>deliveryCountsAsConfirmed(d)).reduce((a,x)=>a+n(x.officeConfirmedSyp||x.amountSyp),0); const p=rd.filter(d=>deliveryCountsAsPending(d)).reduce((a,x)=>a+n(x.amountSyp),0); return `<tr><td>${r}</td><td class="amount">${fmt(s)}</td><td class="amount">${fmt(c)}</td><td class="amount">${fmt(s-c)}</td><td class="amount">${fmt(p)}</td></tr>`}).join("");
+    const remain=total-conf;
+    if($('commandGrid'))$('commandGrid').innerHTML=[
+      [`مجموع ${label} بالسوري`,`${fmt(total)} SYP`,'الإيراد الكامل للمنطقة المختارة'],
+      [`المتبقي الخاص بـ ${label}`,`${fmt(remain)} SYP`,remain>0?'متبقي على المندوبين':'لا يوجد متبقي ظاهر']
+    ].map(x=>`<div class="v43MiniStat"><div class="k">${esc(x[0])}</div><div class="v">${esc(x[1])}</div><div class="s">${esc(x[2])}</div></div>`).join('');
+    const rows=sales.slice().sort((a,b)=>(dateVal(b)||'').localeCompare(dateVal(a)||'')||(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
+    if($('commandRepLedgerBody'))$('commandRepLedgerBody').innerHTML=rows.map(s=>`<tr><td>${esc(s.representativeName||s.repName||s.mandobName||'—')}</td><td class="amount">${fmt(s.amountSyp)} SYP</td><td>${esc(dateVal(s)||s.date||'')}</td><td>${esc(v44RegionOfRow(s)||'—')}</td><td>${esc(s.notes||'—')}</td></tr>`).join('')||`<tr><td colspan="5" class="empty">لا توجد سجلات لهذه المنطقة</td></tr>`;
   }
   function saleButtons(s){ let b=''; if(saleEditAllowed(s)) b+=`<button class="secondary" onclick="openEdit('sales_reports','${s.id}')">تعديل</button>`; if(isAdmin()) b+=`<button class="secondary" onclick="v33OpenRecordImpact('sales_reports','${s.id}')">الأثر</button><button class="secondary" onclick="grantEdit('sales_reports','${s.id}')">إذن تعديل</button><button class="danger v33DeleteBtn" onclick="appDelete('sales_reports','${s.id}','حذف مبيع ${esc(s.representativeName)}')">حذف وربط الصندوق</button>`; return b||'<span class="muted">—</span>'; }
   function renderRecords(){ if(!$("salesBody"))return; if(state.profile?.role==="office"){$("deliveriesSearch").placeholder="بحث باسم المندوب";} if(state.profile?.role==="representative"){$("salesSearch").placeholder="بحث في سجلي";$("deliveriesSearch").placeholder="بحث في تسليماتي";} const st=($("salesSearch")?.value||"").trim(); const sales=live(state.sales).filter(s=>!st||String(s.representativeName||"").includes(st)||String(s.region||"").includes(st)); $("salesBody").innerHTML=sales.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)).map(s=>`<tr><td>${esc(s.date)}</td><td>${esc(s.representativeName)}</td><td>${esc(s.region)}</td><td class="amount">${fmt(s.amountSyp)}</td><td class="amount">${fmt(actualUsdFromSale(s))}</td><td>${esc(s.notes)}${s.editAllowedByAdmin?'<div class="editAllowed">مفتوح بإذن الإدارة</div>':''}</td><td><div class="actions">${saleButtons(s)}</div></td></tr>`).join("")||`<tr><td colspan="7" class="empty">لا توجد مبيعات</td></tr>`; const dt=($("deliveriesSearch")?.value||"").trim(); const dels=live(state.deliveries).filter(d=>!dt||String(d.representativeName||"").includes(dt)||String(d.officeName||"").includes(dt)); $("deliveriesBody").innerHTML=dels.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)).map(d=>`<tr><td>${esc(d.date)}</td><td>${esc(d.representativeName)}</td><td>${esc(d.officeName)}</td><td class="amount">${fmt(d.amountSyp)}</td><td><span class="pill ${statusClass(d.status)}">${statusLabel(d.status)}</span>${editStateText(d,'تسليم')}</td><td><div class="actions">${deliveryButtons(d)}</div></td></tr>`).join("")||`<tr><td colspan="6" class="empty">لا توجد تسليمات</td></tr>`; }
@@ -1361,12 +1511,19 @@
     $('officeMatchBody').innerHTML=rows.map(o=>`<tr><td>${esc(o.name)}</td><td>${esc(o.region)}</td><td class="amount">${fmt(o.confirmedSyp)}</td><td class="amount">${fmt(o.withdrawSyp)}</td><td class="amount">${fmt(o.manualSyp)}</td><td class="amount">${fmt(o.pending)}</td><td>${o.diff}</td><td class="amount ${o.sypBalance<0?'dangerText':'okText'}">${fmt(o.sypBalance)}</td><td>${walletBadge(o)}</td></tr>`).join('')||`<tr><td colspan="9" class="empty">لا توجد بيانات</td></tr>`;
   }
   function renderOfficeWallet(){
-    if(!$('officeWalletBody'))return;
-    const term=($('officeWalletSearch')?.value||'').trim(), rg=$('officeWalletRegion')?.value||'';
-    const rows=officeWalletRows().filter(o=>(!rg||o.region===rg)&&(!term||String(o.name||'').includes(term)));
-    $('officeWalletBody').innerHTML=rows.map(o=>`<tr><td>${esc(o.name)}</td><td>${esc(o.region)}</td><td class="amount walletStrong ${o.sypBalance<0?'dangerText':'okText'}">${fmt(o.sypBalance)} SYP</td><td class="amount walletStrong ${o.usdBalance<0?'dangerText':'okText'}">${fmt(o.usdBalance)} USD</td><td class="amount">${fmt(o.pending)}</td><td>${o.diff}</td><td>${esc(o.lastOp)}</td><td>${walletBadge(o)}</td><td><div class="actions"><button class="secondary" onclick="selectWalletOffice('${o.id}')">اختيار</button><button class="secondary" onclick="openOfficeWallet('${o.id}')">تفاصيل</button></div></td></tr>`).join('')||`<tr><td colspan="9" class="empty">لا توجد بيانات</td></tr>`;
-    renderOfficeWalletLedger(); renderCashbox(); updateWalletPreview();
+    if(!$('officeWalletCards'))return;
+    const term=($('officeWalletSearch')?.value||'').trim();
+    const rg=$('officeWalletRegion')?.value||'';
+    const currency=String($('officeWalletCurrency')?.value||'SYP').toUpperCase()==='USD'?'USD':'SYP';
+    const rows=officeWalletRows().filter(o=>(!rg||sameRegion(o.region,rg))&&(!term||String(o.name||'').includes(term)));
+    $('officeWalletCards').innerHTML=rows.sort((a,b)=>String(a.name||'').localeCompare(String(b.name||''),'ar')).map(o=>{
+      const val=currency==='USD'?n(o.usdBalance):n(o.sypBalance);
+      const cls=val<0?'bad':val>0?'good':'zero';
+      const caption=val<0?'له عندي':val>0?'رصيدي عنده':'صفر';
+      return `<div class="v43OfficeCard ${cls}"><div class="k">${esc(o.name)}</div><div class="v">${fmt(val)} ${currency}</div><div class="s">${esc(o.region||'—')} — ${caption}</div></div>`;
+    }).join('')||`<div class="empty">لا توجد مكاتب</div>`;
   }
+
   function renderOfficeWalletLedger(){
     if(!$('officeWalletLedgerBody'))return;
     const rows=validOfficeMovementRows().filter(w=>w._balanceValid).sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)).slice(0,180);
@@ -2194,7 +2351,9 @@ function buildIssues(){
     return state.reps.filter(r=>!repFilter||String(r.id)===String(repFilter)).map(r=>{const t=repDayTotals(r.id,date); return {date,repId:r.id,name:r.name,region:r.region,saleSyp:t.saleSyp,deliveredSyp:t.deliveredSyp,remainSyp:t.remainSyp,offices:t.offices,countSales:t.countSales,countDeliveries:t.countDeliveries,status:t.remainSyp>0?'متبقي':t.remainSyp<0?'تسليم زائد':'مغلق'}});
   }function renderDailyLedger(){
     if(!$('dailyLedgerBody'))return; const rows=dailyLedgerRows(); const totalSale=rows.reduce((a,x)=>a+x.saleSyp,0), totalDel=rows.reduce((a,x)=>a+x.deliveredSyp,0), totalRem=rows.reduce((a,x)=>a+x.remainSyp,0), active=rows.filter(x=>x.saleSyp||x.deliveredSyp).length;
-    $('dailyLedgerSummary').innerHTML=[['مجموع المبيع SYP',fmt(totalSale)],['مجموع التسليم SYP',fmt(totalDel)],['المتبقي SYP',fmt(totalRem)],['مندوبين عليهم حركة',fmt(active)]].map(x=>`<div class="stat"><div class="k">${x[0]}</div><div class="v">${x[1]}</div></div>`).join('');
+    // v45: تم حذف كروت ملخص السجل اليومي حسب الطلب؛ يبقى الجدول فقط.
+    const dailyLedgerSummaryEl=$('dailyLedgerSummary');
+    if(dailyLedgerSummaryEl) dailyLedgerSummaryEl.innerHTML='';
     $('dailyLedgerBody').innerHTML=rows.map(r=>`<tr><td>${esc(r.name)}</td><td>${esc(r.region||'')}</td><td class="amount">${fmt(r.saleSyp)}</td><td class="amount">${fmt(r.deliveredSyp)}</td><td class="amount ${r.remainSyp>0?'warnText':r.remainSyp<0?'dangerText':'okText'}">${fmt(r.remainSyp)}</td><td>${esc(r.offices||'—')}</td><td><span class="pill ${r.remainSyp===0?'ok':r.remainSyp>0?'warn':'danger'}">${r.status}</span></td></tr>`).join('')||`<tr><td colspan="7" class="empty">لا توجد بيانات</td></tr>`;
   }
   function renderDailyEntry(){
@@ -2252,8 +2411,40 @@ function buildIssues(){
     ];
     $("diagnosticsGrid").innerHTML=rows.map(x=>`<div class="miniCard"><div class="k">${esc(x[0])}</div><div class="v" style="font-size:18px;line-height:1.55;direction:auto;text-align:right">${esc(x[1])}</div></div>`).join('');
   }
+  function bindDashboardFilters(){
+    // v42: لا يوجد فلتر داخل لوحة القيادة. كل الفلاتر داخل قسم سجلات المندوبين.
+  }
+
+  function v44RemoveOldDashboardPanels(){
+    ['v33Deck','v33RecordsPulse'].forEach(id=>{const el=$(id); if(el)el.remove();});
+    if($('statsGrid')){$('statsGrid').innerHTML='';$('statsGrid').style.display='none';}
+  }
+  function v44RegionOfRow(row){
+    const direct=row?.region||row?.regionName||row?.regionId||'';
+    if(direct)return direct;
+    const rep=state.reps.find(r=>repMatchesRecord(r,row));
+    if(rep?.region)return rep.region;
+    const office=state.offices.find(o=>officeIsMain(o,row)||officeIsTarget(o,row));
+    return office?.region||'';
+  }
+  function v44MatchesRegion(row,rg){
+    if(!rg)return true;
+    return sameRegion(v44RegionOfRow(row),rg);
+  }
+  function v44RegionLabel(v){return v?String(v).replace(/^R([1-4])$/,'Region $1'):'الكل'}
+  function v44BindCleanFilters(){
+    const cmd=$('cmdRegion');
+    if(cmd&&!cmd.dataset.v44Bound){cmd.dataset.v44Bound='1';cmd.addEventListener('change',()=>{state.filters.region=cmd.value;renderCommand();});}
+    const reset=$('resetCmdFilter');
+    if(reset&&!reset.dataset.v44Bound){reset.dataset.v44Bound='1';reset.addEventListener('click',()=>{state.filters.region='';if(cmd)cmd.value='';renderCommand();});}
+    ['dashFilterFrom','dashFilterTo'].forEach(id=>{const el=$(id); if(el&&!el.dataset.v44Bound){el.dataset.v44Bound='1';el.addEventListener('change',renderDashboard);el.addEventListener('input',renderDashboard);}});
+    const clear=$('dashFilterClear');
+    if(clear&&!clear.dataset.v44Bound){clear.dataset.v44Bound='1';clear.addEventListener('click',()=>{if($('dashFilterFrom'))$('dashFilterFrom').value='';if($('dashFilterTo'))$('dashFilterTo').value='';renderDashboard();});}
+    ['officeWalletCurrency','officeWalletRegion','officeWalletSearch'].forEach(id=>{const el=$(id); if(el&&!el.dataset.v44Bound){el.dataset.v44Bound='1';el.addEventListener(id==='officeWalletSearch'?'input':'change',renderOfficeWallet);}});
+  }
+
   function renderAll(){
-    renderStats();renderDashboard();renderMySummary();
+    v44RemoveOldDashboardPanels();renderStats();renderDashboard();bindDashboardFilters();v44BindCleanFilters();renderMySummary();
     const tab=state.tab;
     if(tab==='dailyEntrySec')renderDailyEntry();
     if(tab==='commandSec')renderCommand();
@@ -2263,16 +2454,13 @@ function buildIssues(){
     if(tab==='officeMatchSec')renderOfficeMatch();
     if(tab==='officeWalletSec')renderOfficeWallet();
     if(tab==='cashboxSec')renderCashbox();
-    if(tab==='issuesSec')renderIssues();
-    if(tab==='amountsSec')renderManual();
     if(tab==='closingSec')renderClosing();
     if(tab==='balancesSec')renderBalances();
     if(tab==='trashSec')renderTrash();
     if(tab==='peopleSec')renderPeople();
     if(tab==='auditSec')renderAudit();
     if(tab==='settingsSec')renderSettings();
-    if(tab==='diagnosticsSec')renderDiagnostics();
-    if(typeof v33RenderUpgrade==='function')v33RenderUpgrade();
+    v44RemoveOldDashboardPanels();
     if(typeof renderV37ZeroPanel==='function')renderV37ZeroPanel();
   }
   function collectionRowsByName(col){
@@ -2399,7 +2587,7 @@ ${title||col}
   function updateLives(){ if($("saleLive"))$("saleLive").textContent=`${fmt(n($("saleSyp").value))} SYP`; if($("deliveryLive"))$("deliveryLive").textContent=`${fmt(n($("deliverySyp").value))} SYP`; }
   function saveDrafts(){ ['saleSyp','saleNotes','deliverySyp','deliveryNotes'].forEach(id=>{if($(id))localStorage.setItem('arsel_draft_'+id,$(id).value||'')})} function restoreDrafts(){ ['saleSyp','saleNotes','deliverySyp','deliveryNotes'].forEach(id=>{if($(id)){const v=localStorage.getItem('arsel_draft_'+id); if(v)$(id).value=v}}); updateLives(); }
   function setUsdMode(kind,on){const box=$(kind+'UsdBox'),wrap=$(kind+'RateWrap'),btn=$(kind==='sale'?'toggleSaleUsd':'toggleDeliveryUsd'),usd=$(kind+'Usd'); if(!box||!btn)return; box.classList.toggle('show',!!on); if(wrap)wrap.classList.toggle('hide',!on); btn.textContent=on?'إخفاء العملة الثانية':'إضافة عملة ثانية'; if(!on&&usd)usd.value=0;}
-  function setupUi(){ const smartRender=debounce(renderAll,160); $("toggleSaleUsd").onclick=()=>setUsdMode('sale',!$("saleUsdBox").classList.contains('show')); $("toggleDeliveryUsd").onclick=()=>setUsdMode('delivery',!$("deliveryUsdBox").classList.contains('show')); ["salesSearch","deliveriesSearch","repMatchSearch","officeMatchSearch","officeWalletSearch","cashboxSearch","cashboxFrom","cashboxTo"].forEach(id=>{if($(id))$(id).oninput=smartRender}); ["repMatchRegion","officeMatchRegion","officeWalletRegion","cashboxFilterType","cashboxPartyFilter","cashboxFilterRange"].forEach(id=>{if($(id))$(id).onchange=renderAll});
+  function setupUi(){ const smartRender=debounce(renderAll,160); if($("toggleSaleUsd"))$("toggleSaleUsd").onclick=()=>setUsdMode('sale',!$("saleUsdBox").classList.contains('show')); if($("toggleDeliveryUsd"))$("toggleDeliveryUsd").onclick=()=>setUsdMode('delivery',!$("deliveryUsdBox").classList.contains('show')); ["salesSearch","deliveriesSearch","repMatchSearch","officeMatchSearch","officeWalletSearch","cashboxSearch","cashboxFrom","cashboxTo"].forEach(id=>{if($(id))$(id).oninput=smartRender}); ["repMatchRegion","officeMatchRegion","officeWalletRegion","officeWalletCurrency","cashboxFilterType","cashboxPartyFilter","cashboxFilterRange"].forEach(id=>{if($(id))$(id).onchange=renderAll});
     ["auditSearch","auditFrom","auditTo"].forEach(id=>{if($(id))$(id).oninput=()=>{state.auditPage=1;renderAudit()}});
     ["auditRange","auditType","auditRole","auditSort","auditPageSize"].forEach(id=>{if($(id))$(id).onchange=()=>{state.auditPage=1;renderAudit()}});
     if($("auditPrev"))$("auditPrev").onclick=()=>{state.auditPage=Math.max(1,(state.auditPage||1)-1);renderAudit()};
@@ -2421,7 +2609,7 @@ ${title||col}
     if($('copyCashboxReportBtn'))$('copyCashboxReportBtn').onclick=copyCashboxReport;
     if($('exportCashboxCsvBtn'))$('exportCashboxCsvBtn').onclick=exportCashboxCsv;
 
-    $("applyCmdFilter").onclick=()=>{state.filters={from:$("cmdFrom").value,to:$("cmdTo").value,region:$("cmdRegion").value}; renderAll()}; $("resetCmdFilter").onclick=()=>{state.filters={from:'',to:'',region:''};["cmdFrom","cmdTo","cmdRegion"].forEach(id=>$(id).value='');renderAll()}; $("manualTargetType").onchange=()=>{$("manualOfficeWrap").classList.toggle('hide',$("manualTargetType").value!=='office');$("manualRepWrap").classList.toggle('hide',$("manualTargetType").value!=='representative')}; $("closeModal").onclick=()=>$("modal").classList.remove('show'); if($("themeSelect"))$("themeSelect").onchange=()=>setTheme($("themeSelect").value,true); if($("emptyTrashBtn"))$("emptyTrashBtn").onclick=()=>emptyTrash(); if($("refreshTrashBtn"))$("refreshTrashBtn").onclick=()=>loadData(); ["walletOffice","walletOperation","walletToOffice","walletSyp","walletUsd","walletRate","walletCommissionSyp","walletCommissionUsd","cashboxOperation","cashboxSyp","cashboxUsd","cashboxRate","cashboxPartyType","cashboxCategory"].forEach(id=>{if($(id)){const ev=id==="walletOffice"||id==="walletOperation"||id==="cashboxOperation"?"change":"input";$(id).addEventListener(ev,()=>{updateWalletPreview();updateCashboxPreview();})}}); $("refreshBtn").onclick=()=>withBusy('refreshBtn','جاري التحديث...',async()=>{await loadBase();await loadData();toast('تم التحديث')}); $("quickCopyBtn").onclick=copyWhatsappSummary; $("copyManagerWhatsapp").onclick=copyWhatsappSummary; $("copyIssuesBtn").onclick=()=>copyText(buildIssuesText()); $("enableSoundBtn").onclick=()=>{state.sound=!state.sound;toast(state.sound?'تم تشغيل صوت التنبيه':'تم إيقاف صوت التنبيه')}; $("exportSalesCsv").onclick=()=>downloadCsv('sales.csv',live(state.sales)); $("exportDeliveriesCsv").onclick=()=>downloadCsv('deliveries.csv',live(state.deliveries)); $("exportPdfBtn").onclick=()=>withBusy('exportPdfBtn','جاري تجهيز PDF...',()=>exportPdf($("pdfReportType").value)); $("quickFullPdf").onclick=()=>withBusy('quickFullPdf','تجهيز...',()=>exportPdf('full')); $("quickRepPdf").onclick=()=>withBusy('quickRepPdf','تجهيز...',()=>exportPdf('reps')); $("quickOfficePdf").onclick=()=>withBusy('quickOfficePdf','تجهيز...',()=>exportPdf('offices')); $("quickIssuesPdf").onclick=()=>withBusy('quickIssuesPdf','تجهيز...',()=>exportPdf('issues')); }
+    v44BindCleanFilters(); if($("manualTargetType"))$("manualTargetType").onchange=()=>{if($("manualOfficeWrap"))$("manualOfficeWrap").classList.toggle('hide',$("manualTargetType").value!=='office');if($("manualRepWrap"))$("manualRepWrap").classList.toggle('hide',$("manualTargetType").value!=='representative')}; if($("closeModal"))$("closeModal").onclick=()=>$("modal").classList.remove('show'); if($("themeSelect"))$("themeSelect").onchange=()=>setTheme($("themeSelect").value,true); if($("emptyTrashBtn"))$("emptyTrashBtn").onclick=()=>emptyTrash(); if($("refreshTrashBtn"))$("refreshTrashBtn").onclick=()=>loadData(); ["walletOffice","walletOperation","walletToOffice","walletSyp","walletUsd","walletRate","walletCommissionSyp","walletCommissionUsd","cashboxOperation","cashboxSyp","cashboxUsd","cashboxRate","cashboxPartyType","cashboxCategory"].forEach(id=>{if($(id)){const ev=id==="walletOffice"||id==="walletOperation"||id==="cashboxOperation"?"change":"input";$(id).addEventListener(ev,()=>{updateWalletPreview();updateCashboxPreview();})}}); if($("refreshBtn"))$("refreshBtn").onclick=()=>withBusy('refreshBtn','جاري التحديث...',async()=>{await loadBase();await loadData();toast('تم التحديث')}); if($("quickCopyBtn"))$("quickCopyBtn").onclick=copyWhatsappSummary; if($("copyManagerWhatsapp"))$("copyManagerWhatsapp").onclick=copyWhatsappSummary; if($("copyIssuesBtn"))$("copyIssuesBtn").onclick=()=>copyText(buildIssuesText()); if($("enableSoundBtn"))$("enableSoundBtn").onclick=()=>{state.sound=!state.sound;toast(state.sound?'تم تشغيل صوت التنبيه':'تم إيقاف صوت التنبيه')}; if($("exportSalesCsv"))$("exportSalesCsv").onclick=()=>downloadCsv('sales.csv',live(state.sales)); if($("exportDeliveriesCsv"))$("exportDeliveriesCsv").onclick=()=>downloadCsv('deliveries.csv',live(state.deliveries)); if($("exportPdfBtn"))$("exportPdfBtn").onclick=()=>withBusy('exportPdfBtn','جاري تجهيز PDF...',()=>exportPdf($("pdfReportType").value)); if($("quickFullPdf"))$("quickFullPdf").onclick=()=>withBusy('quickFullPdf','تجهيز...',()=>exportPdf('full')); if($("quickRepPdf"))$("quickRepPdf").onclick=()=>withBusy('quickRepPdf','تجهيز...',()=>exportPdf('reps')); if($("quickOfficePdf"))$("quickOfficePdf").onclick=()=>withBusy('quickOfficePdf','تجهيز...',()=>exportPdf('offices')); if($("quickIssuesPdf"))$("quickIssuesPdf").onclick=()=>withBusy('quickIssuesPdf','تجهيز...',()=>exportPdf('issues')); }
   async function saveSale(){try{if(state.profile.role!=="representative")throw new Error('هذا الإجراء للمندوب فقط.'); const syp=n($("saleSyp").value), usd=n($("saleUsd").value), rate=usd>0?n($("saleRate").value):0; if(syp<=0&&usd<=0)throw new Error('اكتب المبلغ السوري.'); if(usd>0&&rate<=0)throw new Error('اكتب سعر الصرف.'); await addDoc(collection(db,'sales_reports'),{representativeId:state.profile.representativeId,representativeName:state.profile.representativeName||state.profile.name,region:state.profile.region,date:$("saleDate").value||today,amountSyp:syp,amountUsd:usd,exchangeRate:rate,notes:$("saleNotes").value.trim(),createdBy:state.user.uid,createdAt:serverTimestamp(),clientTxnId:v38ClientTxnId('sale'),ledgerVersion:'v38',editAllowedByAdmin:false}); await writeAudit('create_sale','تسجيل مبيع مندوب'); ['saleSyp','saleUsd','saleNotes'].forEach(id=>{localStorage.removeItem('arsel_draft_'+id);$(id).value=id.includes('Usd')?0:''}); setUsdMode('sale',false); updateLives(); msg($("saleMsg"),'ok','تم حفظ المبيع.'); await loadData();}catch(e){msg($("saleMsg"),'error',e.message)}}
   async function saveDelivery(){try{if(state.profile.role!=="representative")throw new Error('هذا الإجراء للمندوب فقط.'); const office=state.offices.find(o=>o.id===$("deliveryOffice").value); if(!office)throw new Error('اختر المكتب.'); if(!officesForCurrentRole().some(o=>o.id===office.id))throw new Error('هذا المكتب غير متاح لهذا الحساب.'); const syp=n($("deliverySyp").value), usd=n($("deliveryUsd").value), rate=usd>0?n($("deliveryRate").value):0; if(syp<=0&&usd<=0)throw new Error('اكتب المبلغ السوري.'); if(usd>0&&rate<=0)throw new Error('اكتب سعر الصرف.'); await addDoc(collection(db,'deliveries'),{representativeId:state.profile.representativeId,representativeName:state.profile.representativeName||state.profile.name,representativeUid:state.user.uid,region:state.profile.region,officeId:office.id,officeName:office.name,date:$("deliveryDate").value||today,amountSyp:syp,amountUsd:usd,exchangeRate:rate,notes:$("deliveryNotes").value.trim(),status:'pending_admin',createdBy:state.user.uid,createdAt:serverTimestamp(),clientTxnId:v38ClientTxnId('delivery'),ledgerVersion:'v38',editAllowedByAdmin:false}); await writeAudit('create_delivery',`تسليم من ${state.profile.name} إلى ${office.name}`); ['deliverySyp','deliveryUsd','deliveryNotes'].forEach(id=>{localStorage.removeItem('arsel_draft_'+id);$(id).value=id.includes('Usd')?0:''}); setUsdMode('delivery',false); updateLives(); msg($("deliveryMsg"),'ok','تم حفظ التسليم ودخل على حساب المكتب قيد المطابقة.'); await loadData();}catch(e){msg($("deliveryMsg"),'error',e.message)}}
   async function saveManual(){try{if(!isManager())throw new Error('الصلاحية غير كافية.'); let targetType=$("manualTargetType").value,targetId='',targetName='عام'; if(targetType==='office'){const o=state.offices.find(x=>x.id===$("manualOffice").value); if(!o)throw new Error('اختر المكتب.'); targetId=o.id; targetName=o.name;} if(targetType==='representative'){const r=state.reps.find(x=>x.id===$("manualRep").value); if(!r)throw new Error('اختر المندوب.'); targetId=r.id; targetName=r.name;} await addDoc(collection(db,'manual_amounts'),{type:$("manualType").value,ledgerModel:'v37_zero_rebuild',originVersion:'v37_zero_rebuild',cleanLedger:true,countInBalances:true,forceCountBalance:true,targetType,targetId,targetName,date:$("manualDate").value||today,amountSyp:n($("manualSyp").value),amountUsd:n($("manualUsd").value),exchangeRate:n($("manualRate").value),notes:$("manualNotes").value.trim(),actorUid:state.user.uid,actorName:state.profile.name||state.profile.displayName||'',createdAt:serverTimestamp(),clientTxnId:v38ClientTxnId('manual'),ledgerVersion:'v38'}); await writeAudit('manual_amount','إضافة مبلغ يدوي'); ['manualSyp','manualUsd','manualNotes'].forEach(id=>$(id).value=''); msg($("manualMsg"),'ok','تم حفظ المبلغ.'); await loadData();}catch(e){msg($("manualMsg"),'error',e.message)}}
@@ -2480,7 +2668,7 @@ ${title||col}
   async function copyText(t){try{await navigator.clipboard.writeText(t);toast('تم النسخ')}catch(_){prompt('انسخ النص:',t)}} function copyWhatsappSummary(){copyText(buildWhatsappSummary())}
   function downloadCsv(name,rows){const keys=[...new Set(rows.flatMap(o=>Object.keys(o).filter(k=>typeof o[k]!=='object')))], csv=[keys.join(',')].concat(rows.map(r=>keys.map(k=>`"${String(r[k]??'').replace(/"/g,'""')}"`).join(','))).join('\n'); const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'})); a.download=name; a.click(); URL.revokeObjectURL(a.href)}
   function pdfTable(title,headers,rows){return `<div class="pdfSection"><div class="pdfTitle">${title}</div><table class="pdfTable"><thead><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.length?rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join(''):`<tr><td colspan="${headers.length}">لا توجد بيانات</td></tr>`}</tbody></table></div>`}
-  async function exportPdf(type='full'){try{await ensurePdfLibs(); if(!window.html2canvas||!window.jspdf)throw new Error('مكتبات PDF لم تحمل بعد.'); const c=calc(); const title=$("pdfTitleInput").value||({full:'تقرير شامل',reps:'مطابقة المندوبين',offices:'مطابقة المكاتب',issues:'مشاكل اليوم',closing:'إقفال اليوم'}[type]||'تقرير'); let body=`<div class="pdfHead"><div><div class="pdfBrand">أرسل</div><div class="pdfSub">${title}<br>تقرير مولد من Command Center v38 Factory Reset Ledger</div></div><div class="pdfMeta">Date: ${$("pdfDate").value||today}<br>User: ${esc(state.profile.name||state.user.email)}<br>Project: mandob-app-82843</div></div><div class="pdfGrid">${[['مبيع اليوم',fmt(c.totalSalesToday)],['المؤكد اليوم',fmt(c.confirmedToday)],['قيد المطابقة',fmt(c.pending)],['المتبقي',fmt(c.remain)]].map(x=>`<div class="pdfKpi"><div class="k">${x[0]}</div><div class="v">${x[1]}</div></div>`).join('')}</div>`; if(type==='full'||type==='reps') body+=pdfTable('مطابقة المندوبين',['المندوب','المنطقة','المبيع','المؤكد','المتبقي'],state.reps.map(r=>{const rs=live(state.sales).filter(s=>s.representativeId===r.id||s.representativeName===r.name),rd=live(state.deliveries).filter(d=>d.representativeId===r.id||d.representativeName===r.name);const s=rs.reduce((a,x)=>a+n(x.amountSyp),0),co=rd.filter(d=>isConfirmedStatus(d)).reduce((a,x)=>a+n(x.officeConfirmedSyp||x.amountSyp),0);return[esc(r.name),esc(r.region),fmt(s),fmt(co),fmt(s-co)]})); if(type==='full'||type==='offices') body+=pdfTable('مطابقة المكاتب',['المكتب','المنطقة','المؤكد','السحوبات','الرصيد'],state.offices.map(o=>{const od=live(state.deliveries).filter(d=>d.officeId===o.id||d.officeName===o.name),ow=live(state.withdrawals).filter(w=>w.officeId===o.id||w.officeName===o.name);const co=od.filter(d=>isConfirmedStatus(d)).reduce((a,x)=>a+n(x.officeConfirmedSyp||x.amountSyp),0),wd=ow.reduce((a,x)=>a+n(x.amountSyp),0);return[esc(o.name),esc(o.region),fmt(co),fmt(wd),fmt(co-wd)]})); if(type==='full'||type==='issues') body+=pdfTable('المشاكل والتنبيهات',['الخطورة','النوع','التفصيل','القيمة','الحالة'],buildIssues().map(i=>[i[0],i[1],esc(i[2]),i[3],i[4]])); if(type==='closing') body+=pdfTable('إقفالات اليوم',['التاريخ','المكتب','الحالة','المبلغ'],live(state.closings).filter(x=>x.date===($("pdfDate").value||today)).map(x=>[x.date,esc(x.officeName),esc(x.status),fmt(x.totalSyp)])); const div=document.createElement('div'); div.className='pdfReport'; div.innerHTML=body+`<div class="pdfFoot">أرسل — تقرير داخلي</div>`; $("pdfHiddenArea").innerHTML=''; $("pdfHiddenArea").appendChild(div); const canvas=await html2canvas(div,{scale:window.innerWidth<760?1.35:2,backgroundColor:'#f8fafc',useCORS:true}); const img=canvas.toDataURL('image/jpeg',0.95); const {jsPDF}=window.jspdf; const pdf=new jsPDF('p','mm','a4'); const pageW=210,pageH=297; const imgH=canvas.height*pageW/canvas.width; let y=0; pdf.addImage(img,'JPEG',0,y,pageW,imgH); let left=imgH-pageH; while(left>0){pdf.addPage(); y-=pageH; pdf.addImage(img,'JPEG',0,y,pageW,imgH); left-=pageH;} pdf.save(`arsel_${type}_${today}.pdf`); msg($("pdfMsg"),'ok','تم تصدير PDF.');}catch(e){msg($("pdfMsg"),'error',e.message)}}
+  async function exportPdf(type='full'){try{await ensurePdfLibs(); if(!window.html2canvas||!window.jspdf)throw new Error('مكتبات PDF لم تحمل بعد.'); const c=calc(); const title=$("pdfTitleInput").value||({full:'تقرير شامل',reps:'مطابقة المندوبين',offices:'مطابقة المكاتب',issues:'مشاكل اليوم',closing:'إقفال اليوم'}[type]||'تقرير'); let body=`<div class="pdfHead"><div><div class="pdfBrand">أرسل</div><div class="pdfSub">${title}<br>تقرير مولد من Command Center v41 Clean Dashboard Region Office</div></div><div class="pdfMeta">Date: ${$("pdfDate").value||today}<br>User: ${esc(state.profile.name||state.user.email)}<br>Project: mandob-app-82843</div></div><div class="pdfGrid">${[['مبيع اليوم',fmt(c.totalSalesToday)],['المؤكد اليوم',fmt(c.confirmedToday)],['قيد المطابقة',fmt(c.pending)],['المتبقي',fmt(c.remain)]].map(x=>`<div class="pdfKpi"><div class="k">${x[0]}</div><div class="v">${x[1]}</div></div>`).join('')}</div>`; if(type==='full'||type==='reps') body+=pdfTable('مطابقة المندوبين',['المندوب','المنطقة','المبيع','المؤكد','المتبقي'],state.reps.map(r=>{const rs=live(state.sales).filter(s=>s.representativeId===r.id||s.representativeName===r.name),rd=live(state.deliveries).filter(d=>d.representativeId===r.id||d.representativeName===r.name);const s=rs.reduce((a,x)=>a+n(x.amountSyp),0),co=rd.filter(d=>isConfirmedStatus(d)).reduce((a,x)=>a+n(x.officeConfirmedSyp||x.amountSyp),0);return[esc(r.name),esc(r.region),fmt(s),fmt(co),fmt(s-co)]})); if(type==='full'||type==='offices') body+=pdfTable('مطابقة المكاتب',['المكتب','المنطقة','المؤكد','السحوبات','الرصيد'],state.offices.map(o=>{const od=live(state.deliveries).filter(d=>d.officeId===o.id||d.officeName===o.name),ow=live(state.withdrawals).filter(w=>w.officeId===o.id||w.officeName===o.name);const co=od.filter(d=>isConfirmedStatus(d)).reduce((a,x)=>a+n(x.officeConfirmedSyp||x.amountSyp),0),wd=ow.reduce((a,x)=>a+n(x.amountSyp),0);return[esc(o.name),esc(o.region),fmt(co),fmt(wd),fmt(co-wd)]})); if(type==='full'||type==='issues') body+=pdfTable('المشاكل والتنبيهات',['الخطورة','النوع','التفصيل','القيمة','الحالة'],buildIssues().map(i=>[i[0],i[1],esc(i[2]),i[3],i[4]])); if(type==='closing') body+=pdfTable('إقفالات اليوم',['التاريخ','المكتب','الحالة','المبلغ'],live(state.closings).filter(x=>x.date===($("pdfDate").value||today)).map(x=>[x.date,esc(x.officeName),esc(x.status),fmt(x.totalSyp)])); const div=document.createElement('div'); div.className='pdfReport'; div.innerHTML=body+`<div class="pdfFoot">أرسل — تقرير داخلي</div>`; $("pdfHiddenArea").innerHTML=''; $("pdfHiddenArea").appendChild(div); const canvas=await html2canvas(div,{scale:window.innerWidth<760?1.35:2,backgroundColor:'#f8fafc',useCORS:true}); const img=canvas.toDataURL('image/jpeg',0.95); const {jsPDF}=window.jspdf; const pdf=new jsPDF('p','mm','a4'); const pageW=210,pageH=297; const imgH=canvas.height*pageW/canvas.width; let y=0; pdf.addImage(img,'JPEG',0,y,pageW,imgH); let left=imgH-pageH; while(left>0){pdf.addPage(); y-=pageH; pdf.addImage(img,'JPEG',0,y,pageW,imgH); left-=pageH;} pdf.save(`arsel_${type}_${today}.pdf`); msg($("pdfMsg"),'ok','تم تصدير PDF.');}catch(e){msg($("pdfMsg"),'error',e.message)}}
 
 
   /* v33 Ultimate Fire Upgrade Layer: visual command deck + safer deletion preview */
@@ -2526,15 +2714,7 @@ ${title||col}
     sec.prepend(pulse);
   }
   function v33RenderUpgrade(){
-    if(!state.user)return;
-    v33EnsureDeck(); v33EnsureRecordsPulse();
-    const d=v33Digest();
-    if($('v33Score'))$('v33Score').textContent=Math.round(d.score);
-    if($('v33Signal'))$('v33Signal').innerHTML=[`<span class="pill ${d.pending.length?'warn':'ok'}">${d.pending.length} قيد</span>`,`<span class="pill ${d.diff.length?'danger':'ok'}">${d.diff.length} فرق</span>`,`<span class="pill ${d.negativeWallets.length?'danger':'ok'}">${d.negativeWallets.length} مكتب عليه</span>`,`<span class="pill ${d.change<0?'warn':'ok'}">${d.change>=0?'+':''}${d.change.toFixed(1)}% عن أمس</span>`].join('');
-    if($('v33Kpis'))$('v33Kpis').innerHTML=[v33Kpi('مبيع اليوم',fmt(d.todaySale),'SYP'),v33Kpi('تسليم مؤكد اليوم',fmt(d.todayConfirmed),'SYP'),v33Kpi('هذا الشهر',fmt(d.monthSale),'SYP'),v33Kpi('مقارنة أمس',(d.change>=0?'+':'')+d.change.toFixed(1)+'%','اليوم مقابل أمس')].join('');
-    if($('v33HotList'))$('v33HotList').innerHTML=v33HotItems(d);
-    if($('v33RecordStats'))$('v33RecordStats').innerHTML=[['مبيعات فعالة',fmt(live(state.sales).length)],['تسليمات فعالة',fmt(live(state.deliveries).length)],['داخل السلة',fmt(trashItems().length)],['حذف مترابط','جاهز']].map(x=>`<div class="miniCard"><div class="k">${x[0]}</div><div class="v">${x[1]}</div></div>`).join('');
-    document.querySelectorAll('#salesBody .v33DeleteBtn,#deliveriesBody .v33DeleteBtn').forEach(b=>{b.title='يحذف السجل من العرض وينقل للسلة ويعيد حساب الصندوق والمكاتب فوراً';});
+    v44RemoveOldDashboardPanels();
   }
   function v33RecordLabel(col,item){
     if(!item)return col;
