@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <!-- v31: restored pre-royal-blue visual style from v28; no Firebase/account changes -->
-  <title>Arsel Command Center v45 Remove Daily Summary Cards</title>
+  <title>Arsel Command Center v47 Premium</title>
   <style>
     :root{
       --bg:#050711;--bg2:#0d1424;--glass:rgba(255,255,255,.085);--glass2:rgba(255,255,255,.13);
@@ -432,13 +432,117 @@
     /* v45: hide removed daily summary cards if old cached DOM appears */
     #dailyLedgerSummary{display:none!important}
 
-</style>
+
+
+    /* v46 Dashboard date filter final total */
+    .v46TotalRow td{background:rgba(125,211,252,.12)!important;border-top:1px solid rgba(125,211,252,.35)!important;font-weight:950;color:#e0f2fe}
+    .v46TotalRow .amount{font-size:16px}
+    .v46TotalLabel{display:flex;flex-direction:column;gap:3px}.v46TotalLabel small{color:var(--muted);font-weight:700}
+
+    /* ═══════════════════════════════════════════════
+       v47 PREMIUM EDITION — Visual & UX Upgrades
+       ═══════════════════════════════════════════════ */
+
+    /* 1. Animated background orbs */
+    @keyframes v47OrbFloat{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(18px,-14px) scale(1.06)}66%{transform:translate(-12px,20px) scale(.96)}}
+    @keyframes v47OrbFloat2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-20px,16px) scale(1.05)}}
+    body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;
+      background:
+        radial-gradient(ellipse 520px 380px at 12% 8%,rgba(125,211,252,.18),transparent),
+        radial-gradient(ellipse 400px 300px at 88% 6%,rgba(192,132,252,.16),transparent),
+        radial-gradient(ellipse 460px 340px at 55% 96%,rgba(34,197,94,.12),transparent);
+      animation:v47OrbFloat 18s ease-in-out infinite}
+
+    /* 2. Premium card hover glow */
+    .card,.stat,.miniCard{transition:box-shadow .24s,border-color .24s,transform .18s}
+    .card:hover{box-shadow:0 28px 90px rgba(0,0,0,.32),0 0 0 1px rgba(125,211,252,.12),inset 0 1px 0 rgba(255,255,255,.12)}
+    .stat:hover,.miniCard:hover{transform:translateY(-2px);box-shadow:0 18px 50px rgba(0,0,0,.24),0 0 0 1px rgba(125,211,252,.14)}
+
+    /* 3. Topbar live clock */
+    #v47LiveClock{display:inline-flex;align-items:center;gap:6px;padding:6px 13px;background:rgba(255,255,255,.08);border:1px solid rgba(125,211,252,.20);border-radius:999px;font-size:13px;font-weight:900;color:#bae6fd;direction:ltr;letter-spacing:.5px;white-space:nowrap}
+    #v47LiveClock .v47Pulse{width:7px;height:7px;border-radius:50%;background:#4ade80;box-shadow:0 0 0 0 rgba(74,222,128,.6);animation:v47PulseRing 1.6s ease-out infinite}
+    @keyframes v47PulseRing{0%{box-shadow:0 0 0 0 rgba(74,222,128,.55)}70%{box-shadow:0 0 0 7px rgba(74,222,128,0)}100%{box-shadow:0 0 0 0 rgba(74,222,128,0)}}
+
+    /* 4. Enhanced nav buttons */
+    .nav button{position:relative;overflow:hidden;transition:.2s background,.2s border-color,.18s transform}
+    .nav button::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(125,211,252,.0),rgba(125,211,252,.08));opacity:0;transition:.2s opacity}
+    .nav button:hover::before{opacity:1}
+    .nav button.active{background:linear-gradient(135deg,rgba(125,211,252,.22),rgba(167,243,208,.12))!important;border-color:rgba(125,211,252,.70)!important;box-shadow:0 0 18px rgba(125,211,252,.18),inset 0 1px 0 rgba(255,255,255,.12)!important}
+
+    /* 5. Login page — animated logo pulse + particles */
+    .logo{animation:v47LogoPulse 3.5s ease-in-out infinite;position:relative}
+    @keyframes v47LogoPulse{0%,100%{box-shadow:var(--shadow),inset 0 1px 0 rgba(255,255,255,.28),0 0 0 0 rgba(125,211,252,.0)}50%{box-shadow:var(--shadow),inset 0 1px 0 rgba(255,255,255,.28),0 0 0 14px rgba(125,211,252,.14),0 0 42px rgba(125,211,252,.18)}}
+    .brand h1{background:linear-gradient(135deg,#e0f2fe,#a7f3d0,#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+
+    /* 6. Premium toast upgrade */
+    .toast{animation:v47ToastIn .32s cubic-bezier(.22,1,.36,1) both}
+    @keyframes v47ToastIn{from{transform:translateY(18px) scale(.96);opacity:0}to{transform:none;opacity:1}}
+    .toast.v47Success{border-color:rgba(74,222,128,.42)!important;background:rgba(8,22,18,.92)!important;color:#d1fae5}
+    .toast.v47Error{border-color:rgba(251,113,133,.42)!important;background:rgba(22,8,12,.92)!important;color:#fecdd3}
+    .toast.v47Info{border-color:rgba(125,211,252,.38)!important;background:rgba(8,14,24,.92)!important;color:#bae6fd}
+
+    /* 7. Table row hover */
+    tbody tr{transition:background .15s}
+    tbody tr:hover td{background:rgba(125,211,252,.055)!important}
+
+    /* 8. Money inputs — enhanced glow focus */
+    .moneyInput:focus{border-color:rgba(167,243,208,.9)!important;box-shadow:0 0 0 5px rgba(167,243,208,.14),0 18px 50px rgba(0,0,0,.28)!important;background:rgba(255,255,255,.18)!important}
+
+    /* 9. Sidebar premium header */
+    .v34SideHead{background:linear-gradient(135deg,rgba(10,18,38,.96),rgba(20,28,52,.94))!important;border-bottom:1px solid rgba(125,211,252,.14);padding:14px 16px;border-radius:18px 18px 0 0;margin:-1px -1px 0}
+    .v34SideHead b{font-size:16px;background:linear-gradient(90deg,#e0f2fe,#a7f3d0);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .v34SideHead span{color:var(--muted);font-size:11px;display:block;margin-top:2px}
+
+    /* 10. Pill enhancements */
+    .pill{transition:.18s transform,.18s box-shadow}
+    .pill:hover{transform:translateY(-1px)}
+    .pill.ok{box-shadow:0 4px 14px rgba(74,222,128,.18)}
+    .pill.warn{box-shadow:0 4px 14px rgba(251,191,36,.16)}
+    .pill.danger{box-shadow:0 4px 14px rgba(251,113,133,.18)}
+    .pill.info{box-shadow:0 4px 14px rgba(125,211,252,.14)}
+
+    /* 11. Buttons — micro-interaction ripple area */
+    button:not(.secondary):not(.danger):not(.warn):not(.okbtn):not(.nav button){
+      box-shadow:0 16px 42px rgba(125,211,252,.24),0 4px 14px rgba(167,243,208,.14)!important}
+    button:not(.secondary):not(.danger):not(.warn):not(.okbtn):not(.nav button):hover{
+      box-shadow:0 20px 52px rgba(125,211,252,.34),0 6px 20px rgba(167,243,208,.18)!important}
+
+    /* 12. Scrollbar premium */
+    ::-webkit-scrollbar{width:7px;height:7px}
+    ::-webkit-scrollbar-track{background:rgba(255,255,255,.04);border-radius:999px}
+    ::-webkit-scrollbar-thumb{background:linear-gradient(180deg,rgba(125,211,252,.55),rgba(192,132,252,.42));border-radius:999px}
+    ::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,rgba(125,211,252,.78),rgba(192,132,252,.65))}
+
+    /* 13. Modal — slide up */
+    .drawer.show .modal{animation:v47ModalIn .3s cubic-bezier(.22,1,.36,1) both}
+    @keyframes v47ModalIn{from{transform:translateY(24px) scale(.98);opacity:0}to{transform:none;opacity:1}}
+
+    /* 14. Section entrance animation */
+    .section.active{animation:v47SectionIn .3s ease both}
+    @keyframes v47SectionIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+    /* 15. Premium topbar gradient line */
+    .topbar{border-bottom:1px solid transparent!important;background:rgba(5,7,17,.82)!important;box-shadow:0 1px 0 rgba(125,211,252,.14),0 4px 24px rgba(0,0,0,.38)!important}
+
+    /* 16. v47 badge in sidebar */
+    .v47VersionBadge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:999px;background:linear-gradient(90deg,rgba(125,211,252,.16),rgba(192,132,252,.12));border:1px solid rgba(125,211,252,.22);color:#bae6fd;font-size:10px;font-weight:900;letter-spacing:.5px;margin-top:6px}
+
+    /* 17. Light mode compatibility */
+    body.theme-light .card:hover{box-shadow:0 22px 60px rgba(15,23,42,.12),0 0 0 1px rgba(15,23,42,.08)}
+    body.theme-light .stat:hover,.theme-light .miniCard:hover{box-shadow:0 14px 40px rgba(15,23,42,.10)}
+    body.theme-light .brand h1{-webkit-text-fill-color:initial;background:none;color:inherit}
+    body.theme-light tbody tr:hover td{background:rgba(15,23,42,.04)!important}
+
+    /* Mobile: no hover transform on touch */
+    @media (hover:none){.card:hover,.stat:hover,.miniCard:hover{transform:none!important}}
+
+  </style>
 </head>
 <body>
   <section class="page" id="loginPage">
     <main class="login">
       <section class="brand">
-        <div class="logo">أ</div><h1>أرسل</h1><p class="subtitle">Command Center v42 — Section Scoped Filters</p>
+        <div class="logo">أ</div><h1>أرسل</h1><p class="subtitle">Command Center v47 — Premium Edition</p>
       </section>
       <section class="card">
         <label for="email">البريد الإلكتروني</label><input id="email" type="email" autocomplete="username" placeholder="name@rcell.app">
@@ -476,6 +580,7 @@
                 <table>
                   <thead><tr><th>اسم المندوب</th><th>الإيراد / المبلغ</th><th>التاريخ</th><th>المنطقة</th><th>العملة</th></tr></thead>
                   <tbody id="dashboardRevenueBody"></tbody>
+                  <tfoot id="dashboardRevenueFoot"></tfoot>
                 </table>
               </div>
             </div>
@@ -1405,14 +1510,24 @@
       ['صندوق السوري',fmt(box.syp),'رصيد الصندوق السوري'],
       ['صندوق الدولار',fmt(box.usd),'رصيد صندوق الدولار']
     ].map(x=>`<div class="stat"><div class="k">${x[0]}</div><div class="v">${x[1]}</div><div class="s">${x[2]}</div></div>`).join('');
+
+    const from=$('dashFilterFrom')?.value||'';
+    const to=$('dashFilterTo')?.value||'';
     const rows=live(state.sales).filter(v43DashboardDateFilter).sort((a,b)=>(dateVal(b)||'').localeCompare(dateVal(a)||'')||(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
+    const totalSyp=rows.reduce((a,s)=>a+n(s.amountSyp),0);
+    const totalUsd=rows.reduce((a,s)=>a+n(s.amountUsd||s.usd||0),0);
+    const rangeText=from&&to&&from===to?`تاريخ ${from}`:(from||to?`${from||'البداية'} إلى ${to||'النهاية'}`:'كل السجلات الظاهرة');
+
     if($('dashboardRevenueBody'))$('dashboardRevenueBody').innerHTML=rows.map(s=>{
       const usd=n(s.amountUsd||s.usd||0);
       const cur=usd>0?'SYP + USD':'SYP';
       const amount=usd>0?`${fmt(s.amountSyp)} SYP / ${fmt(usd)} USD`:`${fmt(s.amountSyp)} SYP`;
       return `<tr><td>${esc(s.representativeName||s.repName||s.mandobName||'—')}</td><td class="amount">${amount}</td><td>${esc(dateVal(s)||s.date||'')}</td><td>${esc(v40SaleRegion(s)||s.region||'—')}</td><td>${cur}</td></tr>`;
     }).join('')||`<tr><td colspan="5" class="empty">لا توجد سجلات إيراد ضمن التاريخ المحدد</td></tr>`;
+
+    if($('dashboardRevenueFoot'))$('dashboardRevenueFoot').innerHTML=rows.length?`<tr class="v46TotalRow"><td><div class="v46TotalLabel">المجموع النهائي<small>${esc(rangeText)} — ${rows.length} سجل</small></div></td><td class="amount">${fmt(totalSyp)} SYP${totalUsd?` / ${fmt(totalUsd)} USD`:''}</td><td colspan="3">مجموع السجلات الظاهرة بعد فلتر التاريخ فقط</td></tr>`:'';
   }
+
   function renderBars(){
     const rows=typeof v40DashboardRows==='function'?v40DashboardRows():[];
     const byRep=Object.fromEntries(rows.map(r=>[r.name,r.syp]));
@@ -2839,6 +2954,176 @@ ${title||col}
     window.openArselSidebar=openSide;
     window.closeArselSidebar=closeSide;
   });
+})();
+</script>
+
+<!-- ═══ v47 PREMIUM EDITION — Extra Enhancements ═══ -->
+<script>
+(function(){
+  'use strict';
+  function ready(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',fn); else fn(); }
+
+  ready(function(){
+
+    /* ── 1. Live Clock in Topbar ── */
+    var topActions = document.querySelector('.topActions');
+    if(topActions){
+      var clockEl = document.createElement('div');
+      clockEl.id = 'v47LiveClock';
+      clockEl.innerHTML = '<span class="v47Pulse"></span><span id="v47ClockText">--:--:--</span>';
+      topActions.insertBefore(clockEl, topActions.firstChild);
+      function updateClock(){
+        var now = new Date();
+        var h = String(now.getHours()).padStart(2,'0');
+        var m = String(now.getMinutes()).padStart(2,'0');
+        var s = String(now.getSeconds()).padStart(2,'0');
+        var txt = document.getElementById('v47ClockText');
+        if(txt) txt.textContent = h+':'+m+':'+s;
+      }
+      updateClock();
+      setInterval(updateClock, 1000);
+    }
+
+    /* ── 2. v47 Version Badge in sidebar ── */
+    function injectVersionBadge(){
+      var sideHint = document.getElementById('sideHint');
+      if(sideHint && !document.getElementById('v47Badge')){
+        var badge = document.createElement('span');
+        badge.id = 'v47Badge';
+        badge.className = 'v47VersionBadge';
+        badge.textContent = '✦ v47 Premium';
+        sideHint.parentNode.insertBefore(badge, sideHint.nextSibling);
+      }
+    }
+    injectVersionBadge();
+    // retry after app shows
+    setTimeout(injectVersionBadge, 2000);
+    setTimeout(injectVersionBadge, 5000);
+
+    /* ── 3. Enhance toast notifications with color classes ── */
+    // Patch toastWrap with MutationObserver to auto-add color classes
+    var toastWrap = document.getElementById('toastWrap');
+    if(toastWrap && window.MutationObserver){
+      var toastObserver = new MutationObserver(function(mutations){
+        mutations.forEach(function(m){
+          m.addedNodes.forEach(function(node){
+            if(node.classList && node.classList.contains('toast')){
+              var txt = (node.textContent||'').toLowerCase();
+              if(txt.includes('تم') || txt.includes('حفظ') || txt.includes('نجح') || txt.includes('ناجح') || txt.includes('ok')){
+                node.classList.add('v47Success');
+              } else if(txt.includes('خطأ') || txt.includes('error') || txt.includes('فشل') || txt.includes('غير') || txt.includes('مرفوض')){
+                node.classList.add('v47Error');
+              } else {
+                node.classList.add('v47Info');
+              }
+            }
+          });
+        });
+      });
+      toastObserver.observe(toastWrap, {childList: true});
+    }
+
+    /* ── 4. Smooth section transitions — re-trigger animation on nav click ── */
+    var nav = document.getElementById('nav');
+    if(nav){
+      nav.addEventListener('click', function(e){
+        var btn = e.target.closest('button');
+        if(!btn) return;
+        setTimeout(function(){
+          var active = document.querySelector('.section.active');
+          if(active){
+            active.style.animation = 'none';
+            void active.offsetWidth; // reflow
+            active.style.animation = '';
+          }
+        }, 30);
+      });
+    }
+
+    /* ── 5. Card enter animation on section switch ── */
+    function animateCards(section){
+      if(!section) return;
+      var cards = section.querySelectorAll('.card,.stat,.miniCard');
+      cards.forEach(function(card, i){
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(14px)';
+        setTimeout(function(){
+          card.style.transition = 'opacity .28s ease, transform .28s ease';
+          card.style.opacity = '';
+          card.style.transform = '';
+          setTimeout(function(){ card.style.transition = ''; }, 350);
+        }, 40 + i * 28);
+      });
+    }
+
+    // Hook into nav click to animate cards in new section
+    if(nav){
+      nav.addEventListener('click', function(){
+        setTimeout(function(){
+          var active = document.querySelector('.section.active');
+          animateCards(active);
+        }, 60);
+      });
+    }
+
+    /* ── 6. Keyboard shortcut: Alt+R = refresh, Alt+H = go to dashboard ── */
+    document.addEventListener('keydown', function(e){
+      if(e.altKey && e.key === 'r'){
+        var refreshBtn = document.getElementById('refreshBtn');
+        if(refreshBtn) refreshBtn.click();
+      }
+      if(e.altKey && e.key === 'h'){
+        var dashBtn = document.querySelector('#nav button[data-sec="dashboardSec"], #nav button:first-child');
+        if(dashBtn) dashBtn.click();
+      }
+    });
+
+    /* ── 7. Money input — formatted display on blur ── */
+    document.addEventListener('blur', function(e){
+      var el = e.target;
+      if(el && el.classList && el.classList.contains('smartMoney') && el.value){
+        var raw = parseFloat(String(el.value).replace(/,/g,''));
+        if(!isNaN(raw) && raw > 0){
+          el.value = raw.toLocaleString('en-US', {maximumFractionDigits:2});
+        }
+      }
+    }, true);
+    document.addEventListener('focus', function(e){
+      var el = e.target;
+      if(el && el.classList && el.classList.contains('smartMoney')){
+        el.value = String(el.value).replace(/,/g,'');
+      }
+    }, true);
+
+    /* ── 8. Table row click → highlight for 1.2s ── */
+    document.addEventListener('click', function(e){
+      var tr = e.target.closest('tbody tr');
+      if(!tr) return;
+      tr.style.transition = 'background .15s';
+      tr.style.background = 'rgba(125,211,252,.10)';
+      setTimeout(function(){ tr.style.background = ''; }, 1200);
+    });
+
+    /* ── 9. Auto-close mobile sidebar on section link click (extra safety) ── */
+    document.addEventListener('click', function(e){
+      var btn = e.target.closest('#nav button');
+      if(btn && window.innerWidth <= 1050){
+        setTimeout(function(){
+          if(window.closeArselSidebar) window.closeArselSidebar();
+        }, 100);
+      }
+    });
+
+    /* ── 10. Topbar: show/hide clock on small screens ── */
+    function adjustClockVisibility(){
+      var clk = document.getElementById('v47LiveClock');
+      if(!clk) return;
+      clk.style.display = window.innerWidth < 520 ? 'none' : '';
+    }
+    adjustClockVisibility();
+    window.addEventListener('resize', adjustClockVisibility);
+
+  }); // end ready
 })();
 </script>
 
