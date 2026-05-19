@@ -469,6 +469,12 @@
     .v55RangeNote{font-size:12px;color:var(--muted);line-height:1.7;margin-top:8px}
     .v55RepRemain{font-weight:950;direction:ltr;white-space:nowrap}
 
+
+    /* v57: decimal money input + cleaner dashboard cards */
+    .moneyInput,.smartMoney{font-variant-numeric:tabular-nums;letter-spacing:.2px}
+    .v43CoreGrid .stat .v{font-size:clamp(22px,2.4vw,32px);line-height:1.18;word-break:normal;overflow-wrap:anywhere}
+    #lateRemainBox .num,#adminSaleRemainBox .num{font-size:clamp(22px,2.2vw,30px)}
+
   </style>
 </head>
 <body>
@@ -525,19 +531,19 @@
         <section class="section" id="dailyEntrySec">
           <div class="card dailyEntryHero">
             <h2 class="bigTitle">الإدخال اليومي</h2>
-            <p class="smallText">للإدارة: سجّل مبيع المندوب أولاً. التسليم صار في كرت مستقل حتى ما تختلط المبالغ، والمتبقي يبقى واضح لكل مندوب.</p>
+            <p class="smallText">للإدارة: سجّل الإيراد أولاً، ثم سجّل التسليم من كرت مستقل حتى يبقى المتبقي واضح لكل مندوب ونوع.</p>
           </div>
           <div class="sectionGrid" style="margin-top:18px">
             <div class="card">
-              <h3>إضافة مبيع فقط</h3>
+              <h3>الإيراد</h3>
               <div class="formGrid">
                 <div><label>التاريخ</label><input type="date" id="adminSaleDate"></div>
                 
                 <div class="full"><label>المندوب</label><select id="adminSaleRep"></select></div>
                 <div><label>نوع المبيع / التسليم</label><select id="adminEntryType"><option value="ccbs">ccbs</option><option value="masary">masary</option></select></div>
                 <div class="v50TypeHint">اختر هل المبيع تابع لـ ccbs أو masary، وسيظهر النوع في السجلات ولوحة القيادة.</div>
-                <div class="sypFocus"><label>مبيع المندوب SYP</label><input type="text" id="adminSaleSyp" class="moneyInput" inputmode="numeric" placeholder="اكتب المبيع"></div>
-                <div class="full v55SoftHint">التسليم لا يُسجّل من هنا. سجّل التسليم من كرت <b>تسليم متبقي لاحقاً</b> حتى تختار المكتب والنوع ccbs / masary بدقة.</div>
+                <div class="sypFocus"><label>مبيع المندوب SYP</label><input type="text" id="adminSaleSyp" class="moneyInput" inputmode="decimal" placeholder="اكتب المبيع"></div>
+                <div class="full v55SoftHint">التسليم لا يُسجّل من هنا. سجّل التسليم من كرت <b>التسليم</b> حتى تختار المكتب والنوع ccbs / masary بدقة.</div>
                 <select id="adminSaleOffice" class="v55HiddenDelivery"><option value=""></option></select>
                 <input type="hidden" id="adminDeliveredSyp" value="0">
                 <div class="full"><label>ملاحظات</label><textarea id="adminSaleNotes" placeholder="مثلاً: جفان مبيع اليوم وسلّم لفهد"></textarea></div>
@@ -547,8 +553,8 @@
               <div class="msg" id="adminDailyMsg"></div>
             </div>
             <div class="card">
-              <h3>تسليم متبقي لاحقاً</h3>
-              <p class="smallText">إذا رجع المندوب بعد ساعة وقال سلّمت باقي المبلغ لمكتب آخر، سجّل التسليم هنا بدون إضافة مبيع جديد.</p>
+              <h3>التسليم</h3>
+              <p class="smallText">اختر المندوب والنوع، وسيظهر المتبقي الحالي فوراً قبل تسجيل التسليم.</p>
               <div class="formGrid">
                 <div><label>التاريخ</label><input type="date" id="lateDeliveryDate"></div>
                 
@@ -556,7 +562,7 @@
                 <div class="full"><label>المكتب</label><select id="lateDeliveryOffice"></select></div>
                 <div class="full"><label>نوع المتبقي / التسليم</label><select id="lateDeliveryEntryType"><option value="ccbs">ccbs</option><option value="masary">masary</option></select></div>
                 <div class="v50TypeHint full">اختار نوع المتبقي قبل الحفظ: إذا المتبقي مصاري اختر masary، وإذا ccbs اختر ccbs. الحساب ينخصم من نفس النوع فقط.</div>
-                <div class="sypFocus"><label>المبلغ المسلّم SYP</label><input type="text" id="lateDeliverySyp" class="moneyInput" inputmode="numeric" placeholder="اكتب التسليم"></div>
+                <div class="sypFocus"><label>المبلغ المسلّم SYP</label><input type="text" id="lateDeliverySyp" class="moneyInput" inputmode="decimal" placeholder="اكتب التسليم"></div>
                 <div class="full"><label>ملاحظات</label><textarea id="lateDeliveryNotes" placeholder="مثلاً: تسليم باقي المبلغ لمحمد عامودا"></textarea></div>
                 <div class="full"><div class="remainingBox" id="lateRemainBox"><span>المتبقي بعد التسليم</span><div class="num">0 SYP</div><small>يحسب من سجلات نفس اليوم.</small></div></div>
                 <button class="full" id="saveLateDeliveryBtn">حفظ التسليم اللاحق</button>
@@ -580,7 +586,7 @@
               <div><label>التاريخ</label><input type="date" id="saleDate"></div>
               <div id="saleRateWrap" class="usdRateWrap hide"><label>سعر الصرف</label><input type="number" id="saleRate" min="0" value="15000"></div>
               <div class="full"><label>نوع الإدخال</label><select id="saleEntryType"><option value="ccbs">ccbs</option><option value="masary">masary</option></select></div>
-              <div class="sypFocus"><label>المبلغ السوري</label><input type="text" id="saleSyp" class="moneyInput" inputmode="numeric" placeholder="اكتب المبلغ السوري"></div>
+              <div class="sypFocus"><label>المبلغ السوري</label><input type="text" id="saleSyp" class="moneyInput" inputmode="decimal" placeholder="اكتب المبلغ السوري"></div>
               <div class="full"><div class="livePreview"><span>المبلغ المكتوب</span><b id="saleLive">0 SYP</b></div><div class="quickAmounts" data-target="saleSyp"><button class="secondary" data-add="100000">+100,000</button><button class="secondary" data-add="500000">+500,000</button><button class="secondary" data-add="1000000">+1,000,000</button><button class="secondary" data-clear="1">مسح</button></div></div>
               <div class="full"><button type="button" class="secondary currencyToggle" id="toggleSaleUsd">إضافة عملة ثانية</button></div>
               <div class="full optionalMoney" id="saleUsdBox"><div><label>USD</label><input type="number" id="saleUsd" min="0" value="0"></div></div>
@@ -589,7 +595,7 @@
             <div class="card"><h3>تسليم لمكتب</h3><div class="formGrid">
               <div class="full"><label>المكتب</label><select id="deliveryOffice"></select></div><div class="full"><label>نوع التسليم</label><select id="deliveryEntryType"><option value="ccbs">ccbs</option><option value="masary">masary</option></select></div>
               <div><label>التاريخ</label><input type="date" id="deliveryDate"></div><div id="deliveryRateWrap" class="usdRateWrap hide"><label>سعر الصرف</label><input type="number" id="deliveryRate" min="0" value="15000"></div>
-              <div class="sypFocus"><label>المبلغ السوري</label><input type="text" id="deliverySyp" class="moneyInput" inputmode="numeric" placeholder="اكتب المبلغ السوري"></div>
+              <div class="sypFocus"><label>المبلغ السوري</label><input type="text" id="deliverySyp" class="moneyInput" inputmode="decimal" placeholder="اكتب المبلغ السوري"></div>
               <div class="full"><div class="livePreview"><span>المبلغ المكتوب</span><b id="deliveryLive">0 SYP</b></div><div class="quickAmounts" data-target="deliverySyp"><button class="secondary" data-add="100000">+100,000</button><button class="secondary" data-add="500000">+500,000</button><button class="secondary" data-add="1000000">+1,000,000</button><button class="secondary" data-clear="1">مسح</button></div></div>
               <div class="full"><button type="button" class="secondary currencyToggle" id="toggleDeliveryUsd">إضافة عملة ثانية</button></div>
               <div class="full optionalMoney" id="deliveryUsdBox"><div><label>USD</label><input type="number" id="deliveryUsd" min="0" value="0"></div></div>
@@ -923,12 +929,41 @@
 
   const firebaseConfig={apiKey:"AIzaSyDoVPtyKtuY5LBRw6plvwDVJv4TDIk0Klk",authDomain:"mandob-app-82843.firebaseapp.com",projectId:"mandob-app-82843",storageBucket:"mandob-app-82843.firebasestorage.app",messagingSenderId:"749939721927",appId:"1:749939721927:web:4c1c63aacca39ec41fe0e2",measurementId:"G-40ZG8YVETG"};
   const app=initializeApp(firebaseConfig); const auth=getAuth(app); const db=getFirestore(app);
-  const APP_VERSION='v45 Remove Daily Summary Cards';
+  const APP_VERSION='v57 Decimal Money + Remaining Preview';
   const state={user:null,profile:null,reps:[],offices:[],users:[],sales:[],deliveries:[],withdrawals:[],manual:[],cashbox:[],closings:[],audit:[],settings:{},tab:"dashboardSec",filters:{from:"",to:"",region:""},sound:false,auditPage:1,_auditFiltered:[],firebaseReadStatus:"لم تبدأ القراءة بعد",firebaseReadErrors:[],lastOpenAiError:"",appVersion:APP_VERSION,aiBusy:false};
   const $=id=>document.getElementById(id); const today=new Date().toISOString().slice(0,10);
   ["saleDate","deliveryDate","manualDate","closingDate","pdfDate","dashFilterFrom","dashFilterTo","walletDate","cashboxDate","aiDate"].forEach(id=>setTimeout(()=>{if($(id))$(id).value=today},0));
   const ar="٠١٢٣٤٥٦٧٨٩", fa="۰۱۲۳۴۵۶۷۸۹";
-  function n(v){ if(v===null||v===undefined)return 0; let s=String(v).trim().replace(/[٠-٩]/g,d=>String(ar.indexOf(d))).replace(/[۰-۹]/g,d=>String(fa.indexOf(d))).replace(/,/g,"").replace(/\s/g,"").replace(/[^\d.-]/g,""); return Number(s||0); }
+  function normalizeNumberText(v){
+    return String(v??'')
+      .replace(/[٠-٩]/g,d=>String(ar.indexOf(d)))
+      .replace(/[۰-۹]/g,d=>String(fa.indexOf(d)))
+      .replace(/[٫]/g,'.')
+      .replace(/[،]/g,',')
+      .trim();
+  }
+  function n(v){
+    if(v===null||v===undefined)return 0;
+    let s=normalizeNumberText(v).replace(/\s/g,'').replace(/[^\d.,-]/g,'');
+    if(!s||s==='-'||s==='.'||s===',')return 0;
+    const neg=s.startsWith('-');
+    s=s.replace(/-/g,'');
+    const lastDot=s.lastIndexOf('.'), lastComma=s.lastIndexOf(',');
+    if(lastDot>=0 && lastComma>=0){
+      if(lastComma>lastDot){ s=s.replace(/\./g,''); s=s.replace(/,/g,'.'); }
+      else { s=s.replace(/,/g,''); }
+    }else if(lastComma>=0){
+      const parts=s.split(',');
+      const last=parts[parts.length-1]||'';
+      const looksThousands=parts.length>1 && last.length===3 && parts.slice(1).every(p=>p.length===3);
+      s=looksThousands ? parts.join('') : (parts.slice(0,-1).join('')+'.'+last);
+    }else{
+      const parts=s.split('.');
+      if(parts.length>2){ const last=parts.pop(); s=parts.join('')+'.'+last; }
+    }
+    const num=Number((neg?'-':'')+s);
+    return Number.isFinite(num)?num:0;
+  }
   function fmt(v){return n(v).toLocaleString("en-US",{maximumFractionDigits:2})} function esc(v){return String(v??"").replace(/[&<>'"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[c]))}
   
   function setTheme(mode='auto',persist=false){
@@ -1560,11 +1595,11 @@
     const box=typeof cashboxCalc==='function'?cashboxCalc():{syp:0,usd:0};
     if($('dashboardCoreGrid'))$('dashboardCoreGrid').innerHTML=[
       ['المجموعة الكلية',fmt(g.totalSyp),'إجمالي إيراد المندوبين SYP'],
-      ['مصاري',fmt(v50SalesTotalByType('masary')),v51TypeCardSub('masary')],
-      ['ccbs',fmt(v50SalesTotalByType('ccbs')),v51TypeCardSub('ccbs')],
+      ['مصاري',fmt(v50SalesTotalByType('masary')),''],
+      ['ccbs',fmt(v50SalesTotalByType('ccbs')),''],
       ['صندوق سوري فرهاد',fmt(box.syp),'رصيد الصندوق السوري الأساسي'],
       ['صندوق دولار فرهاد',fmt(box.usd),'رصيد صندوق الدولار الأساسي']
-    ].map(x=>`<div class="stat"><div class="k">${x[0]}</div><div class="v">${x[1]}</div><div class="s">${x[2]}</div></div>`).join('');
+    ].map(x=>`<div class="stat"><div class="k">${x[0]}</div><div class="v">${x[1]}</div>${x[2]?`<div class="s">${x[2]}</div>`:''}</div>`).join('');
 
     const from=$('dashFilterFrom')?.value||'';
     const to=$('dashFilterTo')?.value||'';
@@ -2527,8 +2562,14 @@ function buildIssues(){
   }
   function updateLateDeliveryPreview(){
     const rep=$('lateDeliveryRep')?.value, date=$('lateDeliveryDate')?.value||today, amount=n($('lateDeliverySyp')?.value), deliveryType=($('lateDeliveryEntryType')?.value||'ccbs'), totals=rep?repDayTotals(rep,date,deliveryType):{remainSyp:0};
-    const after=totals.remainSyp-amount; const box=$('lateRemainBox');
-    if(box){box.classList.toggle('warn',after>0);box.classList.toggle('danger',after<0);box.innerHTML=`<span>المتبقي بعد التسليم</span><div class="num">${fmt(after)} SYP</div><small>قبل التسليم لهذا النوع: ${fmt(totals.remainSyp)} SYP</small>`;}
+    const before=totals.remainSyp||0, after=before-amount; const box=$('lateRemainBox');
+    if(box){
+      box.classList.toggle('warn',after>0);
+      box.classList.toggle('danger',after<0);
+      box.innerHTML=rep
+        ? `<span>المتبقي الحالي للمندوب (${deliveryType})</span><div class="num">${fmt(before)} SYP</div><small>بعد هذا التسليم: ${fmt(after)} SYP</small>`
+        : `<span>اختر المندوب ليظهر المتبقي فوراً</span><div class="num">0 SYP</div><small>المتبقي يظهر حسب التاريخ والنوع ccbs / masary.</small>`;
+    }
   }
   async function saveAdminSaleDelivery(){
     try{
@@ -2787,7 +2828,7 @@ ${title||col}
   };function getEditableItem(col,id){return (col==='deliveries'?state.deliveries:state.sales).find(x=>x.id===id)}
   function canEditItem(col,item){if(!item)return false; return col==='deliveries'?deliveryEditAllowed(item):saleEditAllowed(item)}
   window.grantEdit=async(col,id)=>{if(!isAdmin()){toast('إذن التعديل للإدارة فقط.');return;} await updateDoc(doc(db,col,id),{editAllowedByAdmin:true,editPermissionAt:serverTimestamp(),editPermissionBy:state.user.uid,editPermissionByName:state.profile.name||state.profile.displayName||''}); await writeAudit('grant_edit','فتح تعديل بإذن الإدارة',{col,id}); await loadData(); toast('تم فتح التعديل.');}
-  window.openEdit=(col,id)=>{const item=getEditableItem(col,id); if(!canEditItem(col,item)){toast('التعديل مقفول. يحتاج إذن الإدارة.');return;} const isDel=col==='deliveries'; const officeOpts=`<option value="">اختر المكتب</option>`+officesForCurrentRole().map(o=>`<option value="${esc(o.id)}" ${item.officeId===o.id?'selected':''}>${esc(o.name)} — ${esc(o.region)}</option>`).join(''); $("modalTitle").textContent=isDel?'تعديل التسليم':'تعديل المبيع'; $("modalBody").innerHTML=`<div class="formGrid"><div><label>التاريخ</label><input type="date" id="editDate" value="${esc(item.date||today)}"></div><div><label>${isDel?'نوع التسليم':'نوع الإدخال'}</label><select id="editEntryType"><option value="ccbs" ${v50EntryType(item)==='ccbs'?'selected':''}>ccbs</option><option value="masary" ${v50EntryType(item)==='masary'?'selected':''}>masary</option></select></div>${isDel?`<div><label>المكتب</label><select id="editOffice" ${!isPendingStatus(item.status)&&!item.editAllowedByAdmin?'disabled':''}>${officeOpts}</select></div>`:''}<div class="sypFocus"><label>المبلغ السوري</label><input type="text" id="editSyp" class="moneyInput" inputmode="numeric" value="${fmt(item.amountSyp)}"></div><div><label>USD</label><input type="number" id="editUsd" min="0" value="${n(item.amountUsd)}"></div><div><label>سعر الصرف</label><input type="number" id="editRate" min="0" value="${n(item.exchangeRate)||15000}"></div><div class="full"><label>ملاحظات</label><textarea id="editNotes">${esc(item.notes||'')}</textarea></div><div class="full editHint">إذا كان التسليم مؤكداً، أول تعديل بإذن الإدارة يرجّعه لقيد المطابقة حتى تتم مراجعته من جديد.</div><button class="full" onclick="saveEdit('${col}','${id}')">حفظ التعديل</button></div><div class="msg" id="editMsg"></div>`; $("modal").classList.add('show'); const e=$("editSyp"); if(e)e.addEventListener('input',()=>{e.value=n(e.value)?fmt(n(e.value)):''});}
+  window.openEdit=(col,id)=>{const item=getEditableItem(col,id); if(!canEditItem(col,item)){toast('التعديل مقفول. يحتاج إذن الإدارة.');return;} const isDel=col==='deliveries'; const officeOpts=`<option value="">اختر المكتب</option>`+officesForCurrentRole().map(o=>`<option value="${esc(o.id)}" ${item.officeId===o.id?'selected':''}>${esc(o.name)} — ${esc(o.region)}</option>`).join(''); $("modalTitle").textContent=isDel?'تعديل التسليم':'تعديل المبيع'; $("modalBody").innerHTML=`<div class="formGrid"><div><label>التاريخ</label><input type="date" id="editDate" value="${esc(item.date||today)}"></div><div><label>${isDel?'نوع التسليم':'نوع الإدخال'}</label><select id="editEntryType"><option value="ccbs" ${v50EntryType(item)==='ccbs'?'selected':''}>ccbs</option><option value="masary" ${v50EntryType(item)==='masary'?'selected':''}>masary</option></select></div>${isDel?`<div><label>المكتب</label><select id="editOffice" ${!isPendingStatus(item.status)&&!item.editAllowedByAdmin?'disabled':''}>${officeOpts}</select></div>`:''}<div class="sypFocus"><label>المبلغ السوري</label><input type="text" id="editSyp" class="moneyInput" inputmode="decimal" value="${fmt(item.amountSyp)}"></div><div><label>USD</label><input type="number" id="editUsd" min="0" value="${n(item.amountUsd)}"></div><div><label>سعر الصرف</label><input type="number" id="editRate" min="0" value="${n(item.exchangeRate)||15000}"></div><div class="full"><label>ملاحظات</label><textarea id="editNotes">${esc(item.notes||'')}</textarea></div><div class="full editHint">إذا كان التسليم مؤكداً، أول تعديل بإذن الإدارة يرجّعه لقيد المطابقة حتى تتم مراجعته من جديد.</div><button class="full" onclick="saveEdit('${col}','${id}')">حفظ التعديل</button></div><div class="msg" id="editMsg"></div>`; $("modal").classList.add('show'); const e=$("editSyp"); if(e)e.addEventListener('input',()=>{e.value=n(e.value)?fmt(n(e.value)):''});}
   window.saveEdit=async(col,id)=>{try{const item=getEditableItem(col,id); if(!canEditItem(col,item))throw new Error('التعديل مقفول. يحتاج إذن الإدارة.'); const editType=($("editEntryType")?.value||v50EntryType(item)||''); const data={date:$("editDate").value||today,amountSyp:n($("editSyp").value),amountUsd:n($("editUsd").value),exchangeRate:n($("editUsd").value)>0?n($("editRate").value):0,notes:$("editNotes").value.trim(),...(editType?v51TypeFields(editType):{}),editedAt:serverTimestamp(),editedBy:state.user.uid,editedByName:state.profile.name||state.profile.displayName||'',editCount:n(item.editCount)+1}; if(data.amountSyp<=0&&data.amountUsd<=0)throw new Error('اكتب المبلغ.'); if(col==='deliveries'){const office=state.offices.find(o=>o.id===$("editOffice")?.value)||state.offices.find(o=>o.id===item.officeId); if(office){data.officeId=office.id;data.officeName=office.name;} if(!isPendingStatus(item.status)){data.previousStatus=item.status;data.status="pending_admin";data.reopenedByEdit=true;data.officeConfirmedSyp=0;data.differenceSyp=0;} } if(item.editAllowedByAdmin){data.editAllowedByAdmin=false;data.editUsedAt=serverTimestamp();} await updateDoc(doc(db,col,id),data); await writeAudit('edit_record','تعديل عملية',{col,id}); $("modal").classList.remove('show'); await loadData(); toast('تم حفظ التعديل.');}catch(e){msg($("editMsg"),'error',e.message)}}
   function isMyOfficeDelivery(d){return state.profile?.role==="office"&&(d.officeId===state.profile.officeId||d.officeName===state.profile.officeName)}
   window.deliveryAction=async(act,id)=>{const d=state.deliveries.find(x=>x.id===id); if(!d)return; if(['confirm','diff','approve','delete'].includes(act)&&!isAdmin()){toast('هذا الإجراء للإدارة فقط.');return;} if(act==='confirm')await updateDoc(doc(db,'deliveries',id),{status:'admin_confirmed',adminConfirmedSyp:n(d.amountSyp),officeConfirmedSyp:n(d.amountSyp),adminConfirmedAt:serverTimestamp(),adminConfirmedBy:state.user.uid,adminConfirmedByName:'',matchedByAdmin:true}); if(act==='diff'){const val=prompt('اكتب المبلغ الصحيح SYP بعد المطابقة:'); if(val===null)return; await updateDoc(doc(db,'deliveries',id),{status:'difference',adminConfirmedSyp:n(val),officeConfirmedSyp:n(val),differenceSyp:n(d.amountSyp)-n(val),adminConfirmedAt:serverTimestamp(),adminConfirmedBy:state.user.uid,adminConfirmedByName:'',matchedByAdmin:true});} if(act==='approve')await updateDoc(doc(db,'deliveries',id),{status:'approved',approvedAt:serverTimestamp(),approvedBy:state.user.uid,approvedByName:''}); if(act==='delete'){const r=prompt('سبب نقل التسليم إلى السلة:'); if(r===null)return; await softDelete('deliveries',id,`حذف تسليم ${d.representativeName}`,r); return;} await writeAudit('delivery_action',`إجراء تسليم من الإدارة: ${act}`,{id,office:d.officeName,representative:d.representativeName}); await loadData();}
@@ -2811,7 +2852,27 @@ ${title||col}
     ['walletOffice','walletOperation','walletToOffice'].forEach(id=>{const el=$(id); if(el&&!el.dataset.walletBound){el.dataset.walletBound='1'; el.addEventListener('change',()=>{updateWalletPreview();renderOfficeWalletLedger();});}});
     ['walletSyp','walletUsd','walletRate','walletCommissionSyp','walletCommissionUsd','cashboxSyp','cashboxUsd','cashboxRate'].forEach(id=>{const el=$(id); if(el&&!el.dataset.liveBound){el.dataset.liveBound='1'; el.addEventListener('input',()=>{updateWalletPreview();updateCashboxPreview();});}});
   }
-  function setupInputs(){ document.querySelectorAll('.moneyInput,.smartMoney').forEach(inp=>inp.addEventListener('input',()=>{const val=n(inp.value); inp.value=val?fmt(val):''; updateLives(); saveDrafts();})); document.querySelectorAll('.quickAmounts').forEach(box=>box.onclick=e=>{const btn=e.target.closest('button'); if(!btn)return; const inp=$(box.dataset.target); if(!inp)return; if(btn.dataset.clear)inp.value=''; else inp.value=fmt(n(inp.value)+n(btn.dataset.add)); inp.dispatchEvent(new Event('input'));}); updateLives(); }
+  function cleanMoneyTypingValue(v){
+    let s=normalizeNumberText(v).replace(/[^0-9.,-]/g,'');
+    const neg=s.startsWith('-');
+    s=s.replace(/-/g,'');
+    if(neg)s='-'+s;
+    return s;
+  }
+  function setupInputs(){
+    document.querySelectorAll('.moneyInput,.smartMoney').forEach(inp=>{
+      if(inp.dataset.v57MoneyBound)return;
+      inp.dataset.v57MoneyBound='1';
+      inp.setAttribute('inputmode','decimal');
+      inp.addEventListener('input',()=>{
+        const cleaned=cleanMoneyTypingValue(inp.value);
+        if(inp.value!==cleaned)inp.value=cleaned;
+        updateLives(); updateWalletPreview(); updateCashboxPreview(); updateAdminEntryPreview(); updateLateDeliveryPreview(); saveDrafts();
+      });
+      inp.addEventListener('blur',()=>{const val=n(inp.value); inp.value=val?fmt(val):''; updateLives(); updateWalletPreview(); updateCashboxPreview(); updateAdminEntryPreview(); updateLateDeliveryPreview(); saveDrafts();});
+    });
+    document.querySelectorAll('.quickAmounts').forEach(box=>box.onclick=e=>{const btn=e.target.closest('button'); if(!btn)return; const inp=$(box.dataset.target); if(!inp)return; if(btn.dataset.clear)inp.value=''; else inp.value=fmt(n(inp.value)+n(btn.dataset.add)); inp.dispatchEvent(new Event('input'));}); updateLives();
+  }
   function updateLives(){ if($("saleLive"))$("saleLive").textContent=`${fmt(n($("saleSyp").value))} SYP`; if($("deliveryLive"))$("deliveryLive").textContent=`${fmt(n($("deliverySyp").value))} SYP`; }
   function saveDrafts(){ ['saleSyp','saleNotes','deliverySyp','deliveryNotes'].forEach(id=>{if($(id))localStorage.setItem('arsel_draft_'+id,$(id).value||'')})} function restoreDrafts(){ ['saleSyp','saleNotes','deliverySyp','deliveryNotes'].forEach(id=>{if($(id)){const v=localStorage.getItem('arsel_draft_'+id); if(v)$(id).value=v}}); updateLives(); }
   function setUsdMode(kind,on){const box=$(kind+'UsdBox'),wrap=$(kind+'RateWrap'),btn=$(kind==='sale'?'toggleSaleUsd':'toggleDeliveryUsd'),usd=$(kind+'Usd'); if(!box||!btn)return; box.classList.toggle('show',!!on); if(wrap)wrap.classList.toggle('hide',!on); btn.textContent=on?'إخفاء العملة الثانية':'إضافة عملة ثانية'; if(!on&&usd)usd.value=0;}
