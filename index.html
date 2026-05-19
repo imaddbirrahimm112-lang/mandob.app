@@ -475,6 +475,27 @@
     .v43CoreGrid .stat .v{font-size:clamp(22px,2.4vw,32px);line-height:1.18;word-break:normal;overflow-wrap:anywhere}
     #lateRemainBox .num,#adminSaleRemainBox .num{font-size:clamp(22px,2.2vw,30px)}
 
+
+
+    /* v59: delivery can be SYP and/or real USD + premium vault remaining cards */
+    .v59DeliveryModeNote{border:1px solid rgba(251,191,36,.28);background:linear-gradient(135deg,rgba(251,191,36,.10),rgba(125,211,252,.06));border-radius:18px;padding:11px 13px;color:#fef3c7;font-size:12px;line-height:1.8}
+    .v59DualMoneyGrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .v59UsdInput input{font-size:34px!important;height:82px!important;text-align:center!important;direction:ltr!important;font-weight:950!important;border-radius:25px!important;border:2px solid rgba(96,165,250,.48)!important;background:rgba(96,165,250,.105)!important}
+    .v59VaultRemain{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:4px}
+    .v59VaultCard{position:relative;min-height:132px;border:1px solid rgba(255,255,255,.18);border-radius:24px;padding:16px 18px;overflow:hidden;background:radial-gradient(circle at 18% 15%,rgba(255,255,255,.15),transparent 30%),linear-gradient(145deg,rgba(255,255,255,.105),rgba(255,255,255,.035));box-shadow:0 22px 55px rgba(0,0,0,.26),inset 0 1px 0 rgba(255,255,255,.16)}
+    .v59VaultCard::before{content:"";position:absolute;left:14px;top:14px;width:52px;height:52px;border-radius:18px;border:1px solid rgba(255,255,255,.18);background:linear-gradient(145deg,rgba(255,255,255,.18),rgba(255,255,255,.04));box-shadow:0 0 25px rgba(125,211,252,.16);}
+    .v59VaultCard::after{content:"🔒";position:absolute;left:27px;top:26px;font-size:22px;filter:drop-shadow(0 0 8px rgba(255,255,255,.25))}
+    .v59VaultCard.syp{border-color:rgba(251,191,36,.34);background:radial-gradient(circle at 18% 15%,rgba(251,191,36,.18),transparent 32%),linear-gradient(145deg,rgba(255,255,255,.105),rgba(255,255,255,.035))}
+    .v59VaultCard.usd{border-color:rgba(96,165,250,.34);background:radial-gradient(circle at 18% 15%,rgba(96,165,250,.18),transparent 32%),linear-gradient(145deg,rgba(255,255,255,.105),rgba(255,255,255,.035))}
+    .v59VaultCard .label{color:var(--muted);font-size:12px;font-weight:800;margin-bottom:8px}.v59VaultCard .value{font-size:clamp(22px,2.2vw,31px);font-weight:950;direction:ltr;text-align:right;white-space:nowrap}.v59VaultCard small{display:block;color:var(--muted);margin-top:7px;line-height:1.6}
+    @media(max-width:760px){.v59DualMoneyGrid,.v59VaultRemain{grid-template-columns:1fr}.v59UsdInput input{height:92px!important;font-size:34px!important}}
+
+    /* v58: smart split revenue/delivery preview */
+    .v58SmartBox{border:1px solid rgba(125,211,252,.28);background:linear-gradient(135deg,rgba(125,211,252,.10),rgba(167,243,208,.07));border-radius:20px;padding:13px 14px;line-height:1.8}
+    .v58SmartBox b{font-size:clamp(20px,2vw,28px);direction:ltr;display:block;color:#e0fbff;word-break:normal;overflow-wrap:anywhere}
+    .v58SmartBox .okText{color:#bbf7d0}.v58SmartBox .warnText{color:#fde68a}.v58SmartBox .dangerText{color:#fecdd3}
+    .v58MiniField input{font-size:18px!important;font-weight:850!important;text-align:center!important;direction:ltr!important}
+
   </style>
 </head>
 <body>
@@ -542,8 +563,11 @@
                 <div class="full"><label>المندوب</label><select id="adminSaleRep"></select></div>
                 <div><label>نوع المبيع / التسليم</label><select id="adminEntryType"><option value="ccbs">ccbs</option><option value="masary">masary</option></select></div>
                 <div class="v50TypeHint">اختر هل المبيع تابع لـ ccbs أو masary، وسيظهر النوع في السجلات ولوحة القيادة.</div>
-                <div class="sypFocus"><label>مبيع المندوب SYP</label><input type="text" id="adminSaleSyp" class="moneyInput" inputmode="decimal" placeholder="اكتب المبيع"></div>
-                <div class="full v55SoftHint">التسليم لا يُسجّل من هنا. سجّل التسليم من كرت <b>التسليم</b> حتى تختار المكتب والنوع ccbs / masary بدقة.</div>
+                <div class="sypFocus"><label>إجمالي الإيراد SYP</label><input type="text" id="adminSaleSyp" class="moneyInput" inputmode="decimal" placeholder="مثلاً 100,000,000"></div>
+                <div class="v58MiniField"><label>المبلغ المحوّل إلى دولار من الإيراد SYP</label><input type="text" id="adminSmartOutSyp" class="smartMoney" inputmode="decimal" placeholder="مثلاً 20,000,000"></div>
+                <div class="v58MiniField"><label>سعر الصرف للتحويل</label><input type="text" id="adminSmartRate" class="smartMoney" inputmode="decimal" value="15000" placeholder="مثلاً 14300"></div>
+                <div class="full"><div class="v58SmartBox" id="adminSmartPreview"><span>المعاينة الذكية</span><b>0 SYP</b><small>اكتب الإجمالي والمبلغ المحوّل وسعر الصرف ليظهر الصافي والدولار.</small></div></div>
+                <div class="full v55SoftHint">مثال: إجمالي 100,000,000 وتحويل 20,000,000 على سعر 14,300 = إيراد متبقي 80,000,000 SYP ودولار 1,398.60 USD.</div>
                 <select id="adminSaleOffice" class="v55HiddenDelivery"><option value=""></option></select>
                 <input type="hidden" id="adminDeliveredSyp" value="0">
                 <div class="full"><label>ملاحظات</label><textarea id="adminSaleNotes" placeholder="مثلاً: جفان مبيع اليوم وسلّم لفهد"></textarea></div>
@@ -562,10 +586,16 @@
                 <div class="full"><label>المكتب</label><select id="lateDeliveryOffice"></select></div>
                 <div class="full"><label>نوع المتبقي / التسليم</label><select id="lateDeliveryEntryType"><option value="ccbs">ccbs</option><option value="masary">masary</option></select></div>
                 <div class="v50TypeHint full">اختار نوع المتبقي قبل الحفظ: إذا المتبقي مصاري اختر masary، وإذا ccbs اختر ccbs. الحساب ينخصم من نفس النوع فقط.</div>
-                <div class="sypFocus"><label>المبلغ المسلّم SYP</label><input type="text" id="lateDeliverySyp" class="moneyInput" inputmode="decimal" placeholder="اكتب التسليم"></div>
+                <div class="full v59DeliveryModeNote">المندوب ممكن يسلّم سوري أو دولار أو الاثنين معاً. اكتب المبلغ الحقيقي الذي استلمته فقط، والسوري ينقص من متبقي SYP والدولار ينقص من متبقي USD.</div>
+                <div class="full v59DualMoneyGrid">
+                  <div class="sypFocus"><label>المبلغ المسلّم SYP</label><input type="text" id="lateDeliverySyp" class="moneyInput" inputmode="decimal" placeholder="اكتب التسليم السوري"></div>
+                  <div class="v59UsdInput"><label>المبلغ المسلّم USD</label><input type="text" id="lateDeliveryUsdActual" class="moneyInput" inputmode="decimal" placeholder="اكتب الدولار"></div>
+                </div>
+                <div class="v58MiniField"><label>سعر الصرف للعرض فقط</label><input type="text" id="lateDeliveryRateSmart" class="smartMoney" inputmode="decimal" value="15000" placeholder="مثلاً 14300"></div>
+                <div class="full"><div class="v58SmartBox" id="lateDeliveryUsdPreview"><span>معاينة التسليم</span><b>0 SYP / 0 USD</b><small>السوري والدولار ينحفظان كقيمتين حقيقيتين بدون خلط.</small></div></div>
                 <div class="full"><label>ملاحظات</label><textarea id="lateDeliveryNotes" placeholder="مثلاً: تسليم باقي المبلغ لمحمد عامودا"></textarea></div>
-                <div class="full"><div class="remainingBox" id="lateRemainBox"><span>المتبقي بعد التسليم</span><div class="num">0 SYP</div><small>يحسب من سجلات نفس اليوم.</small></div></div>
-                <button class="full" id="saveLateDeliveryBtn">حفظ التسليم اللاحق</button>
+                <div class="full"><div class="v59VaultRemain" id="lateRemainBox"><div class="v59VaultCard syp"><div class="label">متبقي SYP</div><div class="value">0</div><small>اختر المندوب ليظهر المتبقي.</small></div><div class="v59VaultCard usd"><div class="label">متبقي USD</div><div class="value">0</div><small>الدولار الفعلي فقط.</small></div></div></div>
+                <button class="full" id="saveLateDeliveryBtn">حفظ التسليم</button>
               </div>
               <div class="msg" id="lateDeliveryMsg"></div>
             </div>
@@ -929,7 +959,7 @@
 
   const firebaseConfig={apiKey:"AIzaSyDoVPtyKtuY5LBRw6plvwDVJv4TDIk0Klk",authDomain:"mandob-app-82843.firebaseapp.com",projectId:"mandob-app-82843",storageBucket:"mandob-app-82843.firebasestorage.app",messagingSenderId:"749939721927",appId:"1:749939721927:web:4c1c63aacca39ec41fe0e2",measurementId:"G-40ZG8YVETG"};
   const app=initializeApp(firebaseConfig); const auth=getAuth(app); const db=getFirestore(app);
-  const APP_VERSION='v57 Decimal Money + Remaining Preview';
+  const APP_VERSION='v58 Smart Revenue Split + Delivery USD Preview';
   const state={user:null,profile:null,reps:[],offices:[],users:[],sales:[],deliveries:[],withdrawals:[],manual:[],cashbox:[],closings:[],audit:[],settings:{},tab:"dashboardSec",filters:{from:"",to:"",region:""},sound:false,auditPage:1,_auditFiltered:[],firebaseReadStatus:"لم تبدأ القراءة بعد",firebaseReadErrors:[],lastOpenAiError:"",appVersion:APP_VERSION,aiBusy:false};
   const $=id=>document.getElementById(id); const today=new Date().toISOString().slice(0,10);
   ["saleDate","deliveryDate","manualDate","closingDate","pdfDate","dashFilterFrom","dashFilterTo","walletDate","cashboxDate","aiDate"].forEach(id=>setTimeout(()=>{if($(id))$(id).value=today},0));
@@ -1049,7 +1079,11 @@
   function repMatchesRecord(rep,rec){if(!rep||!rec)return false; return String(rec.representativeId||rec.repId||rec.mandobId||'')===String(rep.id||'') || sameKey(rec.representativeName||rec.repName||rec.mandobName,rep.name)}
   function officeIsMain(o,rec){if(!o||!rec)return false; return String(rec.officeId||rec.maktabId||'')===String(o.id||'') || sameKey(rec.officeName||rec.maktabName,o.name)}
   function officeIsTarget(o,rec){if(!o||!rec)return false; return String(rec.toOfficeId||'')===String(o.id||'') || sameKey(rec.toOfficeName,o.name)}
-  function actualUsdFromDelivery(d){return (d?.currency==='USD'||d?.amountCurrency==='USD'||d?.hasActualUsd===true)?n(d.amountUsd):0}
+  function actualUsdFromDelivery(d){
+    if(d?.actualUsdDelivered!==undefined)return n(d.actualUsdDelivered);
+    if(d?.deliveryCurrencyMode==='syp_with_usd_equivalent')return 0;
+    return (d?.currency==='USD'||d?.amountCurrency==='USD'||d?.hasActualUsd===true)?n(d.amountUsd):0;
+  }
   function actualUsdFromSale(s){return (s?.currency==='USD'||s?.amountCurrency==='USD'||s?.hasActualUsd===true)?n(s.amountUsd):0}
   // v39: إجمالي الدولار في لوحة التحكم. يحسب الدولار الحقيقي إن وجد، وإلا يعطي المعادل حسب سعر السجل أو السعر الافتراضي.
   function v39UsdEquivalent(row, sypField='amountSyp'){
@@ -2555,37 +2589,56 @@ function buildIssues(){
     const typeBreakdown=v50TypeBreakdown(sales,del);
     return {saleSyp,saleUsd,deliveredSyp,deliveredUsd,remainSyp:saleSyp-deliveredSyp,remainUsd:saleUsd-deliveredUsd,offices,typeBreakdown,countSales:sales.length,countDeliveries:del.length};
   }
+  function v58SmartRate(id){return n($(id)?.value)||defaultExchangeRate()}
+  function v58UsdFromSyp(syp,rate){rate=n(rate);return rate>0?n(syp)/rate:0}
   function updateAdminEntryPreview(){
-    const sale=n($('adminSaleSyp')?.value), delivered=n($('adminDeliveredSyp')?.value), remain=sale-delivered;
-    const box=$('adminSaleRemainBox'); if(box){box.classList.toggle('warn',remain>0);box.classList.toggle('danger',remain<0);box.innerHTML=`<span>المتبقي بعد هذا الإدخال</span><div class="num">${fmt(remain)} SYP</div><small>${remain>0?'يبقى على المندوب':remain<0?'التسليم أكبر من المبيع':'مغلق'}</small>`;}
+    const total=n($('adminSaleSyp')?.value), converted=n($('adminSmartOutSyp')?.value), rate=v58SmartRate('adminSmartRate');
+    const net=total-converted, usd=v58UsdFromSyp(converted,rate);
+    const smart=$('adminSmartPreview');
+    if(smart){
+      const cls=net<0?'dangerText':converted>0?'okText':'warnText';
+      smart.innerHTML=`<span>المعاينة الذكية</span><b class="${cls}">${fmt(net)} SYP</b><small>دولار من الإيراد: ${fmt(usd,2)} USD — من ${fmt(converted)} SYP على سعر ${fmt(rate,2)}</small>`;
+    }
+    const box=$('adminSaleRemainBox');
+    if(box){
+      box.classList.toggle('warn',net>0);box.classList.toggle('danger',net<0);
+      box.innerHTML=`<span>إيراد المندوب بعد التحويل</span><div class="num">${fmt(net)} SYP</div><small>${converted>0?`تم تحويل ${fmt(converted)} SYP إلى ${fmt(usd,2)} USD`:'بدون تحويل دولار'}</small>`;
+    }
     updateLateDeliveryPreview();
   }
   function updateLateDeliveryPreview(){
-    const rep=$('lateDeliveryRep')?.value, date=$('lateDeliveryDate')?.value||today, amount=n($('lateDeliverySyp')?.value), deliveryType=($('lateDeliveryEntryType')?.value||'ccbs'), totals=rep?repDayTotals(rep,date,deliveryType):{remainSyp:0};
-    const before=totals.remainSyp||0, after=before-amount; const box=$('lateRemainBox');
+    const rep=$('lateDeliveryRep')?.value, date=$('lateDeliveryDate')?.value||today, deliveryType=($('lateDeliveryEntryType')?.value||'ccbs');
+    const sypAmount=n($('lateDeliverySyp')?.value), usdAmount=n($('lateDeliveryUsdActual')?.value), rate=v58SmartRate('lateDeliveryRateSmart');
+    const totals=rep?repDayTotals(rep,date,deliveryType):{remainSyp:0,remainUsd:0};
+    const beforeSyp=totals.remainSyp||0, beforeUsd=totals.remainUsd||0;
+    const afterSyp=beforeSyp-sypAmount, afterUsd=beforeUsd-usdAmount;
+    const sypEquivalentUsd=v58UsdFromSyp(sypAmount,rate);
+    const usdBox=$('lateDeliveryUsdPreview');
+    if(usdBox){
+      usdBox.innerHTML=`<span>معاينة التسليم</span><b>${fmt(sypAmount)} SYP / ${fmt(usdAmount,2)} USD</b><small>معادل السوري للعرض فقط: ${fmt(sypEquivalentUsd,2)} USD — الدولار المكتوب ينقص من متبقي USD الحقيقي.</small>`;
+    }
+    const box=$('lateRemainBox');
     if(box){
-      box.classList.toggle('warn',after>0);
-      box.classList.toggle('danger',after<0);
       box.innerHTML=rep
-        ? `<span>المتبقي الحالي للمندوب (${deliveryType})</span><div class="num">${fmt(before)} SYP</div><small>بعد هذا التسليم: ${fmt(after)} SYP</small>`
-        : `<span>اختر المندوب ليظهر المتبقي فوراً</span><div class="num">0 SYP</div><small>المتبقي يظهر حسب التاريخ والنوع ccbs / masary.</small>`;
+        ? `<div class="v59VaultCard syp"><div class="label">متبقي ${deliveryType} سوري قبل التسليم</div><div class="value ${afterSyp<0?'dangerText':''}">${fmt(beforeSyp)} SYP</div><small>بعد التسليم: ${fmt(afterSyp)} SYP</small></div><div class="v59VaultCard usd"><div class="label">متبقي ${deliveryType} دولار قبل التسليم</div><div class="value ${afterUsd<0?'dangerText':''}">${fmt(beforeUsd,2)} USD</div><small>بعد التسليم: ${fmt(afterUsd,2)} USD</small></div>`
+        : `<div class="v59VaultCard syp"><div class="label">متبقي SYP</div><div class="value">0</div><small>اختر المندوب ليظهر المتبقي فوراً.</small></div><div class="v59VaultCard usd"><div class="label">متبقي USD</div><div class="value">0</div><small>اختر المندوب والنوع.</small></div>`;
     }
   }
   async function saveAdminSaleDelivery(){
     try{
       if(!isAdmin())throw new Error('الإدخال اليومي للإدارة فقط.');
       const rep=repById($('adminSaleRep').value); if(!rep)throw new Error('اختر المندوب.');
-      const office=officeById($('adminSaleOffice').value); const date=$('adminSaleDate').value||today;
-      const saleSyp=n($('adminSaleSyp').value), deliveredSyp=n($('adminDeliveredSyp').value), entryType=($('adminEntryType')?.value||'ccbs');
-      if(saleSyp<=0)throw new Error('اكتب مبيع المندوب.');
+      const date=$('adminSaleDate').value||today;
+      const totalSyp=n($('adminSaleSyp').value), convertedSyp=n($('adminSmartOutSyp')?.value), rate=v58SmartRate('adminSmartRate'), entryType=($('adminEntryType')?.value||'ccbs');
+      if(totalSyp<=0)throw new Error('اكتب إجمالي الإيراد.');
+      if(convertedSyp<0)throw new Error('المبلغ المحوّل لا يجوز أن يكون سالب.');
+      if(convertedSyp>totalSyp)throw new Error('المبلغ المحوّل أكبر من إجمالي الإيراد.');
+      if(convertedSyp>0&&rate<=0)throw new Error('اكتب سعر الصرف للتحويل.');
+      const netSyp=totalSyp-convertedSyp, convertedUsd=v58UsdFromSyp(convertedSyp,rate);
       const entryGroupId=`admin_daily_${Date.now()}_${Math.random().toString(36).slice(2,8)}`;
-      await addDoc(collection(db,'sales_reports'),{representativeId:rep.id,representativeName:rep.name,region:rep.region,date,entryType,inputType:entryType,revenueType:entryType,amountSyp:saleSyp,amountUsd:0,exchangeRate:0,currency:'SYP',amountCurrency:'SYP',noAutoUsd:true,notes:$('adminSaleNotes').value.trim(),source:'admin_daily_entry',entryGroupId,ledgerModel:'v32_5',cleanLedger:true,countInBalances:true,createdByAdmin:true,createdBy:state.user.uid,createdByName:state.profile.name||state.profile.displayName||'',createdAt:serverTimestamp(),clientTxnId:v38ClientTxnId('admin_sale'),ledgerVersion:'v38',editAllowedByAdmin:true});
-      if(deliveredSyp>0){
-        if(!office)throw new Error('اختر المكتب للتسليم أو اجعل التسليم 0.');
-        await addDoc(collection(db,'deliveries'),{representativeId:rep.id,representativeName:rep.name,representativeUid:'admin_entry',region:rep.region,officeId:office.id,officeName:office.name,date,...v51TypeFields(entryType),amountSyp:deliveredSyp,amountUsd:0,exchangeRate:0,currency:'SYP',amountCurrency:'SYP',noAutoUsd:true,notes:$('adminSaleNotes').value.trim(),status:'admin_confirmed',ledgerModel:'v32_5',cleanLedger:true,countInBalances:true,officeConfirmedSyp:deliveredSyp,officeConfirmedAt:serverTimestamp(),officeConfirmedBy:state.user.uid,source:'admin_daily_entry',entryGroupId,createdByAdmin:true,createdBy:state.user.uid,createdByName:state.profile.name||state.profile.displayName||'',createdAt:serverTimestamp(),clientTxnId:v38ClientTxnId('admin_delivery'),ledgerVersion:'v38',editAllowedByAdmin:true});
-      }
-      await writeAudit('admin_daily_entry',`إدخال يومي ${rep.name}`,{rep:rep.name,saleSyp,deliveredSyp,office:office?.name||'',remain:saleSyp-deliveredSyp});
-      ['adminSaleSyp','adminDeliveredSyp','adminSaleNotes'].forEach(id=>{if($(id))$(id).value=''}); updateAdminEntryPreview(); msg($('adminDailyMsg'),'ok',`تم الحفظ. المتبقي: ${fmt(saleSyp-deliveredSyp)} SYP`); await loadData();
+      await addDoc(collection(db,'sales_reports'),{representativeId:rep.id,representativeName:rep.name,region:rep.region,date,entryType,inputType:entryType,revenueType:entryType,amountSyp:netSyp,amountUsd:convertedUsd,exchangeRate:convertedSyp>0?rate:0,currency:'SYP',amountCurrency:convertedSyp>0?'MIXED':'SYP',hasActualUsd:convertedSyp>0,noAutoUsd:convertedSyp<=0,totalRevenueSyp:totalSyp,convertedToUsdSyp:convertedSyp,netRevenueSyp:netSyp,smartSplit:true,notes:$('adminSaleNotes').value.trim(),source:'admin_daily_entry_smart_split',entryGroupId,ledgerModel:'v58_smart_split',cleanLedger:true,countInBalances:true,createdByAdmin:true,createdBy:state.user.uid,createdByName:state.profile.name||state.profile.displayName||'',createdAt:serverTimestamp(),clientTxnId:v38ClientTxnId('admin_sale'),ledgerVersion:'v58',editAllowedByAdmin:true});
+      await writeAudit('admin_daily_entry',`إدخال إيراد ذكي ${rep.name}`,{rep:rep.name,totalSyp,convertedSyp,convertedUsd,rate,netSyp,type:entryType});
+      ['adminSaleSyp','adminSmartOutSyp','adminDeliveredSyp','adminSaleNotes'].forEach(id=>{if($(id))$(id).value=''}); updateAdminEntryPreview(); msg($('adminDailyMsg'),'ok',`تم الحفظ. إيراد المندوب: ${fmt(netSyp)} SYP / ${fmt(convertedUsd,2)} USD`); await loadData();
     }catch(e){msg($('adminDailyMsg'),'error',e.message)}
   }
   async function saveLateDelivery(){
@@ -2593,12 +2646,15 @@ function buildIssues(){
       if(!isAdmin())throw new Error('الإدخال اليومي للإدارة فقط.');
       const rep=repById($('lateDeliveryRep').value); if(!rep)throw new Error('اختر المندوب.');
       const office=officeById($('lateDeliveryOffice').value); if(!office)throw new Error('اختر المكتب.');
-      const date=$('lateDeliveryDate').value||today, amount=n($('lateDeliverySyp').value), deliveryType=($('lateDeliveryEntryType')?.value||'ccbs');
-      if(amount<=0)throw new Error('اكتب مبلغ التسليم.');
-      const before=repDayTotals(rep.id,date,deliveryType).remainSyp;
-      await addDoc(collection(db,'deliveries'),{representativeId:rep.id,representativeName:rep.name,representativeUid:'admin_entry',region:rep.region,officeId:office.id,officeName:office.name,date,...v51TypeFields(deliveryType),amountSyp:amount,amountUsd:0,exchangeRate:0,currency:'SYP',amountCurrency:'SYP',noAutoUsd:true,notes:$('lateDeliveryNotes').value.trim(),status:'admin_confirmed',ledgerModel:'v32_5',cleanLedger:true,countInBalances:true,officeConfirmedSyp:amount,officeConfirmedAt:serverTimestamp(),officeConfirmedBy:state.user.uid,source:'admin_late_delivery',createdByAdmin:true,createdBy:state.user.uid,createdByName:state.profile.name||state.profile.displayName||'',createdAt:serverTimestamp(),clientTxnId:v38ClientTxnId('late_delivery'),ledgerVersion:'v38',editAllowedByAdmin:true});
-      await writeAudit('admin_late_delivery',`تسليم لاحق ${rep.name} إلى ${office.name}`,{rep:rep.name,office:office.name,amount,type:deliveryType,before,after:before-amount});
-      ['lateDeliverySyp','lateDeliveryNotes'].forEach(id=>{if($(id))$(id).value=''}); updateLateDeliveryPreview(); msg($('lateDeliveryMsg'),'ok',`تم حفظ التسليم. المتبقي بعده: ${fmt(before-amount)} SYP`); await loadData();
+      const date=$('lateDeliveryDate').value||today, sypAmount=n($('lateDeliverySyp').value), usdAmount=n($('lateDeliveryUsdActual')?.value), deliveryType=($('lateDeliveryEntryType')?.value||'ccbs'), rate=v58SmartRate('lateDeliveryRateSmart');
+      if(sypAmount<=0 && usdAmount<=0)throw new Error('اكتب مبلغ التسليم السوري أو الدولار.');
+      if(sypAmount<0 || usdAmount<0)throw new Error('المبالغ لا يجوز أن تكون سالبة.');
+      if(sypAmount>0&&rate<=0)throw new Error('اكتب سعر الصرف للعرض والحساب.');
+      const before=repDayTotals(rep.id,date,deliveryType), sypEquivalentUsd=v58UsdFromSyp(sypAmount,rate);
+      const amountCurrency=sypAmount>0&&usdAmount>0?'MIXED':(usdAmount>0?'USD':'SYP');
+      await addDoc(collection(db,'deliveries'),{representativeId:rep.id,representativeName:rep.name,representativeUid:'admin_entry',region:rep.region,officeId:office.id,officeName:office.name,date,...v51TypeFields(deliveryType),amountSyp:sypAmount,amountUsd:usdAmount,actualUsdDelivered:usdAmount,usdEquivalentFromSyp:sypEquivalentUsd,exchangeRate:rate,currency:amountCurrency,amountCurrency,hasActualUsd:usdAmount>0,smartSplit:true,deliveryCurrencyMode:'actual_syp_usd_split',notes:$('lateDeliveryNotes').value.trim(),status:'admin_confirmed',ledgerModel:'v59_dual_currency_delivery',cleanLedger:true,countInBalances:true,officeConfirmedSyp:sypAmount,officeConfirmedUsd:usdAmount,officeConfirmedAt:serverTimestamp(),officeConfirmedBy:state.user.uid,source:'admin_late_delivery',createdByAdmin:true,createdBy:state.user.uid,createdByName:state.profile.name||state.profile.displayName||'',createdAt:serverTimestamp(),clientTxnId:v38ClientTxnId('late_delivery'),ledgerVersion:'v59',editAllowedByAdmin:true});
+      await writeAudit('admin_late_delivery',`تسليم لاحق ${rep.name} إلى ${office.name}`,{rep:rep.name,office:office.name,sypAmount,usdAmount,sypEquivalentUsd,rate,type:deliveryType,beforeSyp:before.remainSyp,beforeUsd:before.remainUsd,afterSyp:before.remainSyp-sypAmount,afterUsd:before.remainUsd-usdAmount});
+      ['lateDeliverySyp','lateDeliveryUsdActual','lateDeliveryNotes'].forEach(id=>{if($(id))$(id).value=''}); updateLateDeliveryPreview(); msg($('lateDeliveryMsg'),'ok',`تم حفظ التسليم. المتبقي بعده: ${fmt(before.remainSyp-sypAmount)} SYP / ${fmt(before.remainUsd-usdAmount,2)} USD`); await loadData();
     }catch(e){msg($('lateDeliveryMsg'),'error',e.message)}
   }
   function repRangeTotals(repId,from,to,type=''){
@@ -2869,7 +2925,7 @@ ${title||col}
         if(inp.value!==cleaned)inp.value=cleaned;
         updateLives(); updateWalletPreview(); updateCashboxPreview(); updateAdminEntryPreview(); updateLateDeliveryPreview(); saveDrafts();
       });
-      inp.addEventListener('blur',()=>{const val=n(inp.value); inp.value=val?fmt(val):''; updateLives(); updateWalletPreview(); updateCashboxPreview(); updateAdminEntryPreview(); updateLateDeliveryPreview(); saveDrafts();});
+      inp.addEventListener('blur',()=>{const val=n(inp.value); const id=(inp.id||'').toLowerCase(); const keepDecimal=id.includes('usd')||id.includes('rate')||id.includes('smart')||inp.dataset.decimals==='2'; inp.value=val?fmt(val,keepDecimal?2:0):''; updateLives(); updateWalletPreview(); updateCashboxPreview(); updateAdminEntryPreview(); updateLateDeliveryPreview(); saveDrafts();});
     });
     document.querySelectorAll('.quickAmounts').forEach(box=>box.onclick=e=>{const btn=e.target.closest('button'); if(!btn)return; const inp=$(box.dataset.target); if(!inp)return; if(btn.dataset.clear)inp.value=''; else inp.value=fmt(n(inp.value)+n(btn.dataset.add)); inp.dispatchEvent(new Event('input'));}); updateLives();
   }
@@ -3075,7 +3131,7 @@ ${title||col}
 
   if($("saveAdminSaleDeliveryBtn"))$("saveAdminSaleDeliveryBtn").onclick=()=>withBusy('saveAdminSaleDeliveryBtn','جاري حفظ الإدخال...',saveAdminSaleDelivery);
   if($("saveLateDeliveryBtn"))$("saveLateDeliveryBtn").onclick=()=>withBusy('saveLateDeliveryBtn','جاري حفظ التسليم...',saveLateDelivery);
-  ["adminSaleSyp","adminDeliveredSyp","lateDeliverySyp","adminSaleRep","adminEntryType","lateDeliveryRep","lateDeliveryEntryType","adminSaleDate","lateDeliveryDate"].forEach(id=>{if($(id))$(id).addEventListener(id.includes('Rep')||id.includes('Date')||id.includes('Type')?'change':'input',()=>{updateAdminEntryPreview();updateLateDeliveryPreview();renderDailyLedger();})});
+  ["adminSaleSyp","adminSmartOutSyp","adminSmartRate","adminDeliveredSyp","lateDeliverySyp","lateDeliveryUsdActual","lateDeliveryRateSmart","adminSaleRep","adminEntryType","lateDeliveryRep","lateDeliveryEntryType","adminSaleDate","lateDeliveryDate"].forEach(id=>{if($(id))$(id).addEventListener(id.includes('Rep')||id.includes('Date')||id.includes('Type')?'change':'input',()=>{updateAdminEntryPreview();updateLateDeliveryPreview();renderDailyLedger();})});
   ["dailyLedgerDate","dailyLedgerFrom","dailyLedgerTo","dailyLedgerRep"].forEach(id=>{if($(id)){['input','change'].forEach(ev=>$(id).addEventListener(ev,renderDailyLedger));}});
   ['dashFilterFrom','dashFilterTo','dashFilterRep'].forEach(id=>{if($(id)){['input','change'].forEach(ev=>$(id).addEventListener(ev,renderDashboard));}});
   if($("refreshDailyLedger"))$("refreshDailyLedger").onclick=()=>withBusy('refreshDailyLedger','جاري التحديث...',async()=>{await loadData(); renderDailyLedger(); toast('تم تحديث السجل اليومي');});
