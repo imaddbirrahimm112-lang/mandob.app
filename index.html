@@ -459,6 +459,16 @@
     .entryTypeBadge.unknown{color:var(--muted)}
     .v50TypeHint{border:1px solid rgba(125,211,252,.22);background:rgba(125,211,252,.07);border-radius:16px;padding:10px 12px;font-size:12px;color:var(--muted);line-height:1.7}
 
+
+
+    /* v55: تنظيف الإدخال اليومي + تفاصيل المكاتب + أرقام أوضح */
+    .v55HiddenDelivery{display:none!important}
+    .v55SoftHint{border:1px solid rgba(125,211,252,.24);background:rgba(125,211,252,.075);border-radius:16px;padding:10px 12px;color:var(--muted);line-height:1.7;font-size:12px}
+    .v43OfficeCard{cursor:pointer;transition:.18s transform,.18s border-color,.18s box-shadow}
+    .v43OfficeCard:hover{transform:translateY(-2px);border-color:rgba(125,211,252,.55)!important;box-shadow:0 16px 44px rgba(0,0,0,.25),0 0 0 1px rgba(125,211,252,.12)}
+    .v55RangeNote{font-size:12px;color:var(--muted);line-height:1.7;margin-top:8px}
+    .v55RepRemain{font-weight:950;direction:ltr;white-space:nowrap}
+
   </style>
 </head>
 <body>
@@ -498,11 +508,12 @@
               <div class="v43FilterBar">
                 <div><label>من تاريخ</label><input type="date" id="dashFilterFrom"></div>
                 <div><label>إلى تاريخ</label><input type="date" id="dashFilterTo"></div>
+                <div><label>المندوب</label><select id="dashFilterRep"><option value="">كل المندوبين</option></select></div>
                 <button class="secondary" id="dashFilterClear" type="button">مسح الفلتر</button>
               </div>
               <div class="tableWrap" style="margin-top:12px">
                 <table>
-                  <thead><tr><th>اسم المندوب</th><th>نوع الإدخال</th><th>الإيراد / المبلغ</th><th>التاريخ</th><th>المنطقة</th><th>العملة</th></tr></thead>
+                  <thead><tr><th>اسم المندوب</th><th>نوع الإدخال</th><th>الإيراد / المبلغ</th><th>المتبقي للمندوب</th><th>التاريخ</th><th>المنطقة</th><th>العملة</th></tr></thead>
                   <tbody id="dashboardRevenueBody"></tbody>
                   <tfoot id="dashboardRevenueFoot"></tfoot>
                 </table>
@@ -514,23 +525,24 @@
         <section class="section" id="dailyEntrySec">
           <div class="card dailyEntryHero">
             <h2 class="bigTitle">الإدخال اليومي</h2>
-            <p class="smallText">للإدارة: سجّل مبيع المندوب وتسليمه للمكتب بالليرة السورية فقط. لا يوجد تحويل تلقائي إلى دولار؛ التحويل يتم لاحقاً من رصيد المكاتب أو الصندوق مع سعر صرف واضح.</p>
+            <p class="smallText">للإدارة: سجّل مبيع المندوب أولاً. التسليم صار في كرت مستقل حتى ما تختلط المبالغ، والمتبقي يبقى واضح لكل مندوب.</p>
           </div>
           <div class="sectionGrid" style="margin-top:18px">
             <div class="card">
-              <h3>إضافة مبيع وتسجيل تسليم</h3>
+              <h3>إضافة مبيع فقط</h3>
               <div class="formGrid">
                 <div><label>التاريخ</label><input type="date" id="adminSaleDate"></div>
                 
                 <div class="full"><label>المندوب</label><select id="adminSaleRep"></select></div>
                 <div><label>نوع المبيع / التسليم</label><select id="adminEntryType"><option value="ccbs">ccbs</option><option value="masary">masary</option></select></div>
-                <div class="v50TypeHint">اختر هل المبلغ تابع لـ ccbs أو masary، وسيظهر النوع في السجلات ولوحة القيادة.</div>
+                <div class="v50TypeHint">اختر هل المبيع تابع لـ ccbs أو masary، وسيظهر النوع في السجلات ولوحة القيادة.</div>
                 <div class="sypFocus"><label>مبيع المندوب SYP</label><input type="text" id="adminSaleSyp" class="moneyInput" inputmode="numeric" placeholder="اكتب المبيع"></div>
-                <div class="full"><label>سلّم إلى مكتب</label><select id="adminSaleOffice"></select></div>
-                <div class="sypFocus"><label>المبلغ المسلّم SYP</label><input type="text" id="adminDeliveredSyp" class="moneyInput" inputmode="numeric" placeholder="اكتب التسليم"></div>
+                <div class="full v55SoftHint">التسليم لا يُسجّل من هنا. سجّل التسليم من كرت <b>تسليم متبقي لاحقاً</b> حتى تختار المكتب والنوع ccbs / masary بدقة.</div>
+                <select id="adminSaleOffice" class="v55HiddenDelivery"><option value=""></option></select>
+                <input type="hidden" id="adminDeliveredSyp" value="0">
                 <div class="full"><label>ملاحظات</label><textarea id="adminSaleNotes" placeholder="مثلاً: جفان مبيع اليوم وسلّم لفهد"></textarea></div>
                 <div class="full"><div class="remainingBox" id="adminSaleRemainBox"><span>المتبقي</span><div class="num">0 SYP</div><small>يحسب من المبيع ناقص التسليم.</small></div></div>
-                <button class="full" id="saveAdminSaleDeliveryBtn">حفظ المبيع والتسليم</button>
+                <button class="full" id="saveAdminSaleDeliveryBtn">حفظ المبيع</button>
               </div>
               <div class="msg" id="adminDailyMsg"></div>
             </div>
@@ -554,8 +566,8 @@
           </div>
           <div class="card" style="margin-top:18px">
             <div class="dailyReportHead">
-              <div><h3>سجل يومي للمندوبين</h3><p class="smallText">اختَر تاريخ وشوف كل مندوب: المبيع، المسلّم، المتبقي، والمكاتب التي استلمت.</p></div>
-              <div class="toolbar"><input type="date" id="dailyLedgerDate"><select id="dailyLedgerRep"><option value="">كل المندوبين</option></select><button type="button" class="secondary" id="refreshDailyLedger">تحديث</button><button type="button" class="secondary" id="exportDailyLedgerExcel">تصدير Excel</button></div>
+              <div><h3>سجل يومي للمندوبين</h3><p class="smallText">اختَر من تاريخ إلى تاريخ وشوف كل مندوب: المبيع، المسلّم، المتبقي، والمكاتب التي استلمت.</p></div>
+              <div class="toolbar"><input type="date" id="dailyLedgerFrom"><input type="date" id="dailyLedgerTo"><input type="hidden" id="dailyLedgerDate"><select id="dailyLedgerRep"><option value="">كل المندوبين</option></select><button type="button" class="secondary" id="refreshDailyLedger">تحديث</button><button type="button" class="secondary" id="exportDailyLedgerExcel">تصدير Excel</button></div>
             </div>
             <div class="tableWrap"><table><thead><tr><th>المندوب</th><th>المنطقة</th><th>تفصيل ccbs / masary</th><th>المبيع SYP</th><th>التسليم SYP</th><th>المتبقي SYP</th><th>المكاتب</th><th>الحالة</th></tr></thead><tbody id="dailyLedgerBody"></tbody></table></div>
           </div>
@@ -596,14 +608,16 @@
               <span class="pill info" id="cmdActiveFilterBadge">الكل</span>
             </div>
             <div class="v43FilterPanel">
-              <div class="v43FilterBar" style="grid-template-columns:minmax(220px,340px) 1fr">
+              <div class="v43FilterBar" style="grid-template-columns:minmax(160px,240px) minmax(180px,280px) minmax(150px,210px) 1fr">
                 <div><label>فلتر المنطقة</label><select id="cmdRegion"><option value="">الكل</option><option value="R1">Region 1</option><option value="R2">Region 2</option><option value="R3">Region 3</option><option value="R4">Region 4</option></select></div>
+                <div><label>فلتر المندوب</label><select id="cmdRep"><option value="">كل المندوبين</option></select></div>
+                <div><label>فلتر النوع</label><select id="cmdEntryType"><option value="">ccbs + masary</option><option value="ccbs">ccbs</option><option value="masary">masary</option><option value="unknown">غير محدد</option></select></div>
                 <button class="secondary" id="resetCmdFilter" type="button">عرض الكل</button>
               </div>
               <div class="v43SmallGrid" id="commandGrid"></div>
               <div class="tableWrap" style="margin-top:12px">
                 <table>
-                  <thead><tr><th>اسم المندوب</th><th>نوع الإدخال</th><th>المبلغ / الإيراد</th><th>التاريخ</th><th>المنطقة</th><th>الملاحظات</th></tr></thead>
+                  <thead><tr><th>اسم المندوب</th><th>نوع الإدخال</th><th>المبلغ / الإيراد</th><th>المتبقي للمندوب</th><th>التاريخ</th><th>المنطقة</th><th>الملاحظات</th></tr></thead>
                   <tbody id="commandRepLedgerBody"></tbody>
                 </table>
               </div>
@@ -635,7 +649,7 @@
               <h3>حركة مكتب / تحويل بين المكاتب</h3>
               <div class="formGrid">
                 <div class="full"><label>المكتب المرسل / المكتب الأساسي</label><select id="walletOffice"></select></div>
-                <div><label>نوع العملية</label><select id="walletOperation"><option value="transfer_office_syp">تحويل سوري إلى مكتب / صندوق فرهاد / خارجي</option><option value="transfer_office_usd">تحويل دولار إلى مكتب / صندوق فرهاد / خارجي</option><option value="convert_syp_to_usd">تحويل داخل المكتب من SYP إلى USD</option><option value="adjustment_syp_plus">إضافة تسوية SYP</option><option value="adjustment_usd_plus">إضافة تسوية USD</option></select></div>
+                <div><label>نوع العملية</label><select id="walletOperation"><option value="transfer_office_syp">تحويل سوري إلى مكتب / صندوق فرهاد / خارجي</option><option value="transfer_office_usd">تحويل دولار إلى مكتب / صندوق فرهاد / خارجي</option><option value="convert_syp_to_usd">قص سوري إلى دولار داخل المكتب</option><option value="adjustment_syp_plus">إضافة تسوية SYP</option><option value="adjustment_usd_plus">إضافة تسوية USD</option></select></div>
                 <div id="walletToOfficeWrap"><label>إلى مكتب / صندوق فرهاد / جاري كردستان</label><select id="walletToOffice"></select></div>
                 <div><label>التاريخ</label><input type="date" id="walletDate"></div>
                 <div><label>المبلغ SYP</label><input type="text" id="walletSyp" class="smartMoney" inputmode="decimal" placeholder="0"></div>
@@ -1355,6 +1369,8 @@
     const repOpts=`<option value="">اختر المندوب</option>`+state.reps.map(r=>`<option value="${esc(r.id)}">${esc(r.name)} — ${esc(r.region||'')}</option>`).join("");
     ["manualRep","adminSaleRep","lateDeliveryRep"].forEach(id=>{if($(id))$(id).innerHTML=repOpts});
     if($("dailyLedgerRep"))$("dailyLedgerRep").innerHTML=`<option value="">كل المندوبين</option>`+state.reps.map(r=>`<option value="${esc(r.id)}">${esc(r.name)} — ${esc(r.region||'')}</option>`).join("");
+    if($("dashFilterRep"))$("dashFilterRep").innerHTML=`<option value="">كل المندوبين</option>`+state.reps.map(r=>`<option value="${esc(r.id)}">${esc(r.name)} — ${esc(r.region||'')}</option>`).join("");
+    if($("cmdRep"))$("cmdRep").innerHTML=`<option value="">كل المندوبين</option>`+state.reps.map(r=>`<option value="${esc(r.id)}">${esc(r.name)} — ${esc(r.region||'')}</option>`).join("");
   }
   function menuForRole(){
     const role=state.profile?.role;
@@ -1480,8 +1496,20 @@
   function v43DashboardDateFilter(row){
     const from=$('dashFilterFrom')?.value||'';
     const to=$('dashFilterTo')?.value||'';
+    const repFilter=$('dashFilterRep')?.value||'';
     const d=dateVal(row)||'';
-    return (!from||d>=from)&&(!to||d<=to);
+    const rep=repFilter?repById(repFilter):null;
+    return (!from||d>=from)&&(!to||d<=to)&&(!repFilter||(rep&&repMatchesRecord(rep,row)));
+  }
+  function v55RepForRecord(row){
+    return state.reps.find(r=>repMatchesRecord(r,row))||null;
+  }
+  function v55RepRemainForRecord(row, regionFilter=''){
+    const rep=v55RepForRecord(row);
+    if(!rep)return 0;
+    const sales=live(state.sales).filter(s=>repMatchesRecord(rep,s)&&(!regionFilter||v44MatchesRegion(s,regionFilter)));
+    const del=live(state.deliveries).filter(d=>repMatchesRecord(rep,d)&&deliveryCountsInLedger(d)&&deliveryCountsAsConfirmed(d)&&(!regionFilter||v44MatchesRegion(d,regionFilter)));
+    return sales.reduce((a,x)=>a+n(x.amountSyp),0)-del.reduce((a,x)=>a+n(x.officeConfirmedSyp||x.amountSyp),0);
   }
   function v50EntryType(row){
     const raw=String(row?.entryType||row?.inputType||row?.revenueType||row?.saleType||row?.channel||'').trim().toLowerCase();
@@ -1549,10 +1577,11 @@
       const usd=n(s.amountUsd||s.usd||0);
       const cur=usd>0?'SYP + USD':'SYP';
       const amount=usd>0?`${fmt(s.amountSyp)} SYP / ${fmt(usd)} USD`:`${fmt(s.amountSyp)} SYP`;
-      return `<tr><td>${esc(s.representativeName||s.repName||s.mandobName||'—')}</td><td>${v50EntryTypeBadge(s)}</td><td class="amount">${amount}</td><td>${esc(dateVal(s)||s.date||'')}</td><td>${esc(v40SaleRegion(s)||s.region||'—')}</td><td>${cur}</td></tr>`;
-    }).join('')||`<tr><td colspan="6" class="empty">لا توجد سجلات إيراد ضمن التاريخ المحدد</td></tr>`;
+      const remain=v55RepRemainForRecord(s);
+      return `<tr><td>${esc(s.representativeName||s.repName||s.mandobName||'—')}</td><td>${v50EntryTypeBadge(s)}</td><td class="amount">${amount}</td><td class="amount v55RepRemain ${remain>0?'warnText':remain<0?'dangerText':'okText'}">${fmt(remain)} SYP</td><td>${esc(dateVal(s)||s.date||'')}</td><td>${esc(v40SaleRegion(s)||s.region||'—')}</td><td>${cur}</td></tr>`;
+    }).join('')||`<tr><td colspan="7" class="empty">لا توجد سجلات إيراد ضمن التاريخ المحدد</td></tr>`;
 
-    if($('dashboardRevenueFoot'))$('dashboardRevenueFoot').innerHTML=rows.length?`<tr class="v46TotalRow"><td><div class="v46TotalLabel">المجموع النهائي<small>${esc(rangeText)} — ${rows.length} سجل</small></div></td><td class="amount">${fmt(totalSyp)} SYP${totalUsd?` / ${fmt(totalUsd)} USD`:''}</td><td colspan="4">مجموع السجلات الظاهرة بعد فلتر التاريخ فقط</td></tr>`:'';
+    if($('dashboardRevenueFoot'))$('dashboardRevenueFoot').innerHTML=rows.length?`<tr class="v46TotalRow"><td><div class="v46TotalLabel">المجموع النهائي<small>${esc(rangeText)} — ${rows.length} سجل</small></div></td><td class="amount">${fmt(totalSyp)} SYP${totalUsd?` / ${fmt(totalUsd)} USD`:''}</td><td colspan="5">مجموع السجلات الظاهرة بعد فلتر التاريخ فقط</td></tr>`:'';
   }
 
   function renderBars(){
@@ -1589,28 +1618,53 @@
 
   function v43RegionLabel(v){return v44RegionLabel(v)}
   function v43MatchesCommandRegion(row){return v44MatchesRegion(row,$('cmdRegion')?.value||'')}
+  function v56SelectedRepMatches(row){
+    const repId=$('cmdRep')?.value||'';
+    if(!repId)return true;
+    const rep=repById(repId);
+    return !!(rep&&repMatchesRecord(rep,row));
+  }
+  function v56SelectedTypeMatches(row, delivery=false){
+    const type=$('cmdEntryType')?.value||'';
+    if(!type)return true;
+    const t=delivery?v51DeliveryType(row):v50EntryType(row);
+    if(type==='unknown')return !t;
+    return t===type;
+  }
+  function v56RepRemainForRecordFiltered(row, regionFilter='', typeFilter=''){
+    const rep=v55RepForRecord(row);
+    if(!rep)return 0;
+    const sales=live(state.sales).filter(s=>repMatchesRecord(rep,s)&&(!regionFilter||v44MatchesRegion(s,regionFilter))&&(!typeFilter||(typeFilter==='unknown'?!v50EntryType(s):v50EntryType(s)===typeFilter)));
+    const del=live(state.deliveries).filter(d=>repMatchesRecord(rep,d)&&deliveryCountsInLedger(d)&&deliveryCountsAsConfirmed(d)&&(!regionFilter||v44MatchesRegion(d,regionFilter))&&(!typeFilter||(typeFilter==='unknown'?!v51DeliveryType(d):v51DeliveryType(d)===typeFilter)));
+    return sales.reduce((a,x)=>a+n(x.amountSyp),0)-del.reduce((a,x)=>a+n(x.officeConfirmedSyp||x.amountSyp),0);
+  }
   function renderCommand(){
     if(!$('commandGrid')&&!$('commandRepLedgerBody'))return;
     const region=$('cmdRegion')?.value||state.filters.region||'';
+    const repId=$('cmdRep')?.value||'';
+    const typeFilter=$('cmdEntryType')?.value||'';
+    const rep=repId?repById(repId):null;
     const label=v44RegionLabel(region);
-    if($('cmdActiveFilterBadge'))$('cmdActiveFilterBadge').textContent=label;
-    const sales=live(state.sales).filter(s=>v44MatchesRegion(s,region));
-    const del=live(state.deliveries).filter(d=>deliveryCountsInLedger(d)&&v44MatchesRegion(d,region));
+    const typeLabel=typeFilter?(typeFilter==='unknown'?'غير محدد':typeFilter):'كل الأنواع';
+    const repLabel=rep?rep.name:'كل المندوبين';
+    if($('cmdActiveFilterBadge'))$('cmdActiveFilterBadge').textContent=`${label} — ${repLabel} — ${typeLabel}`;
+    const sales=live(state.sales).filter(s=>v44MatchesRegion(s,region)&&v56SelectedRepMatches(s)&&v56SelectedTypeMatches(s,false));
+    const del=live(state.deliveries).filter(d=>deliveryCountsInLedger(d)&&v44MatchesRegion(d,region)&&v56SelectedRepMatches(d)&&v56SelectedTypeMatches(d,true));
     const total=sales.reduce((a,x)=>a+n(x.amountSyp),0);
     const conf=del.filter(d=>deliveryCountsAsConfirmed(d)).reduce((a,x)=>a+n(x.officeConfirmedSyp||x.amountSyp),0);
     const remain=total-conf;
     if($('commandGrid'))$('commandGrid').innerHTML=[
-      [`مجموع ${label} بالسوري`,`${fmt(total)} SYP`,'الإيراد الكامل للمنطقة المختارة'],
-      [`المتبقي الخاص بـ ${label}`,`${fmt(remain)} SYP`,remain>0?'متبقي على المندوبين':'لا يوجد متبقي ظاهر']
+      [`مجموع ${label} بالسوري`,`${fmt(total)} SYP`,`${repLabel} — ${typeLabel}`],
+      [`المتبقي الخاص بالفلتر`,`${fmt(remain)} SYP`,remain>0?'متبقي على المندوبين':'لا يوجد متبقي ظاهر']
     ].map(x=>`<div class="v43MiniStat"><div class="k">${esc(x[0])}</div><div class="v">${esc(x[1])}</div><div class="s">${esc(x[2])}</div></div>`).join('');
     const rows=sales.slice().sort((a,b)=>(dateVal(b)||'').localeCompare(dateVal(a)||'')||(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
-    if($('commandRepLedgerBody'))$('commandRepLedgerBody').innerHTML=rows.map(s=>`<tr><td>${esc(s.representativeName||s.repName||s.mandobName||'—')}</td><td>${v50EntryTypeBadge(s)}</td><td class="amount">${fmt(s.amountSyp)} SYP</td><td>${esc(dateVal(s)||s.date||'')}</td><td>${esc(v44RegionOfRow(s)||'—')}</td><td>${esc(s.notes||'—')}</td></tr>`).join('')||`<tr><td colspan="6" class="empty">لا توجد سجلات لهذه المنطقة</td></tr>`;
+    if($('commandRepLedgerBody'))$('commandRepLedgerBody').innerHTML=rows.map(s=>{const rem=v56RepRemainForRecordFiltered(s,region,typeFilter);return `<tr><td>${esc(s.representativeName||s.repName||s.mandobName||'—')}</td><td>${v50EntryTypeBadge(s)}</td><td class="amount">${fmt(s.amountSyp)} SYP</td><td class="amount v55RepRemain ${rem>0?'warnText':rem<0?'dangerText':'okText'}">${fmt(rem)} SYP</td><td>${esc(dateVal(s)||s.date||'')}</td><td>${esc(v44RegionOfRow(s)||'—')}</td><td>${esc(s.notes||'—')}</td></tr>`}).join('')||`<tr><td colspan="7" class="empty">لا توجد سجلات ضمن هذا الفلتر</td></tr>`;
   }
   function saleButtons(s){ let b=''; if(saleEditAllowed(s)) b+=`<button class="secondary" onclick="openEdit('sales_reports','${s.id}')">تعديل</button>`; if(isAdmin()) b+=`<button class="secondary" onclick="v33OpenRecordImpact('sales_reports','${s.id}')">الأثر</button><button class="secondary" onclick="grantEdit('sales_reports','${s.id}')">إذن تعديل</button><button class="danger v33DeleteBtn" onclick="appDelete('sales_reports','${s.id}','حذف مبيع ${esc(s.representativeName)}')">حذف وربط الصندوق</button>`; return b||'<span class="muted">—</span>'; }
   function renderRecords(){ if(!$("salesBody"))return; if(state.profile?.role==="office"){$("deliveriesSearch").placeholder="بحث باسم المندوب";} if(state.profile?.role==="representative"){$("salesSearch").placeholder="بحث في سجلي";$("deliveriesSearch").placeholder="بحث في تسليماتي";} const st=($("salesSearch")?.value||"").trim(); const sales=live(state.sales).filter(s=>!st||String(s.representativeName||"").includes(st)||String(s.region||"").includes(st)); $("salesBody").innerHTML=sales.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)).map(s=>`<tr><td>${esc(s.date)}</td><td>${esc(s.representativeName)}</td><td>${esc(s.region)}</td><td>${v50EntryTypeBadge(s)}</td><td class="amount">${fmt(s.amountSyp)}</td><td class="amount">${fmt(actualUsdFromSale(s))}</td><td>${esc(s.notes)}${s.editAllowedByAdmin?'<div class="editAllowed">مفتوح بإذن الإدارة</div>':''}</td><td><div class="actions">${saleButtons(s)}</div></td></tr>`).join("")||`<tr><td colspan="8" class="empty">لا توجد مبيعات</td></tr>`; const dt=($("deliveriesSearch")?.value||"").trim(); const dels=live(state.deliveries).filter(d=>!dt||String(d.representativeName||"").includes(dt)||String(d.officeName||"").includes(dt)); $("deliveriesBody").innerHTML=dels.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)).map(d=>`<tr><td>${esc(d.date)}</td><td>${esc(d.representativeName)}</td><td>${esc(d.officeName)}</td><td>${v50EntryTypeBadge(d)}</td><td class="amount">${fmt(d.amountSyp)}</td><td><span class="pill ${statusClass(d.status)}">${statusLabel(d.status)}</span>${editStateText(d,'تسليم')}</td><td><div class="actions">${deliveryButtons(d)}</div></td></tr>`).join("")||`<tr><td colspan="7" class="empty">لا توجد تسليمات</td></tr>`; }
   function deliveryButtons(d){ const role=state.profile?.role; let b=''; if(deliveryEditAllowed(d)) b+=`<button class="secondary" onclick="openEdit('deliveries','${d.id}')">تعديل</button>`; if(isAdmin()&&isPendingStatus(d.status)) b+=`<button class="okbtn" onclick="deliveryAction('confirm','${d.id}')">تأكيد</button><button class="warn" onclick="deliveryAction('diff','${d.id}')">تسجيل فرق</button>`; if(isAdmin()&&d.status==='difference') b+=`<button class="okbtn" onclick="deliveryAction('approve','${d.id}')">اعتماد الفرق</button>`; if(isAdmin()) b+=`<button class="secondary" onclick="v33OpenRecordImpact('deliveries','${d.id}')">الأثر</button><button class="secondary" onclick="grantEdit('deliveries','${d.id}')">إذن تعديل</button><button class="danger v33DeleteBtn" onclick="deliveryAction('delete','${d.id}')">حذف وربط المكتب</button>`; return b||'<span class="muted">—</span>'; }
   function renderRepMatch(){ if(!$("repMatchBody"))return; const term=($("repMatchSearch")?.value||"").trim(), rg=$("repMatchRegion")?.value||""; $("repMatchBody").innerHTML=state.reps.filter(r=>(!rg||r.region===rg)&&(!term||String(r.name||"").includes(term))).map(r=>{const rs=live(state.sales).filter(s=>s.representativeId===r.id||s.representativeName===r.name), rd=live(state.deliveries).filter(d=>d.representativeId===r.id||d.representativeName===r.name); const sale=rs.reduce((a,x)=>a+n(x.amountSyp),0), conf=rd.filter(d=>isConfirmedStatus(d)).reduce((a,x)=>a+n(x.officeConfirmedSyp||x.amountSyp),0), pend=rd.filter(d=>isPendingStatus(d.status)).reduce((a,x)=>a+n(x.amountSyp),0), diff=rd.filter(d=>d.status==="difference").length; const yesterdayRemain=rs.filter(x=>x.date<today).reduce((a,x)=>a+n(x.amountSyp),0)-rd.filter(x=>x.date<today&&isConfirmedStatus(x)).reduce((a,x)=>a+n(x.officeConfirmedSyp||x.amountSyp),0); const remain=sale-conf; const cls=diff?'danger':remain>0?'warn':'ok'; return `<tr><td>${esc(r.name)}</td><td>${esc(r.region)}</td><td class="amount">${fmt(sale)}</td><td class="amount">${fmt(conf)}</td><td class="amount">${fmt(pend)}</td><td>${diff}</td><td class="amount">${fmt(yesterdayRemain)}</td><td class="amount">${fmt(remain)}</td><td><span class="pill ${cls}">${diff?'فرق':remain>0?'متبقي':'مطابق'}</span></td></tr>`}).join("")||`<tr><td colspan="9" class="empty">لا توجد بيانات</td></tr>`; }
-  function walletOpLabel(op){return ({withdraw_syp:'سحب سوري قديم',withdraw_usd:'سحب دولار قديم',convert_syp_to_usd:'تحويل SYP إلى USD',adjustment_syp_plus:'تسوية +SYP',adjustment_usd_plus:'تسوية +USD',transfer_office_syp:'تحويل سوري إلى مكتب/صندوق',transfer_office_usd:'تحويل دولار إلى مكتب/صندوق'})[op]||op||'سحب SYP'}
+  function walletOpLabel(op){return ({withdraw_syp:'سحب سوري قديم',withdraw_usd:'سحب دولار قديم',convert_syp_to_usd:'قص سوري إلى دولار داخل المكتب',adjustment_syp_plus:'تسوية +SYP',adjustment_usd_plus:'تسوية +USD',transfer_office_syp:'تحويل سوري إلى مكتب/صندوق',transfer_office_usd:'تحويل دولار إلى مكتب/صندوق'})[op]||op||'سحب SYP'}
   function officeWalletCalc(o){
     if(isFarhadCashboxOffice(o)){
       const c=typeof cashboxCalc==='function'?cashboxCalc():{syp:0,usd:0,ledger:[]};
@@ -1667,7 +1721,7 @@
       const val=currency==='USD'?n(o.usdBalance):n(o.sypBalance);
       const cls=o.isCashboxWallet?'good v49CashboxOfficeCard':(val<0?'bad':val>0?'good':'zero');
       const caption=o.isCashboxWallet?(currency==='USD'?'صندوق دولار فرهاد':'صندوق سوري فرهاد'):(val<0?'له عندي':val>0?'رصيدي عنده':'صفر');
-      return `<div class="v43OfficeCard ${cls}"><div class="k">${esc(o.name)}</div><div class="v">${fmt(val)} ${currency}</div><div class="s">${o.isCashboxWallet?'الصندوق الأساسي':esc(o.region||'—')} — ${caption}</div></div>`;
+      return `<div class="v43OfficeCard ${cls}" onclick="openOfficeWallet('${esc(o.id)}')" title="اضغط لعرض كل التفاصيل"><div class="k">${esc(o.name)}</div><div class="v">${fmt(val)} ${currency}</div><div class="s">${o.isCashboxWallet?'الصندوق الأساسي':esc(o.region||'—')} — ${caption}</div></div>`;
     }).join('')||`<div class="empty">لا توجد مكاتب</div>`;
     updateWalletPreview();
     renderOfficeWalletLedger();
@@ -1688,7 +1742,7 @@
     let afterSyp=row.sypBalance, afterUsd=row.usdBalance, line='';
     if(op==='withdraw_syp'){afterSyp-=syp; line=`سحب ${fmt(syp)} SYP`;}
     else if(op==='withdraw_usd'){afterUsd-=usd; line=`سحب ${fmt(usd)} USD`;}
-    else if(op==='convert_syp_to_usd'){const conv=rate>0?syp/rate:0; afterSyp-=syp; afterUsd+=conv; line=`تحويل ${fmt(syp)} SYP إلى ${fmt(conv)} USD`;}
+    else if(op==='convert_syp_to_usd'){const conv=rate>0?syp/rate:0; afterSyp-=syp; afterUsd+=conv; line=`قص ${fmt(syp)} SYP وتحويله إلى ${fmt(conv)} USD`;}
     else if(op==='adjustment_syp_plus'){afterSyp+=syp; line=`تسوية زيادة ${fmt(syp)} SYP`;}
     else if(op==='adjustment_usd_plus'){afterUsd+=usd; line=`تسوية زيادة ${fmt(usd)} USD`;}
     else if(op==='transfer_office_syp'){afterSyp-=syp+feeS; afterUsd-=feeU; line=`تحويل ${fmt(syp)} SYP إلى ${dest?.name||'مكتب آخر'}${externalDest?' — خارج الحسابات':''}${feeS||feeU?` + عمولة ${fmt(feeS)} SYP / ${fmt(feeU)} USD`:''}`;}
@@ -2506,9 +2560,22 @@ function buildIssues(){
       ['lateDeliverySyp','lateDeliveryNotes'].forEach(id=>{if($(id))$(id).value=''}); updateLateDeliveryPreview(); msg($('lateDeliveryMsg'),'ok',`تم حفظ التسليم. المتبقي بعده: ${fmt(before-amount)} SYP`); await loadData();
     }catch(e){msg($('lateDeliveryMsg'),'error',e.message)}
   }
+  function repRangeTotals(repId,from,to,type=''){
+    const rep=repById(repId);
+    const sales=live(state.sales).filter(s=>repMatchesRecord(rep,s)&&(!from||dateVal(s)>=from)&&(!to||dateVal(s)<=to)&&(!type||v50EntryType(s)===type));
+    const del=live(state.deliveries).filter(d=>repMatchesRecord(rep,d)&&deliveryCountsInLedger(d)&&(!from||dateVal(d)>=from)&&(!to||dateVal(d)<=to)&&(!type||v51DeliveryType(d)===type));
+    const saleSyp=sales.reduce((a,x)=>a+n(x.amountSyp),0), saleUsd=sales.reduce((a,x)=>a+actualUsdFromSale(x),0);
+    const deliveredSyp=del.reduce((a,x)=>a+n(x.officeConfirmedSyp||x.amountSyp),0), deliveredUsd=del.reduce((a,x)=>a+actualUsdFromDelivery(x),0);
+    const offices=[...new Set(del.map(x=>x.officeName).filter(Boolean))].join('، ');
+    const typeBreakdown=v50TypeBreakdown(sales,del);
+    return {saleSyp,saleUsd,deliveredSyp,deliveredUsd,remainSyp:saleSyp-deliveredSyp,remainUsd:saleUsd-deliveredUsd,offices,typeBreakdown,countSales:sales.length,countDeliveries:del.length};
+  }
   function dailyLedgerRows(){
-    const date=$('dailyLedgerDate')?.value||today, repFilter=$('dailyLedgerRep')?.value||'';
-    return state.reps.filter(r=>!repFilter||String(r.id)===String(repFilter)).map(r=>{const t=repDayTotals(r.id,date); return {date,repId:r.id,name:r.name,region:r.region,typeBreakdown:t.typeBreakdown,saleSyp:t.saleSyp,deliveredSyp:t.deliveredSyp,remainSyp:t.remainSyp,offices:t.offices,countSales:t.countSales,countDeliveries:t.countDeliveries,status:t.remainSyp>0?'متبقي':t.remainSyp<0?'تسليم زائد':'مغلق'}});
+    const from=$('dailyLedgerFrom')?.value||$('dailyLedgerDate')?.value||today;
+    const to=$('dailyLedgerTo')?.value||from;
+    if($('dailyLedgerDate'))$('dailyLedgerDate').value=from;
+    const repFilter=$('dailyLedgerRep')?.value||'';
+    return state.reps.filter(r=>!repFilter||String(r.id)===String(repFilter)).map(r=>{const t=repRangeTotals(r.id,from,to); return {date:from===to?from:`${from} → ${to}`,repId:r.id,name:r.name,region:r.region,typeBreakdown:t.typeBreakdown,saleSyp:t.saleSyp,deliveredSyp:t.deliveredSyp,remainSyp:t.remainSyp,offices:t.offices,countSales:t.countSales,countDeliveries:t.countDeliveries,status:t.remainSyp>0?'متبقي':t.remainSyp<0?'تسليم زائد':'مغلق'}});
   }function renderDailyLedger(){
     if(!$('dailyLedgerBody'))return; const rows=dailyLedgerRows(); const totalSale=rows.reduce((a,x)=>a+x.saleSyp,0), totalDel=rows.reduce((a,x)=>a+x.deliveredSyp,0), totalRem=rows.reduce((a,x)=>a+x.remainSyp,0), active=rows.filter(x=>x.saleSyp||x.deliveredSyp).length;
     // v45: تم حذف كروت ملخص السجل اليومي حسب الطلب؛ يبقى الجدول فقط.
@@ -2518,7 +2585,7 @@ function buildIssues(){
   }
   function renderDailyEntry(){
     if(!isAdmin())return;
-    ['adminSaleDate','lateDeliveryDate','dailyLedgerDate'].forEach(id=>{if($(id)&&!$(id).value)$(id).value=today});
+    ['adminSaleDate','lateDeliveryDate','dailyLedgerDate','dailyLedgerFrom','dailyLedgerTo'].forEach(id=>{if($(id)&&!$(id).value)$(id).value=today});
     updateAdminEntryPreview(); renderDailyLedger();
   }
   function excelEscape(v){return String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
@@ -2528,7 +2595,7 @@ function buildIssues(){
     const html=`<html><head><meta charset="UTF-8"></head><body><table border="1"><thead><tr>${header}</tr></thead><tbody>${body}</tbody></table></body></html>`;
     const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob(['\ufeff'+html],{type:'application/vnd.ms-excel;charset=utf-8'})); a.download=name.endsWith('.xls')?name:name+'.xls'; a.click(); URL.revokeObjectURL(a.href);
   }
-  function exportDailyLedgerExcel(){downloadExcel(`daily_ledger_${$('dailyLedgerDate')?.value||today}.xls`,dailyLedgerRows(),[{label:'التاريخ',key:'date'},{label:'المندوب',key:'name'},{label:'المنطقة',key:'region'},{label:'نوع الإدخال',key:'typeBreakdown'},{label:'المبيع SYP',key:'saleSyp'},{label:'التسليم SYP',key:'deliveredSyp'},{label:'المتبقي SYP',key:'remainSyp'},{label:'المكاتب',key:'offices'},{label:'الحالة',key:'status'}])}
+  function exportDailyLedgerExcel(){const f=$('dailyLedgerFrom')?.value||$('dailyLedgerDate')?.value||today, t=$('dailyLedgerTo')?.value||f; downloadExcel(`daily_ledger_${f}_${t}.xls`,dailyLedgerRows(),[{label:'الفترة',key:'date'},{label:'المندوب',key:'name'},{label:'المنطقة',key:'region'},{label:'نوع الإدخال',key:'typeBreakdown'},{label:'المبيع SYP',key:'saleSyp'},{label:'التسليم SYP',key:'deliveredSyp'},{label:'المتبقي SYP',key:'remainSyp'},{label:'المكاتب',key:'offices'},{label:'الحالة',key:'status'}])}
   function exportOfficeWalletExcel(){downloadExcel(`office_wallet_${today}.xls`,officeWalletRows(),[{label:'المكتب',key:'name'},{label:'المنطقة',key:'region'},{label:'صندوق سوري فرهاد',key:'sypBalance'},{label:'صندوق دولار فرهاد',key:'usdBalance'},{label:'قيد المطابقة',key:'pending'},{label:'فروقات',key:'diff'},{label:'الحالة',key:'status'}])}
   function renderGlobalSearch(){
     const box=$('globalResults'), q=($('globalSearch')?.value||'').trim(); if(!box)return; if(!q){box.classList.remove('show');box.innerHTML='';return;}
@@ -2549,7 +2616,7 @@ function buildIssues(){
       else if(op==='transfer_office_usd'){usd=incoming?n(w.amountUsd):-(n(w.amountUsd)+n(w.commissionUsd)); syp=incoming?0:-n(w.commissionSyp); party=incoming?w.officeName:w.toOfficeName;}
       else if(op==='withdraw_syp'){syp=-n(w.amountSyp);}
       else if(op==='withdraw_usd'){usd=-n(w.amountUsd);}
-      else if(op==='convert_syp_to_usd'){syp=-n(w.sourceSyp||w.amountSyp); usd=n(w.convertedUsd||w.amountUsd); type='تحويل داخل المكتب SYP إلى USD'; party='تحويل عملة';}
+      else if(op==='convert_syp_to_usd'){syp=-n(w.sourceSyp||w.amountSyp); usd=n(w.convertedUsd||w.amountUsd); type='قص سوري إلى دولار داخل المكتب'; party='تحويل عملة';}
       else if(op==='adjustment_syp_plus'){syp=n(w.amountSyp); party='تسوية';}
       else if(op==='adjustment_usd_plus'){usd=n(w.amountUsd); party='تسوية';}
       rows.push({date:w.date||'',type,party,syp,usd,rate:n(w.exchangeRate),status:'محفوظ',notes:w.notes||''});
@@ -2595,11 +2662,12 @@ function buildIssues(){
   function v44BindCleanFilters(){
     const cmd=$('cmdRegion');
     if(cmd&&!cmd.dataset.v44Bound){cmd.dataset.v44Bound='1';cmd.addEventListener('change',()=>{state.filters.region=cmd.value;renderCommand();});}
+    ['cmdRep','cmdEntryType'].forEach(id=>{const el=$(id); if(el&&!el.dataset.v56Bound){el.dataset.v56Bound='1';el.addEventListener('change',renderCommand);}});
     const reset=$('resetCmdFilter');
-    if(reset&&!reset.dataset.v44Bound){reset.dataset.v44Bound='1';reset.addEventListener('click',()=>{state.filters.region='';if(cmd)cmd.value='';renderCommand();});}
+    if(reset&&!reset.dataset.v44Bound){reset.dataset.v44Bound='1';reset.addEventListener('click',()=>{state.filters.region='';if(cmd)cmd.value='';if($('cmdRep'))$('cmdRep').value='';if($('cmdEntryType'))$('cmdEntryType').value='';renderCommand();});}
     ['dashFilterFrom','dashFilterTo'].forEach(id=>{const el=$(id); if(el&&!el.dataset.v44Bound){el.dataset.v44Bound='1';el.addEventListener('change',renderDashboard);el.addEventListener('input',renderDashboard);}});
     const clear=$('dashFilterClear');
-    if(clear&&!clear.dataset.v44Bound){clear.dataset.v44Bound='1';clear.addEventListener('click',()=>{if($('dashFilterFrom'))$('dashFilterFrom').value='';if($('dashFilterTo'))$('dashFilterTo').value='';renderDashboard();});}
+    if(clear&&!clear.dataset.v44Bound){clear.dataset.v44Bound='1';clear.addEventListener('click',()=>{if($('dashFilterFrom'))$('dashFilterFrom').value='';if($('dashFilterTo'))$('dashFilterTo').value='';if($('dashFilterRep'))$('dashFilterRep').value='';renderDashboard();});}
     ['officeWalletCurrency','officeWalletRegion','officeWalletSearch'].forEach(id=>{const el=$(id); if(el&&!el.dataset.v44Bound){el.dataset.v44Bound='1';el.addEventListener(id==='officeWalletSearch'?'input':'change',renderOfficeWallet);}});
   }
 
@@ -2947,7 +3015,8 @@ ${title||col}
   if($("saveAdminSaleDeliveryBtn"))$("saveAdminSaleDeliveryBtn").onclick=()=>withBusy('saveAdminSaleDeliveryBtn','جاري حفظ الإدخال...',saveAdminSaleDelivery);
   if($("saveLateDeliveryBtn"))$("saveLateDeliveryBtn").onclick=()=>withBusy('saveLateDeliveryBtn','جاري حفظ التسليم...',saveLateDelivery);
   ["adminSaleSyp","adminDeliveredSyp","lateDeliverySyp","adminSaleRep","adminEntryType","lateDeliveryRep","lateDeliveryEntryType","adminSaleDate","lateDeliveryDate"].forEach(id=>{if($(id))$(id).addEventListener(id.includes('Rep')||id.includes('Date')||id.includes('Type')?'change':'input',()=>{updateAdminEntryPreview();updateLateDeliveryPreview();renderDailyLedger();})});
-  ["dailyLedgerDate","dailyLedgerRep"].forEach(id=>{if($(id)){['input','change'].forEach(ev=>$(id).addEventListener(ev,renderDailyLedger));}});
+  ["dailyLedgerDate","dailyLedgerFrom","dailyLedgerTo","dailyLedgerRep"].forEach(id=>{if($(id)){['input','change'].forEach(ev=>$(id).addEventListener(ev,renderDailyLedger));}});
+  ['dashFilterFrom','dashFilterTo','dashFilterRep'].forEach(id=>{if($(id)){['input','change'].forEach(ev=>$(id).addEventListener(ev,renderDashboard));}});
   if($("refreshDailyLedger"))$("refreshDailyLedger").onclick=()=>withBusy('refreshDailyLedger','جاري التحديث...',async()=>{await loadData(); renderDailyLedger(); toast('تم تحديث السجل اليومي');});
   if($("exportDailyLedgerExcel"))$("exportDailyLedgerExcel").onclick=()=>{renderDailyLedger(); exportDailyLedgerExcel();};
   if($("exportOfficeWalletExcel"))$("exportOfficeWalletExcel").onclick=exportOfficeWalletExcel;
