@@ -785,6 +785,42 @@ th{
   .daily-buttons button{width:100%}
 }
 
+
+/* ===== Daily log edit/delete visibility ===== */
+.action-open{
+  background:rgba(53,200,255,.16) !important;
+  border-color:rgba(100,185,255,.28) !important;
+  color:#eef8ff !important;
+  min-width:92px;
+}
+.record-actions{
+  display:flex;
+  gap:8px;
+  align-items:center;
+  justify-content:flex-start;
+}
+.record-actions .edit-btn{
+  background:rgba(53,200,255,.16) !important;
+  border-color:rgba(100,185,255,.28) !important;
+}
+.record-actions .danger{
+  min-width:54px;
+}
+.daily-summary-table th:last-child,
+.daily-summary-table td:last-child{
+  text-align:center;
+}
+
+
+/* ===== Delegate region filter in daily entry ===== */
+#revRegion,#delRegion{
+  border-color:rgba(53,200,255,.24);
+  background:rgba(8,18,42,.72);
+}
+#revDelegate,#delDelegate{
+  border-color:rgba(88,255,159,.18);
+}
+
 </style>
 </head>
 
@@ -852,6 +888,8 @@ th{
             <div class="section-head"><div><h2>إدخال الإيراد اليومي</h2><small>هذا فقط لإضافة إيراد المندوب. لا يدخل بالتسليم.</small></div></div>
             <input id="editingRevenueId" type="hidden" />
             <div class="form-grid">
+              
+              <div class="field"><label>المنطقة</label><select id="revRegion" onchange="onDelegateRegionChange('rev')"></select></div>
               <div class="field"><label>اسم المندوب</label><select id="revDelegate" onchange="onRevFormChange()"></select></div>
               <div class="field">
                 <label>التاريخ</label>
@@ -877,6 +915,8 @@ th{
             <input id="editingDeliveryId" type="hidden" />
             <input id="cutMode" type="hidden" value="0" />
             <div class="form-grid">
+              
+              <div class="field"><label>المنطقة</label><select id="delRegion" onchange="onDelegateRegionChange('del')"></select></div>
               <div class="field"><label>اسم المندوب</label><select id="delDelegate" onchange="updateDeliveryCalculation()"></select></div>
               <div class="field"><label>التاريخ</label><input id="delDate" type="date" onchange="updateDeliveryCalculation()" /></div>
               <div class="field"><label>المكتب الذي استلم</label><select id="delOffice"></select></div>
@@ -1392,14 +1432,44 @@ th{
       const totalAsSyp=deliveredSyp+cutSyp+(rate>0?directUsd*rate:0);
       return{mode,rate,exchangeRate:rate,deliveredSyp,directUsd,cutSyp,cutUsd,deliveredUsd,totalAsSyp,totalDeliveredAsSyp:totalAsSyp,deliveredUsdAsSyp:rate>0?directUsd*rate:0};
     }
+    function delegateRegionList(){
+      return [...new Set(allDelegates.map(d=>d.region).filter(Boolean))]
+        .sort((a,b)=>String(a).localeCompare(String(b),undefined,{numeric:true}));
+    }
+
+    function fillDelegateRegionSelect(id){
+      const el=$(id);if(!el)return;
+      const keep=el.value;
+      const opts='<option value="">كل المناطق</option>'+delegateRegionList().map(r=>`<option value="${r}">${r}</option>`).join("");
+      el.innerHTML=opts;
+      if([...el.options].some(o=>o.value===keep))el.value=keep;
+    }
+
+    function fillDelegateSelect(prefix,keepValue=""){
+      const regionEl=$(prefix+"Region");
+      const delegateEl=$(prefix+"Delegate");
+      if(!delegateEl)return;
+      const region=regionEl?regionEl.value:"";
+      const keep=keepValue || delegateEl.value;
+      const list=region?allDelegates.filter(d=>d.region===region):allDelegates;
+      delegateEl.innerHTML='<option value="">اختر المندوب</option>'+list.map(d=>`<option value="${d.name}">${d.name}</option>`).join("");
+      if([...delegateEl.options].some(o=>o.value===keep))delegateEl.value=keep;
+      else delegateEl.value="";
+    }
+
+    window.onDelegateRegionChange=function(prefix){
+      fillDelegateSelect(prefix);
+      if(prefix==="rev")onRevFormChange();
+      if(prefix==="del")updateDeliveryCalculation();
+    };
+
     function fillSelects(){
-      const ds='<option value="">اختر المندوب</option>'+allDelegates.map(d=>`<option value="${d.name}">${d.region} - ${d.name}</option>`).join("");
+      fillDelegateRegionSelect("revRegion");
+      fillDelegateRegionSelect("delRegion");
+      fillDelegateSelect("rev");
+      fillDelegateSelect("del");
+
       const os='<option value="">اختر المكتب</option>'+allOffices.map(o=>`<option value="${o.name}">${o.region} - ${o.name}</option>`).join("");
-      ["revDelegate","delDelegate"].forEach(id=>{
-        const el=$(id);if(!el)return;
-        const keep=el.value;el.innerHTML=ds;
-        if([...el.options].some(o=>o.value===keep))el.value=keep;
-      });
       const officeEl=$("delOffice");if(!officeEl)return;
       const keepOffice=officeEl.value;officeEl.innerHTML=os;
       if([...officeEl.options].some(o=>o.value===keepOffice))officeEl.value=keepOffice;
@@ -2093,7 +2163,7 @@ th{
       updateDeliveryModeUi();
       updateDeliveryCalculation();
     };
-    window.editRevenue=function(id){const r=revenues.find(x=>x.id===id);if(!r)return;$("editingRevenueId").value=r.id;$("revDelegate").value=r.delegateName;$("revDate").value=r.date||todayString();$("revType").value=r.revenueType||"masary";$("revAmount").value=num(r.revenueSyp)||"";$("revNote").value=r.note||"";showView("entry");onRevFormChange();toast("وضع التعديل: "+r.delegateName,"info")};window.deleteRevenue=async function(id){if(!confirm("حذف الإيراد؟ التسليمات لا تنحذف لأنها عمليات مستقلة."))return;await deleteDoc(doc(db,"dailyRevenues",id));toast("تم حذف الإيراد ✅","success")};
+    window.editRevenue=function(id){const r=revenues.find(x=>x.id===id);if(!r)return;$("editingRevenueId").value=r.id;if($("revRegion")){$("revRegion").value=r.region||"";fillDelegateSelect("rev",r.delegateName)}else{$("revDelegate").value=r.delegateName}$("revDate").value=r.date||todayString();$("revType").value=r.revenueType||"masary";$("revAmount").value=num(r.revenueSyp)||"";$("revNote").value=r.note||"";showView("entry");onRevFormChange();toast("وضع التعديل: "+r.delegateName,"info")};window.deleteRevenue=async function(id){if(!confirm("حذف الإيراد؟ التسليمات لا تنحذف لأنها عمليات مستقلة."))return;await deleteDoc(doc(db,"dailyRevenues",id));toast("تم حذف الإيراد ✅","success")};
 
     /* ====== saveRevenue + resetRevenueForm (كانوا ناقصين — هذا سبب عدم الحفظ) ====== */
     window.saveRevenue=async function(){
@@ -2135,6 +2205,7 @@ th{
       if($("revType"))$("revType").value="masary";
       if($("revAmount"))$("revAmount").value="";
       if($("revNote"))$("revNote").value="";
+      fillDelegateSelect("rev");
       onRevFormChange();
     };
 
@@ -2204,7 +2275,7 @@ th{
       const d=deliveries.find(x=>x.id===id);if(!d)return;
       const n=deliveryNumbers(d);
       $("editingDeliveryId").value=d.id;
-      $("delDelegate").value=d.delegateName;
+      if($("delRegion")){$("delRegion").value=d.region||"";fillDelegateSelect("del",d.delegateName)}else{$("delDelegate").value=d.delegateName}
       $("delDate").value=d.date||todayString();
       $("delOffice").value=d.officeName;
       $("delSyp").value=n.mode==="cut"?n.cutSyp:n.deliveredSyp;
@@ -2233,6 +2304,7 @@ th{
       $("modalContent").innerHTML=html;$("officeModal").classList.add("show");
     };window.hideOfficeModal=function(){$("officeModal").classList.remove("show")};window.closeOfficeModal=function(e){if(e.target.id==="officeModal")hideOfficeModal()};
     window.clearFilters=function(){$("fromDate").value="";$("toDate").value="";$("nameFilter").value="";$("regionFilter").value="";renderDailyLog()};window.toggleDay=function(day){collapsedDays.has(day)?collapsedDays.delete(day):collapsedDays.add(day);renderDailyLog()};window.toggleDayDetails=function(day){expandedDetailsDays.has(day)?expandedDetailsDays.delete(day):expandedDetailsDays.add(day);renderDailyLog()};
+    window.openDayDetails=function(day){collapsedDays.delete(day);expandedDetailsDays.add(day);renderDailyLog()};
     function getFilteredDaysData(){const from=$("fromDate").value,to=$("toDate").value,name=$("nameFilter").value.trim(),region=$("regionFilter").value;return{revs:revenues.filter(r=>(!from||r.date>=from)&&(!to||r.date<=to)&&(!name||String(r.delegateName).includes(name))&&(!region||r.region===region)),dels:deliveries.filter(d=>(!from||d.date>=from)&&(!to||d.date<=to)&&(!name||String(d.delegateName).includes(name))&&(!region||d.region===region))}}
     window.renderDailyLog=function(){
       const{revs,dels}=getFilteredDaysData();
@@ -2296,12 +2368,13 @@ th{
           <td class="ltr total-cell">${fmt(x.deliveredTodayAsSyp,"SYP")}</td>
           <td class="ltr remain-cell">${fmt(x.remaining,"SYP")}</td>
           <td>${[...x.offices].join("، ")||"-"}</td>
+          <td><button class="secondary small action-open" onclick="openDayDetails('${day}')">تعديل / حذف</button></td>
         </tr>`).join("");
 
         const revenueRows=dayRevs.map(r=>`<tr>
           <td>إيراد</td><td>${r.delegateName}</td><td>${r.region}</td><td>${getTypeLabel(r.revenueType)}</td>
           <td class="ltr revenue-cell">${fmt(r.revenueSyp,"SYP")}</td><td class="ltr">-</td><td class="ltr">-</td><td>-</td>
-          <td><button class="secondary small" onclick="editRevenue('${r.id}')">تعديل</button><button class="danger small" onclick="deleteRevenue('${r.id}')">حذف</button></td>
+          <td class="record-actions"><button class="secondary small edit-btn" onclick="editRevenue('${r.id}')">تعديل</button><button class="danger small" onclick="deleteRevenue('${r.id}')">حذف</button></td>
         </tr>`).join("");
 
         const deliveryRows=dayDels.sort((a,b)=>deliverySortKey(a).localeCompare(deliverySortKey(b))).map(d=>{
@@ -2313,7 +2386,7 @@ th{
           return`<tr>
             <td>${op}</td><td>${d.delegateName}</td><td>${d.region}</td><td>${d.officeName||"-"}</td>
             <td class="ltr">${sypText}</td><td class="ltr">${usdText}</td><td class="ltr">${rateText}</td><td>${d.note||"-"}</td>
-            <td><button class="secondary small" onclick="editDelivery('${d.id}')">تعديل</button><button class="danger small" onclick="deleteDelivery('${d.id}')">حذف</button></td>
+            <td class="record-actions"><button class="secondary small edit-btn" onclick="editDelivery('${d.id}')">تعديل</button><button class="danger small" onclick="deleteDelivery('${d.id}')">حذف</button></td>
           </tr>`;
         }).join("");
 
@@ -2339,7 +2412,7 @@ th{
             <div class="table-wrap daily-summary-table">
               <table>
                 <thead><tr>
-                  <th>المندوب</th><th>المنطقة</th><th>إيراد اليوم</th><th>تسليم سوري</th><th>قص سوري</th><th>دولار من القص</th><th>دولار مباشر</th><th>إجمالي التسليم</th><th>المتبقي النهائي</th><th>المكاتب</th>
+                  <th>المندوب</th><th>المنطقة</th><th>إيراد اليوم</th><th>تسليم سوري</th><th>قص سوري</th><th>دولار من القص</th><th>دولار مباشر</th><th>إجمالي التسليم</th><th>المتبقي النهائي</th><th>المكاتب</th><th>إجراء</th>
                 </tr></thead>
                 <tbody>${summaryRows}</tbody>
               </table>
