@@ -20,47 +20,48 @@
     .modal{position:fixed;inset:0;background:rgba(0,0,0,.62);z-index:50;display:none;place-items:center;padding:18px}.modal.show{display:grid}.modal-box{width:min(780px,96vw);border-radius:28px;padding:18px;background:rgba(12,16,32,.94);max-height:86vh;overflow:auto}.mobile-nav{display:none}
     @media(max-width:1220px){.kpi-grid{grid-template-columns:repeat(8,1fr)}.office-grid{grid-template-columns:repeat(8,1fr)}.form-grid,.calc-box{grid-template-columns:repeat(8,1fr)}}@media(max-width:880px){.shell{display:block;width:min(100%,96vw);padding-bottom:88px}.sidebar{display:none}.mobile-nav{position:fixed;display:grid;grid-template-columns:repeat(8,1fr);gap:8px;left:10px;right:10px;bottom:10px;padding:8px;border-radius:24px;background:rgba(10,14,26,.86);border:1px solid rgba(255,255,255,.16);backdrop-filter:blur(22px);box-shadow:0 18px 60px rgba(0,0,0,.42);z-index:60}.mobile-nav button{padding:12px 8px;border-radius:17px;font-size:12px;box-shadow:none;background:rgba(255,255,255,.08)}.mobile-nav button.active{background:linear-gradient(135deg,var(--blue),var(--violet))}}@media(max-width:720px){.topbar,.section-head,.day-head{flex-direction:column;align-items:stretch}.head-actions,.form-actions,.filters{justify-content:stretch}.head-actions button,.form-actions button,.filters input,.filters select,.filters button{width:100%}.kpi-grid,.office-grid,.form-grid,.calc-box{grid-template-columns:1fr}.value{font-size:22px}table{min-width:980px}}
   
-/* ===== Liquid Blue Full Theme — office card design 02 ===== */
+/* ===== IMAD v2 — Brighter Open Blue Theme ===== */
 :root{
-  --panel:rgba(14,24,54,.72);
-  --border:rgba(91,177,255,.18);
-  --muted:rgba(220,238,255,.62);
-  --blue:#2f7cff;
-  --violet:#735cff;
-  --cyan:#35c8ff;
+  --panel:rgba(22,42,90,.68);
+  --border:rgba(100,185,255,.24);
+  --muted:rgba(230,244,255,.72);
+  --blue:#3388ff;
+  --violet:#7b66ff;
+  --cyan:#30d4ff;
+  --green:#28e880;
 }
 body{
   background:
-    radial-gradient(circle at 8% 6%,rgba(53,200,255,.20),transparent 32%),
-    radial-gradient(circle at 82% 13%,rgba(115,92,255,.22),transparent 30%),
-    radial-gradient(circle at 55% 95%,rgba(47,124,255,.12),transparent 38%),
-    linear-gradient(135deg,#040815,#071126 52%,#030611) !important;
+    radial-gradient(circle at 8% 6%,rgba(53,200,255,.32),transparent 36%),
+    radial-gradient(circle at 82% 13%,rgba(115,92,255,.30),transparent 34%),
+    radial-gradient(circle at 55% 95%,rgba(47,124,255,.20),transparent 42%),
+    linear-gradient(135deg,#071228,#0c1e48 52%,#070e22) !important;
 }
 .topbar,.section,.sidebar,.login-card,.modal-box{
-  background:linear-gradient(135deg,rgba(16,31,70,.72),rgba(8,13,30,.74)) !important;
-  border-color:rgba(91,177,255,.18) !important;
-  box-shadow:0 20px 70px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.06) !important;
+  background:linear-gradient(135deg,rgba(22,44,95,.76),rgba(12,22,55,.78)) !important;
+  border-color:rgba(100,185,255,.24) !important;
+  box-shadow:0 20px 70px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.09) !important;
 }
 .logo-box{
-  background:linear-gradient(135deg,rgba(53,200,255,.18),rgba(115,92,255,.11)) !important;
-  border-color:rgba(91,177,255,.22) !important;
+  background:linear-gradient(135deg,rgba(53,200,255,.26),rgba(115,92,255,.18)) !important;
+  border-color:rgba(100,185,255,.30) !important;
 }
 .nav button.active, .mobile-nav button.active{
-  background:linear-gradient(135deg,rgba(47,124,255,.96),rgba(53,200,255,.82)) !important;
-  box-shadow:0 15px 35px rgba(47,124,255,.28) !important;
+  background:linear-gradient(135deg,rgba(51,136,255,.98),rgba(53,200,255,.90)) !important;
+  box-shadow:0 15px 35px rgba(51,136,255,.36) !important;
 }
 button{
-  background:linear-gradient(135deg,#2f7cff,#35c8ff) !important;
+  background:linear-gradient(135deg,#3388ff,#30d4ff) !important;
 }
 button.secondary{
-  background:rgba(255,255,255,.075) !important;
+  background:rgba(255,255,255,.10) !important;
 }
 button.danger{
   background:linear-gradient(135deg,#ff5757,#ff8a3d) !important;
 }
 input,select,textarea{
-  background:rgba(9,16,35,.72) !important;
-  border-color:rgba(91,177,255,.17) !important;
+  background:rgba(12,24,56,.72) !important;
+  border-color:rgba(100,185,255,.22) !important;
 }
 .card{
   background:
@@ -727,16 +728,50 @@ th{
 .cut-detail{color:#58ff9f;font-weight:900}
 #delRateField{display:flex}
 #viewEntry .calc-item span{color:#f7fbff}
-#viewEntry .field label{color:rgba(230,245,255,.82)}
+#viewEntry .field label{color:rgba(230,245,255,.88)}
 #viewEntry .calc-box{grid-template-columns:repeat(auto-fit,minmax(170px,1fr)) !important}
-.delivery-mode-note{margin-top:10px;padding:10px 12px;border-radius:16px;background:rgba(53,200,255,.08);border:1px solid rgba(91,177,255,.18);color:rgba(230,245,255,.82);font-weight:800;line-height:1.7}
-.field-hint{margin-top:4px;color:rgba(220,238,255,.56);font-size:12px;line-height:1.5}
+.delivery-mode-note{margin-top:10px;padding:10px 12px;border-radius:16px;background:rgba(53,200,255,.10);border:1px solid rgba(100,185,255,.22);color:rgba(230,245,255,.88);font-weight:800;line-height:1.7}
+.field-hint{margin-top:4px;color:rgba(220,238,255,.62);font-size:12px;line-height:1.5}
 .rate-required{border-color:rgba(255,138,61,.75) !important;box-shadow:0 0 0 3px rgba(255,138,61,.12) !important}
+
+/* ===== IMAD v2 New Features ===== */
+
+/* Toast Notifications */
+#toastContainer{position:fixed;top:22px;left:50%;transform:translateX(-50%);z-index:999;display:flex;flex-direction:column;gap:10px;pointer-events:none;min-width:320px;max-width:min(540px,90vw)}
+.toast{padding:14px 18px;border-radius:20px;font-size:14px;font-weight:900;line-height:1.55;backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,.18);box-shadow:0 18px 50px rgba(0,0,0,.38);animation:toastIn .28s cubic-bezier(.34,1.56,.64,1) forwards;pointer-events:auto;display:flex;align-items:center;gap:10px}
+.toast.removing{animation:toastOut .22s ease forwards}
+.toast.success{background:linear-gradient(135deg,rgba(32,180,100,.92),rgba(28,155,90,.88));border-color:rgba(80,255,160,.28)}
+.toast.error{background:linear-gradient(135deg,rgba(200,50,50,.90),rgba(180,70,40,.88));border-color:rgba(255,120,80,.28)}
+.toast.info{background:linear-gradient(135deg,rgba(30,80,180,.90),rgba(40,110,210,.88));border-color:rgba(80,160,255,.28)}
+.toast.warn{background:linear-gradient(135deg,rgba(180,110,20,.90),rgba(200,140,30,.88));border-color:rgba(255,200,60,.28)}
+.toast-icon{font-size:18px;flex-shrink:0}
+@keyframes toastIn{from{opacity:0;transform:translateY(-14px) scale(.92)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes toastOut{to{opacity:0;transform:translateY(-8px) scale(.94)}}
+
+/* Live balance badge on revenue form */
+.rev-balance-badge{display:inline-flex;align-items:center;gap:8px;margin-top:10px;padding:10px 14px;border-radius:16px;background:rgba(53,200,255,.09);border:1px solid rgba(100,185,255,.20);font-size:13px;font-weight:900;color:rgba(230,245,255,.88);direction:ltr;text-align:right}
+.rev-balance-badge .bal-num{color:#58ff9f;font-size:17px}
+.rev-dup-warn{margin-top:8px;padding:9px 13px;border-radius:14px;background:rgba(255,160,30,.09);border:1px solid rgba(255,180,50,.24);color:rgba(255,225,140,.88);font-size:13px;font-weight:900;display:none}
+
+/* Quick date shortcuts */
+.date-shortcuts{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.date-btn{padding:5px 11px;border-radius:10px;font-size:12px;background:rgba(53,200,255,.13) !important;border:1px solid rgba(100,185,255,.22) !important;box-shadow:none !important;color:rgba(220,245,255,.88);cursor:pointer;font-weight:900}
+.date-btn:hover{background:rgba(53,200,255,.24) !important}
+
+/* Export / Copy action bar */
+.entry-actions-bar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;align-items:center}
+.entry-actions-bar button{font-size:12px;padding:9px 14px}
+
+/* Dashboard revenue sparkline note */
+.dash-rev-badge{margin-top:12px;padding:12px 15px;border-radius:18px;background:rgba(53,200,255,.08);border:1px solid rgba(100,185,255,.18);display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.dash-rev-badge span{font-size:13px;font-weight:900;color:rgba(220,245,255,.78)}
+.dash-rev-badge b{color:#58ff9f}
 
 </style>
 </head>
 
 <body>
+  <div id="toastContainer"></div>
   <div id="loginScreen" class="login-screen">
     <div class="login-card">
       <h1>تسجيل الدخول</h1>
@@ -799,13 +834,23 @@ th{
             <div class="section-head"><div><h2>إدخال الإيراد اليومي</h2><small>هذا فقط لإضافة إيراد المندوب. لا يدخل بالتسليم.</small></div></div>
             <input id="editingRevenueId" type="hidden" />
             <div class="form-grid">
-              <div class="field"><label>اسم المندوب</label><select id="revDelegate"></select></div>
-              <div class="field"><label>التاريخ</label><input id="revDate" type="date" /></div>
+              <div class="field"><label>اسم المندوب</label><select id="revDelegate" onchange="onRevFormChange()"></select></div>
+              <div class="field">
+                <label>التاريخ</label>
+                <input id="revDate" type="date" onchange="onRevFormChange()" />
+                <div class="date-shortcuts">
+                  <button class="date-btn" onclick="setRevDate(0)">اليوم</button>
+                  <button class="date-btn" onclick="setRevDate(-1)">أمس</button>
+                  <button class="date-btn" onclick="setRevDate(-2)">قبل أمس</button>
+                </div>
+              </div>
               <div class="field"><label>نوع الإيراد</label><select id="revType"><option value="masary">مصاري</option><option value="ccbs">CCBS</option><option value="private">مخصوص</option></select></div>
-              <div class="field"><label>الإيراد اليومي سوري</label><input id="revAmount" type="text" inputmode="numeric" placeholder="مثلاً 100000000" /></div>
+              <div class="field"><label>الإيراد اليومي سوري</label><input id="revAmount" type="text" inputmode="numeric" placeholder="مثلاً 100000000" oninput="onRevFormChange()" /></div>
               <div class="field" style="grid-column:1/-1;"><label>ملاحظة</label><textarea id="revNote" placeholder="اختياري"></textarea></div>
             </div>
-            <div class="form-actions"><button class="good" onclick="saveRevenue()">حفظ الإيراد</button><button class="secondary" onclick="resetRevenueForm()">تفريغ</button></div>
+            <div id="revBalanceBadge" class="rev-balance-badge" style="display:none">💰 مجموع إيراد هذا المندوب اليوم: <span id="revTodayTotal" class="bal-num">0 SYP</span></div>
+            <div id="revDupWarn" class="rev-dup-warn">⚠️ يوجد إيراد مسجل لهذا المندوب في نفس اليوم — راجع السجل قبل الإضافة.</div>
+            <div class="form-actions"><button class="good" onclick="saveRevenue()">حفظ الإيراد ✓</button><button class="secondary" onclick="resetRevenueForm()">تفريغ</button></div>
           </div>
 
           <div class="section">
@@ -834,7 +879,12 @@ th{
           </div>
 
           <div class="section">
-            <div class="section-head"><div><h2>سجل الإيرادات اليومية</h2><small>داخل قسم إدخال الإيراد اليومي: الإيراد، التسليم، والمتبقي لكل يوم.</small></div></div>
+            <div class="section-head"><div><h2>سجل الإيرادات اليومية</h2><small>داخل قسم إدخال الإيراد اليومي: الإيراد، التسليم، والمتبقي لكل يوم.</small></div>
+              <div class="head-actions">
+                <button class="secondary" onclick="copyRevenueReport()" title="نسخ تقرير">📋 نسخ تقرير</button>
+                <button class="secondary" onclick="exportRevenueCsv()" title="تصدير CSV">⬇ CSV</button>
+              </div>
+            </div>
             <div class="filters">
               <input id="fromDate" type="date" onchange="renderDailyLog()" />
               <input id="toDate" type="date" onchange="renderDailyLog()" />
@@ -1754,15 +1804,15 @@ th{
       a.href=URL.createObjectURL(blob);a.download="cashbox_report.csv";a.click();URL.revokeObjectURL(a.href);
     };
 
-    function calculateSummary(){const s={totalRevenueSyp:0,masarySyp:0,ccbsSyp:0,cutSyp:0,cutUsd:0,rateSum:0,rateCount:0,sypFarhad:0,usdFarhad:0};revenues.forEach(r=>{const a=num(r.revenueSyp);s.totalRevenueSyp+=a;if(r.revenueType==="masary")s.masarySyp+=a;if(r.revenueType==="ccbs")s.ccbsSyp+=a});deliveries.forEach(d=>{const n=deliveryNumbers(d);s.cutSyp+=n.cutSyp;s.cutUsd+=n.cutUsd;if(n.rate>0){s.rateSum+=n.rate;s.rateCount++}});s.avgRate=s.rateCount?s.rateSum/s.rateCount:0;const cb=calcCashboxBalances();s.sypFarhad=cb.syp_farhad||0;s.usdFarhad=cb.usd_farhad||0;return s}
+    function calculateSummary(){const s={totalRevenueSyp:0,masarySyp:0,ccbsSyp:0,cutSyp:0,cutUsd:0,officeCutSyp:0,officeCutUsd:0,rateSum:0,rateCount:0,sypFarhad:0,usdFarhad:0};revenues.forEach(r=>{const a=num(r.revenueSyp);s.totalRevenueSyp+=a;if(r.revenueType==="masary")s.masarySyp+=a;if(r.revenueType==="ccbs")s.ccbsSyp+=a});deliveries.forEach(d=>{const n=deliveryNumbers(d);s.cutSyp+=n.cutSyp;s.cutUsd+=n.cutUsd;if(n.rate>0){s.rateSum+=n.rate;s.rateCount++}});officeMoves.forEach(m=>{if(m.type!=="office_convert_syp_to_usd")return;const amtSyp=num(m.amountSyp);const rate=num(m.exchangeRate);const amtUsd=Number(m.amountUsd||0)||(rate>0?amtSyp/rate:0);s.officeCutSyp+=amtSyp;s.officeCutUsd+=amtUsd;if(rate>0){s.rateSum+=rate;s.rateCount++}});s.totalCutSyp=s.cutSyp+s.officeCutSyp;s.totalCutUsd=s.cutUsd+s.officeCutUsd;s.avgRate=s.rateCount?s.rateSum/s.rateCount:0;const cb=calcCashboxBalances();s.sypFarhad=cb.syp_farhad||0;s.usdFarhad=cb.usd_farhad||0;return s}
     function renderKpis(){
       const s=calculateSummary();
       const cards=[
         ["إجمالي الإيرادات الكلي",fmt(s.totalRevenueSyp,"SYP"),"من إدخالات الإيراد اليومي"],
         ["مصاري",fmt(s.masarySyp,"SYP"),"إيرادات مصاري"],
         ["CCBS",fmt(s.ccbsSyp,"SYP"),"إيرادات CCBS"],
-        ["إجمالي قص السوري",fmt(s.cutSyp,"SYP"),"مجموع السوري المقصوص إلى دولار"],
-        ["إجمالي قص الدولار",fmtUsd(s.cutUsd),"الدولار الناتج من القص"],
+        ["إجمالي قص السوري",fmt(s.totalCutSyp,"SYP"),`مندوبون: ${fmt(s.cutSyp)} — مكاتب: ${fmt(s.officeCutSyp)}`],
+        ["إجمالي قص الدولار",fmtUsd(s.totalCutUsd),`مندوبون: ${fmtUsd(s.cutUsd)} — مكاتب: ${fmtUsd(s.officeCutUsd)}`],
         ["سعر الصرف الوسطي",s.avgRate?Math.round(s.avgRate).toLocaleString("en-US"):"0","رقم سعر فقط"],
         ["رصيد سوري فرهاد",fmt(s.sypFarhad,"SYP"),"من الصندوق والحوالات"],
         ["رصيد دولار فرهاد",fmtUsd(s.usdFarhad),"من الصندوق والحوالات"]
@@ -2007,7 +2057,8 @@ th{
         await setDoc(ref,{id:ref.id,date:$("delDate").value||todayString(),delegateName:delegate.name,delegateId:delegate.id,region:delegate.region,officeId:office.id,officeName:office.name,officeRegion:office.region,mode:cut?"cut":"direct",deliveredSyp,cutSyp,cutUsd,directUsd,deliveredUsd,exchangeRate:rate,totalDeliveredAsSyp:totalAsSyp,note:$("delNote").value.trim(),createdBy:auth.currentUser.uid,updatedAt:serverTimestamp(),createdAt:id?undefined:serverTimestamp()},{merge:true});
         resetDeliveryForm();
         renderDailyLog();
-      }catch(e){setStatus("فشل حفظ التسليم: "+e.message)}
+        toast("تم حفظ التسليم ✅","success");
+      }catch(e){toast("فشل حفظ التسليم: "+e.message,"error")}
     };
     window.resetDeliveryForm=function(){
       $("editingDeliveryId").value="";
@@ -2020,54 +2071,113 @@ th{
       updateDeliveryModeUi();
       updateDeliveryCalculation();
     };
+    window.editRevenue=function(id){const r=revenues.find(x=>x.id===id);if(!r)return;$("editingRevenueId").value=r.id;$("revDelegate").value=r.delegateName;$("revDate").value=r.date||todayString();$("revType").value=r.revenueType||"masary";$("revAmount").value=num(r.revenueSyp)||"";$("revNote").value=r.note||"";showView("entry");onRevFormChange();toast("وضع التعديل: "+r.delegateName,"info")};window.deleteRevenue=async function(id){if(!confirm("حذف الإيراد؟ التسليمات لا تنحذف لأنها عمليات مستقلة."))return;await deleteDoc(doc(db,"dailyRevenues",id));toast("تم حذف الإيراد ✅","success")};
 
+    /* ====== saveRevenue + resetRevenueForm (كانوا ناقصين — هذا سبب عدم الحفظ) ====== */
     window.saveRevenue=async function(){
       try{
-        if(!auth.currentUser){setStatus("لازم تسجل دخول أولاً.");return}
-        const delegate=getDelegate($("revDelegate").value);
-        if(!delegate){setStatus("اختر اسم المندوب.");return}
-        const amount=num($("revAmount").value);
-        if(amount<=0){setStatus("اكتب مبلغ الإيراد اليومي السوري.");return}
-
-        const id=$("editingRevenueId").value;
+        if(!auth.currentUser)return toast("يجب تسجيل الدخول أولاً","error");
+        const delegateName=String($("revDelegate")?.value||"").trim();
+        const delegate=allDelegates.find(d=>d.name===delegateName)||null;
+        if(!delegate)return toast("اختر اسم المندوب.","error");
+        const date=$("revDate")?.value||todayString();
+        const revenueType=$("revType")?.value||"masary";
+        const revenueSyp=num($("revAmount")?.value);
+        if(revenueSyp<=0)return toast("اكتب مبلغ الإيراد (أكبر من صفر).","error");
+        const note=String($("revNote")?.value||"").trim();
+        const id=$("editingRevenueId")?.value||"";
         const ref=id?doc(db,"dailyRevenues",id):doc(collection(db,"dailyRevenues"));
-        const payload={
+        await setDoc(ref,{
           id:ref.id,
-          date:$("revDate").value||todayString(),
+          date,
           delegateName:delegate.name,
           delegateId:delegate.id,
-          region:delegate.region,
-          revenueType:$("revType").value||"masary",
-          revenueSyp:amount,
-          note:$("revNote").value.trim(),
+          region:delegate.region||"",
+          revenueType,
+          revenueSyp,
+          note,
           createdBy:auth.currentUser.uid,
           updatedAt:serverTimestamp(),
-          createdAt:id?undefined:serverTimestamp()
-        };
-
-        await setDoc(ref,payload,{merge:true});
-
-        const i=revenues.findIndex(r=>r.id===ref.id);
-        if(i>=0)revenues[i]={...revenues[i],...payload};
-        else revenues.push({...payload});
-
+          ...(id?{}:{createdAt:serverTimestamp()})
+        },{merge:true});
         resetRevenueForm();
-        renderAll();
-        setStatus("الإيراد انحفظ ✅");
-      }catch(e){
-        setStatus("فشل حفظ الإيراد: "+(e.code?e.code+" - ":"")+(e.message||e));
-      }
+        toast(id?"تم تعديل الإيراد ✅":"تم حفظ الإيراد ✅ - "+delegate.name+" / "+fmt(revenueSyp,"SYP"),"success");
+        renderDailyLog();renderKpis();
+      }catch(e){toast("فشل حفظ الإيراد: "+e.message,"error")}
     };
 
     window.resetRevenueForm=function(){
       if($("editingRevenueId"))$("editingRevenueId").value="";
+      if($("revDelegate"))$("revDelegate").value="";
       if($("revDate"))$("revDate").value=todayString();
       if($("revType"))$("revType").value="masary";
       if($("revAmount"))$("revAmount").value="";
       if($("revNote"))$("revNote").value="";
+      onRevFormChange();
     };
 
-    window.editRevenue=function(id){const r=revenues.find(x=>x.id===id);if(!r)return;$("editingRevenueId").value=r.id;$("revDelegate").value=r.delegateName;$("revDate").value=r.date||todayString();$("revType").value=r.revenueType||"masary";$("revAmount").value=num(r.revenueSyp)||"";$("revNote").value=r.note||"";showView("entry");setStatus("وضع تعديل الإيراد شغال.")};window.deleteRevenue=async function(id){if(!confirm("حذف الإيراد؟ التسليمات لا تنحذف لأنها عمليات مستقلة."))return;await deleteDoc(doc(db,"dailyRevenues",id));setStatus("تم حذف الإيراد ✅")};
+    /* ====== Quick date shortcuts ====== */
+    window.setRevDate=function(offsetDays){
+      const d=new Date();d.setDate(d.getDate()+offsetDays);
+      const iso=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+      if($("revDate"))$("revDate").value=iso;
+      onRevFormChange();
+    };
+
+    /* ====== Live balance badge + duplicate warning on revenue form ====== */
+    window.onRevFormChange=function(){
+      const delegateName=String($("revDelegate")?.value||"").trim();
+      const date=$("revDate")?.value||todayString();
+      if(!delegateName){
+        if($("revBalanceBadge"))$("revBalanceBadge").style.display="none";
+        if($("revDupWarn"))$("revDupWarn").style.display="none";
+        return;
+      }
+      const editId=$("editingRevenueId")?.value||"";
+      const dayRevs=revenues.filter(r=>r.delegateName===delegateName&&r.date===date&&r.id!==editId);
+      const total=dayRevs.reduce((a,r)=>a+num(r.revenueSyp),0);
+      if($("revBalanceBadge"))$("revBalanceBadge").style.display=total>0?"flex":"none";
+      if($("revTodayTotal"))$("revTodayTotal").textContent=fmt(total,"SYP");
+      if($("revDupWarn"))$("revDupWarn").style.display=dayRevs.length>0?"block":"none";
+    };
+
+    /* ====== Toast notification system ====== */
+    function toast(msg,type="info",duration=3800){
+      const icons={success:"✅",error:"❌",info:"ℹ️",warn:"⚠️"};
+      const el=document.createElement("div");
+      el.className="toast "+type;
+      el.innerHTML=`<span class="toast-icon">${icons[type]||"ℹ️"}</span><span>${msg}</span>`;
+      const container=$("toastContainer");if(!container)return;
+      container.appendChild(el);
+      setTimeout(()=>{el.classList.add("removing");setTimeout(()=>el.remove(),240)},duration);
+    }
+
+    /* ====== Export daily revenue log to CSV ====== */
+    window.exportRevenueCsv=function(){
+      const from=$("fromDate")?.value||"",to=$("toDate")?.value||"",nameF=String($("nameFilter")?.value||"").toLowerCase(),regionF=$("regionFilter")?.value||"";
+      const filteredRevs=revenues.filter(r=>{
+        if(from&&String(r.date||"")<from)return false;
+        if(to&&String(r.date||"")>to)return false;
+        if(nameF&&!String(r.delegateName||"").toLowerCase().includes(nameF))return false;
+        if(regionF&&r.region!==regionF)return false;
+        return true;
+      }).sort((a,b)=>String(b.date||"").localeCompare(String(a.date||"")));
+      const header=["التاريخ","المندوب","المنطقة","نوع الإيراد","المبلغ SYP","ملاحظة"];
+      const rows=filteredRevs.map(r=>[r.date||"",r.delegateName||"",r.region||"",getTypeLabel(r.revenueType),num(r.revenueSyp),r.note||""].map(v=>`"${String(v).replaceAll('"','""')}"`).join(","));
+      const csv=[header.join(","),...rows].join("\n");
+      const blob=new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8"});
+      const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="revenue_log.csv";a.click();URL.revokeObjectURL(a.href);
+      toast("تم تصدير السجل CSV ✅","success");
+    };
+
+    /* ====== Copy revenue summary report to clipboard ====== */
+    window.copyRevenueReport=async function(){
+      const total=revenues.reduce((a,r)=>a+num(r.revenueSyp),0);
+      const masary=revenues.filter(r=>r.revenueType==="masary").reduce((a,r)=>a+num(r.revenueSyp),0);
+      const ccbs=revenues.filter(r=>r.revenueType==="ccbs").reduce((a,r)=>a+num(r.revenueSyp),0);
+      const report=`تقرير الإيرادات - IMAD\nإجمالي الإيرادات: ${fmt(total,"SYP")}\nمصاري: ${fmt(masary,"SYP")}\nCCBS: ${fmt(ccbs,"SYP")}\nعدد السجلات: ${revenues.length}`;
+      try{await navigator.clipboard.writeText(report);toast("تم نسخ التقرير 📋","success")}catch(e){toast("لم يُنسخ التقرير تلقائياً.","warn")}
+    };
     window.editDelivery=function(id){
       const d=deliveries.find(x=>x.id===id);if(!d)return;
       const n=deliveryNumbers(d);
@@ -2343,7 +2453,7 @@ th{
     };
 
 
-    function renderAll(){renderKpis();renderDashboardCashboxes();renderCashboxes();renderOffices();renderDailyLog();renderCashLog();renderLoanSummary();renderCashReports();renderOfficeHub();renderOfficeLog();renderOfficeReports();renderCutDollarSection();renderLoansSection();renderDelegateMatch();renderSettingsSection();updateDeliveryCalculation();if($("cashDate")){updateCashboxFormMode();updateCashPreview()}if($("officeMoveDate")){fillOfficeMoveSelects();updateOfficeMovePreview()}}
+    function renderAll(){renderKpis();renderDashboardCashboxes();renderCashboxes();renderOffices();renderDailyLog();renderCashLog();renderLoanSummary();renderCashReports();renderOfficeHub();renderOfficeLog();renderOfficeReports();renderCutDollarSection();renderLoansSection();renderDelegateMatch();renderSettingsSection();updateDeliveryCalculation();onRevFormChange();if($("cashDate")){updateCashboxFormMode();updateCashPreview()}if($("officeMoveDate")){fillOfficeMoveSelects();updateOfficeMovePreview()}}
     
     document.addEventListener("keydown",e=>{
       if(e.key==="Enter" && $("loginScreen") && $("loginScreen").style.display!=="none"){
@@ -2352,7 +2462,7 @@ th{
       }
     });
 
-    onAuthStateChanged(auth,user=>{showApp(user);if(user){setStatus("");fillSelects();if($("revDate"))$("revDate").value=todayString();if($("delDate"))$("delDate").value=todayString();if($("cashDate"))$("cashDate").value=todayString();if($("officeMoveDate"))$("officeMoveDate").value=todayString();startLiveSync();setTimeout(()=>{reloadAll().catch(e=>setStatus("تنبيه تحميل البيانات: "+e.message))},50)}else{stopLiveSync();setLoginStatus("")}});
+    onAuthStateChanged(auth,user=>{showApp(user);if(user){setStatus("");fillSelects();if($("revDate"))$("revDate").value=todayString();if($("delDate"))$("delDate").value=todayString();if($("cashDate"))$("cashDate").value=todayString();if($("officeMoveDate"))$("officeMoveDate").value=todayString();startLiveSync();setTimeout(()=>{reloadAll().catch(e=>setStatus("تنبيه تحميل البيانات: "+e.message))},50);setTimeout(onRevFormChange,200)}else{stopLiveSync();setLoginStatus("")}});
     fillSelects();
   </script>
 </body>
