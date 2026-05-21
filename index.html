@@ -1089,6 +1089,139 @@ html,body{
   -webkit-text-fill-color:#ff2f4f !important;
 }
 
+
+/* ===== Revenue type columns: Masary / CCBS ===== */
+.type-masary-cell{color:#62ffb1 !important;font-weight:900}
+.type-ccbs-cell{color:#79d6ff !important;font-weight:900}
+.delegate-type-mini{
+  margin-top:5px;
+  color:rgba(220,238,255,.68);
+  font-size:11px;
+  line-height:1.55;
+  font-weight:800;
+}
+#matchTypeFilter{
+  border-color:rgba(121,214,255,.25);
+  background:rgba(8,18,42,.78);
+  font-weight:900;
+}
+
+
+/* ===== Dashboard revenue cards: fill empty space cleanly ===== */
+.dashboard-revenue-section{
+  padding-top:18px !important;
+}
+.dashboard-revenue-grid{
+  display:grid !important;
+  grid-template-columns:repeat(5,minmax(0,1fr)) !important;
+  gap:16px !important;
+  align-items:stretch !important;
+}
+.dashboard-revenue-grid .card{
+  min-height:174px !important;
+  padding:20px 18px !important;
+  border-radius:28px !important;
+  display:flex !important;
+  flex-direction:column !important;
+  justify-content:center !important;
+  background:
+    radial-gradient(circle at 12% 16%,rgba(68,168,255,.25),transparent 22%),
+    linear-gradient(145deg,rgba(255,255,255,.10),rgba(255,255,255,.045)) !important;
+}
+.dashboard-revenue-grid .card .label{
+  font-size:14px !important;
+}
+.dashboard-revenue-grid .card .value{
+  font-size:clamp(26px,1.75vw,34px) !important;
+  line-height:1.18 !important;
+  margin-top:14px !important;
+}
+.dashboard-revenue-grid .card .sub{
+  margin-top:10px !important;
+  min-height:20px !important;
+}
+.dashboard-revenue-grid .card:nth-child(1),
+.dashboard-revenue-grid .card:nth-child(2),
+.dashboard-revenue-grid .card:nth-child(3){
+  min-height:186px !important;
+}
+.dashboard-revenue-grid .card:nth-child(n+6){
+  grid-column:span 1;
+}
+@media(min-width:1200px){
+  .dashboard-revenue-grid .card:nth-child(6){
+    grid-column:2 / span 1;
+  }
+  .dashboard-revenue-grid .card:nth-child(7){
+    grid-column:3 / span 1;
+  }
+  .dashboard-revenue-grid .card:nth-child(8){
+    grid-column:4 / span 1;
+  }
+}
+@media(max-width:1199px){
+  .dashboard-revenue-grid{
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  }
+}
+@media(max-width:760px){
+  .dashboard-revenue-grid{
+    grid-template-columns:1fr !important;
+  }
+  .dashboard-revenue-grid .card{
+    min-height:140px !important;
+  }
+}
+
+
+/* ===== FINAL: Dashboard revenue cards fill space 4x2 ===== */
+.dashboard-revenue-grid{
+  display:grid !important;
+  grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+  gap:18px !important;
+  width:100% !important;
+  align-items:stretch !important;
+}
+.dashboard-revenue-grid > .card{
+  grid-column:auto !important;
+  min-height:178px !important;
+  padding:22px 20px !important;
+  border-radius:30px !important;
+  justify-content:center !important;
+}
+.dashboard-revenue-grid > .card .value{
+  font-size:clamp(28px,2vw,38px) !important;
+  line-height:1.18 !important;
+}
+.dashboard-revenue-grid > .card .label{
+  font-size:14px !important;
+}
+.dashboard-revenue-grid > .card .sub{
+  font-size:12px !important;
+}
+@media(max-width:1250px){
+  .dashboard-revenue-grid{grid-template-columns:repeat(3,minmax(0,1fr)) !important}
+}
+@media(max-width:850px){
+  .dashboard-revenue-grid{grid-template-columns:repeat(2,minmax(0,1fr)) !important}
+}
+@media(max-width:560px){
+  .dashboard-revenue-grid{grid-template-columns:1fr !important}
+}
+
+
+/* ===== Delegate matching type filter note ===== */
+.match-note{
+  margin:0 0 10px;
+  padding:10px 12px;
+  border-radius:14px;
+  background:rgba(255,191,110,.10);
+  border:1px solid rgba(255,191,110,.22);
+  color:rgba(255,238,210,.92);
+  font-size:12px;
+  font-weight:800;
+}
+
 </style>
 </head>
 
@@ -1549,6 +1682,11 @@ html,body{
                 <option value="Region 2">Region 2</option>
                 <option value="Region 3">Region 3</option>
                 <option value="Region 4">Region 4</option>
+              </select>
+              <select id="matchTypeFilter" onchange="renderDelegateMatch()">
+                <option value="">كل الأنواع</option>
+                <option value="masary">مصاري</option>
+                <option value="ccbs">CCBS</option>
               </select>
               <button class="secondary" onclick="clearDelegateMatchFilters()">مسح</button>
               <button class="secondary" onclick="exportDelegateMatchExcel()">تصدير Excel</button>
@@ -2880,7 +3018,12 @@ html,body{
       }
 
       function summarizeDelegateForDay(delegateName,day,dayRevs,dayDels){
-        const revToday=dayRevs.filter(r=>r.delegateName===delegateName).reduce((a,r)=>a+num(r.revenueSyp),0);
+        const delegateDayRevs=dayRevs.filter(r=>r.delegateName===delegateName);
+        const revToday=delegateDayRevs.reduce((a,r)=>a+num(r.revenueSyp),0);
+        const masaryToday=delegateDayRevs.filter(r=>r.revenueType==="masary").reduce((a,r)=>a+num(r.revenueSyp),0);
+        const ccbsToday=delegateDayRevs.filter(r=>r.revenueType==="ccbs").reduce((a,r)=>a+num(r.revenueSyp),0);
+        const privateToday=delegateDayRevs.filter(r=>r.revenueType==="private").reduce((a,r)=>a+num(r.revenueSyp),0);
+        const revTypeSummary=[masaryToday>0?`مصاري ${fmt(masaryToday,"SYP")}`:"",ccbsToday>0?`CCBS ${fmt(ccbsToday,"SYP")}`:"",privateToday>0?`مخصوص ${fmt(privateToday,"SYP")}`:""].filter(Boolean).join(" / ")||"-";
         const revUntil=revenues.filter(r=>r.delegateName===delegateName&&String(r.date||"")<=String(day||"")).reduce((a,r)=>a+num(r.revenueSyp),0);
 
         let directSypToday=0,cutSypToday=0,cutUsdToday=0,directUsdToday=0,deliveredTodayAsSyp=0;
@@ -2900,7 +3043,7 @@ html,body{
         const deliveredUntil=deliveries.filter(d=>d.delegateName===delegateName&&String(d.date||"")<=String(day||"")).reduce((a,d)=>a+deliveryNumbers(d).totalAsSyp,0);
         const remaining=revUntil-deliveredUntil;
         const region=getDelegateRegion(delegateName,dayRevs,dayDels);
-        return{delegateName,region,revToday,revUntil,directSypToday,cutSypToday,cutUsdToday,directUsdToday,deliveredTodayAsSyp,deliveredUntil,remaining,offices,rates};
+        return{delegateName,region,revToday,masaryToday,ccbsToday,privateToday,revTypeSummary,revUntil,directSypToday,cutSypToday,cutUsdToday,directUsdToday,deliveredTodayAsSyp,deliveredUntil,remaining,offices,rates};
       }
 
       $("dailyGroupedLog").innerHTML=[...days].sort().reverse().map(day=>{
@@ -2910,6 +3053,8 @@ html,body{
         const rows=names.map(name=>summarizeDelegateForDay(name,day,dayRevs,dayDels));
 
         const totalRevenueToday=rows.reduce((a,x)=>a+x.revToday,0);
+        const totalMasaryToday=rows.reduce((a,x)=>a+x.masaryToday,0);
+        const totalCcbsToday=rows.reduce((a,x)=>a+x.ccbsToday,0);
         const totalDeliveredToday=rows.reduce((a,x)=>a+x.deliveredTodayAsSyp,0);
         const totalCutSypToday=rows.reduce((a,x)=>a+x.cutSypToday,0);
         const totalCutUsdToday=rows.reduce((a,x)=>a+x.cutUsdToday,0);
@@ -2921,6 +3066,8 @@ html,body{
           <td>${x.delegateName}</td>
           <td>${x.region}</td>
           <td class="ltr revenue-cell">${fmt(x.revToday,"SYP")}</td>
+          <td class="ltr type-masary-cell">${fmt(x.masaryToday,"SYP")}</td>
+          <td class="ltr type-ccbs-cell">${fmt(x.ccbsToday,"SYP")}</td>
           <td class="ltr">${fmt(x.directSypToday,"SYP")}</td>
           <td class="ltr cut-detail">${fmt(x.cutSypToday,"SYP")}</td>
           <td class="ltr">${fmtUsd(x.cutUsdToday)}</td>
@@ -2956,6 +3103,8 @@ html,body{
               <div class="day-title">إيراد ${day}</div>
               <div class="day-total">
                 <span class="pill">إيراد اليوم: ${fmt(totalRevenueToday,"SYP")}</span>
+                <span class="pill">مصاري: ${fmt(totalMasaryToday,"SYP")}</span>
+                <span class="pill">CCBS: ${fmt(totalCcbsToday,"SYP")}</span>
                 <span class="pill">تسليم اليوم: ${fmt(totalDeliveredToday,"SYP")}</span>
                 <span class="pill">قص سوري: ${fmt(totalCutSypToday,"SYP")}</span>
                 <span class="pill">دولار من القص: ${fmtUsd(totalCutUsdToday)}</span>
@@ -2972,7 +3121,7 @@ html,body{
             <div class="table-wrap daily-summary-table">
               <table>
                 <thead><tr>
-                  <th>المندوب</th><th>المنطقة</th><th>إيراد اليوم</th><th>تسليم سوري</th><th>قص سوري</th><th>دولار من القص</th><th>دولار مباشر</th><th>إجمالي التسليم</th><th>المتبقي النهائي</th><th>المكاتب</th><th>إجراء</th>
+                  <th>المندوب</th><th>المنطقة</th><th>إيراد اليوم</th><th>مصاري</th><th>CCBS</th><th>تسليم سوري</th><th>قص سوري</th><th>دولار من القص</th><th>دولار مباشر</th><th>إجمالي التسليم</th><th>المتبقي النهائي</th><th>المكاتب</th><th>إجراء</th>
                 </tr></thead>
                 <tbody>${summaryRows}</tbody>
               </table>
@@ -3128,44 +3277,143 @@ function collectCutDollarRows(){
     };
 
     function filteredDelegateMatchData(){
-      const from=$("matchFromDate")?.value||"",to=$("matchToDate")?.value||"",name=String($("matchNameFilter")?.value||"").trim(),region=$("matchRegionFilter")?.value||"";
-      const revs=revenues.filter(r=>(!from||r.date>=from)&&(!to||r.date<=to)&&(!name||String(r.delegateName).includes(name))&&(!region||r.region===region));
-      const dels=deliveries.filter(d=>(!from||d.date>=from)&&(!to||d.date<=to)&&(!name||String(d.delegateName).includes(name))&&(!region||d.region===region));
-      return{revs,dels};
+      const from=$("matchFromDate")?.value||"";
+      const to=$("matchToDate")?.value||"";
+      const name=String($("matchNameFilter")?.value||"").trim();
+      const region=$("matchRegionFilter")?.value||"";
+      const type=$("matchTypeFilter")?.value||"";
+
+      const baseRevs=revenues.filter(r=>
+        (!from||r.date>=from)&&(!to||r.date<=to)&&
+        (!name||String(r.delegateName).includes(name))&&
+        (!region||r.region===region)
+      );
+      const revs=baseRevs.filter(r=>!type||r.revenueType===type);
+
+      const dels=deliveries.filter(d=>
+        (!from||d.date>=from)&&(!to||d.date<=to)&&
+        (!name||String(d.delegateName).includes(name))&&
+        (!region||d.region===region)
+      );
+
+      return{revs,dels,baseRevs,type};
     }
 
-    window.clearDelegateMatchFilters=function(){["matchFromDate","matchToDate","matchNameFilter"].forEach(id=>{if($(id))$(id).value=""});if($("matchRegionFilter"))$("matchRegionFilter").value="";renderDelegateMatch()}
+    window.clearDelegateMatchFilters=function(){
+      ["matchFromDate","matchToDate","matchNameFilter"].forEach(id=>{if($(id))$(id).value=""});
+      if($("matchRegionFilter"))$("matchRegionFilter").value="";
+      if($("matchTypeFilter"))$("matchTypeFilter").value="";
+      renderDelegateMatch();
+    };
+
+    function buildDelegateMatchRows(){
+      const{revs,dels,baseRevs,type}=filteredDelegateMatchData();
+      const map={};
+
+      function ensure(name,region){
+        if(!map[name])map[name]={
+          name,
+          region:region||"-",
+          revenue:0,
+          masary:0,
+          ccbs:0,
+          privateRevenue:0,
+          delivered:0,
+          deliveredUsd:0,
+          remaining:0
+        };
+        return map[name];
+      }
+
+      // عند فلترة نوع محدد: لا نخلط النوع الثاني إطلاقاً.
+      // عند عدم اختيار نوع: نعرض مصاري + CCBS معاً.
+      const sourceForTypes=type?revs:baseRevs;
+      for(const r of sourceForTypes){
+        const x=ensure(r.delegateName,r.region);
+        if(r.revenueType==="masary")x.masary+=num(r.revenueSyp);
+        else if(r.revenueType==="ccbs")x.ccbs+=num(r.revenueSyp);
+        else if(r.revenueType==="private")x.privateRevenue+=num(r.revenueSyp);
+      }
+
+      for(const r of revs){
+        const x=ensure(r.delegateName,r.region);
+        x.revenue+=num(r.revenueSyp);
+      }
+
+      // التسليم غير مفصول حسب مصاري/CCBS.
+      // لذلك عند اختيار نوع محدد لا نخصم التسليم العام حتى لا يطلع المتبقي سالب غلط.
+      if(!type){
+        for(const d of dels){
+          const n=deliveryNumbers(d);
+          const x=ensure(d.delegateName,d.region);
+          x.delivered+=n.totalAsSyp;
+          x.deliveredUsd+=n.deliveredUsd;
+        }
+      }
+
+      return Object.values(map)
+        .map(x=>({...x,remaining:type?x.revenue:(x.revenue-x.delivered)}))
+        .filter(x=>x.revenue!==0||x.delivered!==0||x.masary!==0||x.ccbs!==0)
+        .sort((a,b)=>String(a.region).localeCompare(String(b.region))||String(a.name).localeCompare(String(b.name)));
+    }
 
     window.renderDelegateMatch=function(){
-      const{revs,dels}=filteredDelegateMatchData();
-      const map={};
-      function ensure(name,region){if(!map[name])map[name]={name,region:region||"-",revenue:0,delivered:0,deliveredUsd:0,remaining:0};return map[name]}
-      for(const r of revs){const x=ensure(r.delegateName,r.region);x.revenue+=num(r.revenueSyp)}
-      for(const d of dels){const n=deliveryNumbers(d);const x=ensure(d.delegateName,d.region);x.delivered+=n.totalAsSyp;x.deliveredUsd+=n.deliveredUsd}
-      const rows=Object.values(map).map(x=>({...x,remaining:x.revenue-x.delivered})).sort((a,b)=>String(a.region).localeCompare(String(b.region))||String(a.name).localeCompare(String(b.name)));
-      const totalRevenue=rows.reduce((a,x)=>a+x.revenue,0),totalDelivered=rows.reduce((a,x)=>a+x.delivered,0),totalRemaining=rows.reduce((a,x)=>a+x.remaining,0);
+      const type=$("matchTypeFilter")?.value||"";
+      const typeLabel=type?getTypeLabel(type):"";
+      const rows=buildDelegateMatchRows();
+
+      const totalRevenue=rows.reduce((a,x)=>a+x.revenue,0);
+      const totalDelivered=rows.reduce((a,x)=>a+x.delivered,0);
+      const totalRemaining=rows.reduce((a,x)=>a+x.remaining,0);
+
       if($("matchTotalRevenue"))$("matchTotalRevenue").textContent=fmt(totalRevenue,"SYP");
-      if($("matchTotalDelivered"))$("matchTotalDelivered").textContent=fmt(totalDelivered,"SYP");
+      if($("matchTotalDelivered"))$("matchTotalDelivered").textContent=type?"غير محسوب":fmt(totalDelivered,"SYP");
       if($("matchTotalRemaining"))$("matchTotalRemaining").textContent=fmt(totalRemaining,"SYP");
       if($("matchDelegateCount"))$("matchDelegateCount").textContent=String(rows.length);
 
       const el=$("delegateMatchTable");
       if(el){
-        if(!rows.length)el.innerHTML='<div class="empty">لا توجد بيانات مطابقة حسب الفلتر.</div>';
-        else el.innerHTML=`<div class="table-wrap"><table><thead><tr><th>المندوب</th><th>الريجين</th><th>إجمالي الإيراد</th><th>إجمالي التسليم</th><th>تسليم دولار</th><th>إجمالي المتبقي</th></tr></thead><tbody>${rows.map(x=>`<tr><td>${x.name}</td><td>${x.region}</td><td class="ltr">${fmt(x.revenue,"SYP")}</td><td class="ltr">${fmt(x.delivered,"SYP")}</td><td class="ltr">${fmtUsd(x.deliveredUsd)}</td><td class="ltr">${fmt(x.remaining,"SYP")}</td></tr>`).join("")}</tbody></table></div>`;
+        if(!rows.length){
+          el.innerHTML='<div class="empty">لا توجد بيانات مطابقة حسب الفلتر.</div>';
+        }else if(type){
+          el.innerHTML=`<div class="match-note">عند فلترة ${typeLabel} لا يتم خصم التسليم العام، لأن التسليم غير محدد هل هو مصاري أو CCBS.</div>
+          <div class="table-wrap"><table><thead><tr><th>المندوب</th><th>الريجين</th><th>${typeLabel}</th><th>إجمالي الإيراد</th><th>المتبقي</th></tr></thead><tbody>${rows.map(x=>{
+            const typeValue=type==="masary"?x.masary:type==="ccbs"?x.ccbs:x.privateRevenue;
+            return `<tr><td><b>${x.name}</b></td><td>${x.region}</td><td class="ltr ${type==="masary"?"type-masary-cell":"type-ccbs-cell"}">${fmt(typeValue,"SYP")}</td><td class="ltr">${fmt(x.revenue,"SYP")}</td><td class="ltr">${fmt(x.remaining,"SYP")}</td></tr>`;
+          }).join("")}</tbody></table></div>`;
+        }else{
+          el.innerHTML=`<div class="table-wrap"><table><thead><tr><th>المندوب</th><th>الريجين</th><th>مصاري</th><th>CCBS</th><th>إجمالي الإيراد</th><th>إجمالي التسليم</th><th>تسليم دولار</th><th>إجمالي المتبقي</th></tr></thead><tbody>${rows.map(x=>`<tr><td><b>${x.name}</b><div class="delegate-type-mini">مصاري: ${fmt(x.masary,"SYP")} / CCBS: ${fmt(x.ccbs,"SYP")}</div></td><td>${x.region}</td><td class="ltr type-masary-cell">${fmt(x.masary,"SYP")}</td><td class="ltr type-ccbs-cell">${fmt(x.ccbs,"SYP")}</td><td class="ltr">${fmt(x.revenue,"SYP")}</td><td class="ltr">${fmt(x.delivered,"SYP")}</td><td class="ltr">${fmtUsd(x.deliveredUsd)}</td><td class="ltr">${fmt(x.remaining,"SYP")}</td></tr>`).join("")}</tbody></table></div>`;
+        }
       }
 
       const regionMap={};
-      for(const r of rows){if(!regionMap[r.region])regionMap[r.region]={region:r.region,revenue:0,delivered:0,remaining:0};regionMap[r.region].revenue+=r.revenue;regionMap[r.region].delivered+=r.delivered;regionMap[r.region].remaining+=r.remaining}
+      for(const r of rows){
+        if(!regionMap[r.region])regionMap[r.region]={region:r.region,revenue:0,masary:0,ccbs:0,delivered:0,remaining:0};
+        regionMap[r.region].revenue+=r.revenue;
+        regionMap[r.region].masary+=r.masary;
+        regionMap[r.region].ccbs+=r.ccbs;
+        regionMap[r.region].delivered+=r.delivered;
+        regionMap[r.region].remaining+=r.remaining;
+      }
       const regRows=Object.values(regionMap);
       const regEl=$("regionMatchTable");
       if(regEl){
-        if(!regRows.length)regEl.innerHTML='<div class="empty">لا يوجد ملخص ريجينات حسب الفلتر.</div>';
-        else regEl.innerHTML=`<div class="table-wrap"><table><thead><tr><th>الريجين</th><th>إجمالي الإيراد</th><th>إجمالي التسليم</th><th>إجمالي المتبقي</th></tr></thead><tbody>${regRows.map(x=>`<tr><td>${x.region}</td><td class="ltr">${fmt(x.revenue,"SYP")}</td><td class="ltr">${fmt(x.delivered,"SYP")}</td><td class="ltr">${fmt(x.remaining,"SYP")}</td></tr>`).join("")}</tbody></table></div>`;
+        if(!regRows.length){
+          regEl.innerHTML='<div class="empty">لا يوجد ملخص ريجينات حسب الفلتر.</div>';
+        }else if(type){
+          regEl.innerHTML=`<div class="table-wrap"><table><thead><tr><th>الريجين</th><th>${typeLabel}</th><th>إجمالي الإيراد</th><th>المتبقي</th></tr></thead><tbody>${regRows.map(x=>{
+            const typeValue=type==="masary"?x.masary:type==="ccbs"?x.ccbs:0;
+            return `<tr><td>${x.region}</td><td class="ltr">${fmt(typeValue,"SYP")}</td><td class="ltr">${fmt(x.revenue,"SYP")}</td><td class="ltr">${fmt(x.remaining,"SYP")}</td></tr>`;
+          }).join("")}</tbody></table></div>`;
+        }else{
+          regEl.innerHTML=`<div class="table-wrap"><table><thead><tr><th>الريجين</th><th>مصاري</th><th>CCBS</th><th>إجمالي الإيراد</th><th>إجمالي التسليم</th><th>إجمالي المتبقي</th></tr></thead><tbody>${regRows.map(x=>`<tr><td>${x.region}</td><td class="ltr">${fmt(x.masary,"SYP")}</td><td class="ltr">${fmt(x.ccbs,"SYP")}</td><td class="ltr">${fmt(x.revenue,"SYP")}</td><td class="ltr">${fmt(x.delivered,"SYP")}</td><td class="ltr">${fmt(x.remaining,"SYP")}</td></tr>`).join("")}</tbody></table></div>`;
+        }
       }
+      markNegativeAmounts(document);
     };
 
-    window.addCustomOffice=async function(){
+
+window.addCustomOffice=async function(){
       try{
         if(!auth.currentUser)return;
         const name=String($("newOfficeName")?.value||"").trim();
@@ -3216,21 +3464,26 @@ function collectCutDollarRows(){
     };
 
     function getDelegateMatchRowsForExport(){
-      const{revs,dels}=filteredDelegateMatchData();
-      const map={};
-      function ensure(name,region){if(!map[name])map[name]={name,region:region||"-",revenue:0,delivered:0,deliveredUsd:0,remaining:0};return map[name]}
-      for(const r of revs){const x=ensure(r.delegateName,r.region);x.revenue+=num(r.revenueSyp)}
-      for(const d of dels){const n=deliveryNumbers(d);const x=ensure(d.delegateName,d.region);x.delivered+=n.totalAsSyp;x.deliveredUsd+=n.deliveredUsd}
-      return Object.values(map).map(x=>({...x,remaining:x.revenue-x.delivered})).sort((a,b)=>String(a.region).localeCompare(String(b.region))||String(a.name).localeCompare(String(b.name)));
+      return buildDelegateMatchRows();
     }
     window.exportDelegateMatchExcel=function(){
-      const rows=getDelegateMatchRowsForExport().map(x=>[x.name,x.region,num(x.revenue),num(x.delivered),Number(x.deliveredUsd||0).toFixed(2),num(x.remaining)]);
-      downloadExcelTable("delegate_matching","مطابقة المندوبين",["المندوب","الريجين","إجمالي الإيراد","إجمالي التسليم","تسليم دولار","إجمالي المتبقي"],rows,excelDateRangeMeta("matchFromDate","matchToDate"));
+      const type=$("matchTypeFilter")?.value||"";
+      if(type){
+        const label=getTypeLabel(type);
+        const rows=getDelegateMatchRowsForExport().map(x=>{
+          const typeValue=type==="masary"?x.masary:type==="ccbs"?x.ccbs:x.privateRevenue;
+          return [x.name,x.region,num(typeValue),num(x.revenue),num(x.remaining)];
+        });
+        downloadExcelTable("delegate_matching_"+type,"مطابقة المندوبين",["المندوب","الريجين",label,"إجمالي الإيراد","المتبقي"],rows,excelDateRangeMeta("matchFromDate","matchToDate"));
+      }else{
+        const rows=getDelegateMatchRowsForExport().map(x=>[x.name,x.region,num(x.masary),num(x.ccbs),num(x.revenue),num(x.delivered),Number(x.deliveredUsd||0).toFixed(2),num(x.remaining)]);
+        downloadExcelTable("delegate_matching","مطابقة المندوبين",["المندوب","الريجين","مصاري","CCBS","إجمالي الإيراد","إجمالي التسليم","تسليم دولار","إجمالي المتبقي"],rows,excelDateRangeMeta("matchFromDate","matchToDate"));
+      }
     };
 
 
-    
-    function markNegativeAmounts(root=document){
+
+function markNegativeAmounts(root=document){
       const negRe=/-\s*\d[\d,]*(?:\.\d+)?\s*(?:SYP|USD)?/i;
 
       root.querySelectorAll(".negative-amount").forEach(el=>el.classList.remove("negative-amount"));
