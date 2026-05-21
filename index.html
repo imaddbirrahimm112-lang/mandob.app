@@ -767,6 +767,24 @@ th{
 .dash-rev-badge span{font-size:13px;font-weight:900;color:rgba(220,245,255,.78)}
 .dash-rev-badge b{color:#58ff9f}
 
+
+/* ===== Clean Daily Entry Log ===== */
+.clean-day-box{border-color:rgba(90,177,255,.18)!important;background:rgba(4,12,32,.30)!important}
+.clean-day-head{background:linear-gradient(135deg,rgba(53,200,255,.08),rgba(115,92,255,.06))!important}
+.daily-buttons{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.daily-summary-title{padding:12px 14px 6px;color:rgba(230,245,255,.80);font-weight:900;font-size:13px}
+.daily-summary-table table{min-width:1080px}
+.daily-summary-table td,.daily-summary-table th{padding:15px 12px}
+.revenue-cell{color:#f7fbff!important}
+.total-cell{color:#79d6ff!important}
+.remain-cell,.remain-pill{color:#58ff9f!important;font-weight:900!important}
+.movement-details{margin-top:10px;border-top:1px solid rgba(100,185,255,.12)}
+.movement-details .table-wrap{margin:0 12px 12px}
+@media(max-width:720px){
+  .daily-buttons{justify-content:stretch}
+  .daily-buttons button{width:100%}
+}
+
 </style>
 </head>
 
@@ -855,7 +873,7 @@ th{
 
           <div class="section">
             <div class="section-head"><div><h2>تسليم إلى مكتب</h2><small>هذا منفصل عن إدخال الإيراد. يظهر سعر الصرف وحساب القص قبل الحفظ.</small></div><button id="cutBtn" class="secondary" onclick="toggleCutMode()">قص السوري إلى دولار: إيقاف</button></div>
-            <div id="deliveryModeNote" class="delivery-mode-note">الوضع الحالي: تسليم مباشر. سعر الصرف يُستخدم عند إدخال دولار أو تفعيل القص.</div>
+            <div id="deliveryModeNote" class="delivery-mode-note">الوضع الحالي: تسليم مباشر. الرصيد المعروض هو المتبقي الكامل للمندوب من كل الأيام.</div>
             <input id="editingDeliveryId" type="hidden" />
             <input id="cutMode" type="hidden" value="0" />
             <div class="form-grid">
@@ -868,7 +886,7 @@ th{
               <div class="field" style="grid-column:1/-1;"><label>ملاحظة</label><textarea id="delNote" placeholder="اختياري"></textarea></div>
             </div>
             <div class="calc-box">
-              <div class="calc-item"><b>رصيد المندوب قبل هذا التسليم</b><span id="calcBefore">0 SYP</span></div>
+              <div class="calc-item"><b>الرصيد الكامل للمندوب قبل التسليم</b><span id="calcBefore">0 SYP</span></div>
               <div class="calc-item"><b>سعر الصرف</b><span id="calcRate">0</span></div>
               <div class="calc-item"><b>الدولار الناتج من القص</b><span id="calcCutUsd">0 USD</span></div>
               <div class="calc-item"><b>قيمة الدولار المباشر</b><span id="calcDirectUsdAsSyp">0 SYP</span></div>
@@ -1320,7 +1338,7 @@ th{
 
     const delegatesByRegion={"Region 1":["جفان","علي","كاوا","دلخواز","بشار","صالة قامشلو 1","صالة قامشلو 2","صالة عامودا","صالة درباسية","صالة معبدة","صالة ديريك"],"Region 2":["شريف","يوسف","كمال","صالة حسكة 1","صالة حسكة 2","صالة تل تمر","صالة الشدادي"],"Region 3":["جاسم حسو","فرهاد خليل","احمد اومري","صالة الرقة 1","صالة الرقة 2","احمد هنيدي","صالة الطبقة","صالة دير الزور"],"Region 4":["شاهر ابو احمد","عبدو جاسم","صالة منبج","عادل عبدالعزيز","صالة كوباني"]};
     const officesByRegion={"R1":["هوكر تمي ديريك","تبارك رميلان","اسماعيل عبدي","محمد عامودا","شيخاني","عماد تمو","سوار قامشلو","ميداس عامودا","دعدوش درباسية","روهين تربه سبيه","روهين تل تمر","الحديدي تل كوجر","فهد"],"R2":["زين حسكة","سوار حسكة","يارا حسكة","زين 2 حسكة","نورجان حسكة","جاد شداده"],"R3":["العويد للحوالات رقة","الصفا جزرة بوحميد","خريس طبقة","انس العويد","رامي العويد"],"R4":["القصاب منبج","مسرو كوباني","ابو امير منبج"]};
-    let revenues=[],deliveries=[],officeDocs=[],cashboxes=[],cashMoves=[],officeMoves=[],officeCurrencyMode="SYP",officeHubCurrencyMode="ALL",unsubscribers=[];const collapsedDays=new Set();
+    let revenues=[],deliveries=[],officeDocs=[],cashboxes=[],cashMoves=[],officeMoves=[],officeCurrencyMode="SYP",officeHubCurrencyMode="ALL",unsubscribers=[];const collapsedDays=new Set();const expandedDetailsDays=new Set();
     function safeId(text){return String(text).trim().replace(/[^\p{L}\p{N}]+/gu,"_").replace(/^_+|_+$/g,"")}
     const baseDelegates=Object.entries(delegatesByRegion).flatMap(([region,names])=>names.map(name=>({id:safeId(region+"_"+name),name,region,custom:false})));
     const baseOffices=Object.entries(officesByRegion).flatMap(([region,names])=>names.map(name=>({id:safeId(region+"_"+name),name,region,custom:false})));
@@ -2001,13 +2019,17 @@ th{
     window.copyOfficeReport=async function(){const totalSyp=allOffices.reduce((a,o)=>a+getOfficeBalance(o.id).syp,0),totalUsd=allOffices.reduce((a,o)=>a+getOfficeBalance(o.id).usd,0);const report=`تقرير المكاتب والحوالات\nإجمالي SYP: ${fmt(totalSyp,"SYP")}\nإجمالي USD: ${fmtUsd(totalUsd)}\nعدد الحركات: ${officeMoves.length}`;try{await navigator.clipboard.writeText(report)}catch(e){setStatus("لم أقدر أنسخ التقرير.")}}
     window.exportOfficeCsv=function(){const rows=getFilteredOfficeMoves();const header=["date","type","from","to","party","syp","usd","fee_syp","fee_usd","rate","note"];const csv=[header.join(",")].concat(rows.map(m=>[m.date||"",officeMoveLabels[m.type]||m.type,m.fromOfficeName||m.fromCashboxName||"",m.toOfficeName||m.toCashboxName||"",m.party||"",num(m.amountSyp),num(m.amountUsd),num(m.feeSyp),num(m.feeUsd),num(m.exchangeRate),m.note||""].map(v=>`"${String(v).replaceAll('"','""')}"`).join(","))).join("\n");const blob=new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="office_movements_excel.csv";a.click();URL.revokeObjectURL(a.href)}
     window.setOfficeCurrency=function(currency){officeCurrencyMode=currency;$("officeSypBtn").className=currency==="SYP"?"active-tab":"secondary";$("officeUsdBtn").className=currency==="USD"?"active-tab":"secondary";$("officeModeText").textContent=currency==="SYP"?"يعرض حالياً المكاتب التي لديها رصيد سوري فقط":"يعرض حالياً المكاتب التي لديها رصيد دولار فقط";renderOffices()};function renderOffices(){const active=allOffices.filter(o=>{const b=getOfficeBalance(o.id);return officeCurrencyMode==="SYP"?b.syp!==0:b.usd!==0});if(!active.length){$("officeGrid").innerHTML=`<div class="empty">${officeCurrencyMode==="SYP"?"حالياً لا يوجد مكاتب لديها رصيد سوري.":"حالياً لا يوجد مكاتب لديها رصيد دولار."}</div>`;return}$("officeGrid").innerHTML=active.map(o=>{const b=getOfficeBalance(o.id),amount=officeCurrencyMode==="SYP"?b.syp:b.usd,curr=officeCurrencyMode==="SYP"?"SYP":"USD",label=officeCurrencyMode==="SYP"?"رصيد سوري":"رصيد دولار";return`<div class="card office-card" onclick="showOfficeDetails('${o.id}')"><div class="label">${o.region}</div><div class="value" style="direction:rtl;text-align:right;">${o.name}</div><div class="money-row"><span>${label}</span><span>${fmt(amount,curr)}</span></div><div class="sub" style="direction:rtl;text-align:right;">اضغط للتفاصيل</div></div>`}).join("")}
-    function delegateDayTotals(delegateName,date,excludeDeliveryId=""){const revenue=revenues.filter(r=>r.delegateName===delegateName&&r.date===date).reduce((a,r)=>a+num(r.revenueSyp),0),dels=deliveries.filter(d=>d.delegateName===delegateName&&d.date===date&&d.id!==excludeDeliveryId),delivered=dels.reduce((a,d)=>a+deliveryNumbers(d).totalAsSyp,0);return{revenue,delivered,remaining:revenue-delivered}}
+    function delegateTotalBalance(delegateName,excludeDeliveryId=""){
+      const revenue=revenues.filter(r=>r.delegateName===delegateName).reduce((a,r)=>a+num(r.revenueSyp),0);
+      const delivered=deliveries.filter(d=>d.delegateName===delegateName&&d.id!==excludeDeliveryId).reduce((a,d)=>a+deliveryNumbers(d).totalAsSyp,0);
+      return{revenue,delivered,remaining:revenue-delivered};
+    }
     function updateDeliveryModeUi(){
       const cut=$("cutMode")?.value==="1";
       if($("cutBtn")){$("cutBtn").textContent=cut?"قص السوري إلى دولار: تشغيل":"قص السوري إلى دولار: إيقاف";$("cutBtn").className=cut?"good":"secondary"}
       if($("delSypLabel"))$("delSypLabel").textContent=cut?"المبلغ السوري المراد قصه إلى دولار":"المسلّم سوري";
       if($("delUsdLabel"))$("delUsdLabel").textContent=cut?"دولار مباشر إضافي":"المسلّم دولار";
-      if($("deliveryModeNote"))$("deliveryModeNote").textContent=cut?"الوضع الحالي: قص السوري إلى دولار. اكتب مبلغ السوري وسعر الصرف وسيظهر الدولار الناتج قبل الحفظ.":"الوضع الحالي: تسليم مباشر. سعر الصرف يُستخدم عند إدخال دولار مباشر.";
+      if($("deliveryModeNote"))$("deliveryModeNote").textContent=cut?"الوضع الحالي: قص السوري إلى دولار. الرصيد المعروض هو المتبقي الكامل للمندوب من كل الأيام.":"الوضع الحالي: تسليم مباشر. الرصيد المعروض هو المتبقي الكامل للمندوب من كل الأيام.";
       if($("delRateField"))$("delRateField").style.display="";
     }
     window.toggleCutMode=function(){
@@ -2017,7 +2039,7 @@ th{
       updateDeliveryCalculation();
     };
     window.updateDeliveryCalculation=function(){
-      const before=delegateDayTotals($("delDelegate").value,$("delDate").value||todayString(),$("editingDeliveryId").value).remaining;
+      const before=delegateTotalBalance($("delDelegate").value,$("editingDeliveryId").value).remaining;
       const rate=num($("delRate").value);
       const inputSyp=num($("delSyp").value);
       const directUsd=Number(clean($("delUsd").value)||0);
@@ -2210,35 +2232,125 @@ th{
       }
       $("modalContent").innerHTML=html;$("officeModal").classList.add("show");
     };window.hideOfficeModal=function(){$("officeModal").classList.remove("show")};window.closeOfficeModal=function(e){if(e.target.id==="officeModal")hideOfficeModal()};
-    window.clearFilters=function(){$("fromDate").value="";$("toDate").value="";$("nameFilter").value="";$("regionFilter").value="";renderDailyLog()};window.toggleDay=function(day){collapsedDays.has(day)?collapsedDays.delete(day):collapsedDays.add(day);renderDailyLog()};
+    window.clearFilters=function(){$("fromDate").value="";$("toDate").value="";$("nameFilter").value="";$("regionFilter").value="";renderDailyLog()};window.toggleDay=function(day){collapsedDays.has(day)?collapsedDays.delete(day):collapsedDays.add(day);renderDailyLog()};window.toggleDayDetails=function(day){expandedDetailsDays.has(day)?expandedDetailsDays.delete(day):expandedDetailsDays.add(day);renderDailyLog()};
     function getFilteredDaysData(){const from=$("fromDate").value,to=$("toDate").value,name=$("nameFilter").value.trim(),region=$("regionFilter").value;return{revs:revenues.filter(r=>(!from||r.date>=from)&&(!to||r.date<=to)&&(!name||String(r.delegateName).includes(name))&&(!region||r.region===region)),dels:deliveries.filter(d=>(!from||d.date>=from)&&(!to||d.date<=to)&&(!name||String(d.delegateName).includes(name))&&(!region||d.region===region))}}
     window.renderDailyLog=function(){
-      const{revs,dels}=getFilteredDaysData(),days=new Set([...revs.map(r=>r.date),...dels.map(d=>d.date)]);
+      const{revs,dels}=getFilteredDaysData();
+      const days=new Set([...revs.map(r=>r.date),...dels.map(d=>d.date)]);
       if(!days.size){$("dailyGroupedLog").innerHTML=`<div class="empty">لا يوجد سجلات حالياً.</div>`;return}
-      $("dailyGroupedLog").innerHTML=[...days].sort().reverse().map(day=>{
-        const dayRevs=revs.filter(r=>r.date===day),dayDels=dels.filter(d=>d.date===day),names=new Set([...dayRevs.map(r=>r.delegateName),...dayDels.map(d=>d.delegateName)]);
-        let dayRevenue=0,dayDirectSyp=0,dayUsd=0,dayDeliveredForRemaining=0;
-        dayRevs.forEach(r=>dayRevenue+=num(r.revenueSyp));
-        dayDels.forEach(d=>{const n=deliveryNumbers(d);dayDirectSyp+=n.deliveredSyp;dayUsd+=n.deliveredUsd;dayDeliveredForRemaining+=n.totalAsSyp});
-        const hidden=collapsedDays.has(day);
-        const summaryRows=[...names].map(delegateName=>{
-          const delegateRevs=dayRevs.filter(r=>r.delegateName===delegateName),delegateDels=dayDels.filter(d=>d.delegateName===delegateName),region=(delegateRevs[0]||delegateDels[0]||{}).region||"-";
-          const revenue=delegateRevs.reduce((a,r)=>a+num(r.revenueSyp),0);
-          let directSyp=0,usd=0,deliveredForRemaining=0;const offices=new Set();
-          delegateDels.forEach(d=>{const n=deliveryNumbers(d);directSyp+=n.deliveredSyp;usd+=n.deliveredUsd;deliveredForRemaining+=n.totalAsSyp;if(d.officeName)offices.add(d.officeName)});
-          return`<tr><td>${delegateName}</td><td>${region}</td><td class="ltr">${fmt(revenue,"SYP")}</td><td class="ltr">${fmt(directSyp,"SYP")}</td><td class="ltr">${fmtUsd(usd)}</td><td class="ltr">${fmt(revenue-deliveredForRemaining,"SYP")}</td><td>${[...offices].join("، ")||"-"}</td></tr>`;
-        }).join("");
-        const revenueRows=dayRevs.map(r=>`<tr><td>إيراد</td><td>${r.delegateName}</td><td>${r.region}</td><td>${getTypeLabel(r.revenueType)}</td><td class="ltr">${fmt(r.revenueSyp,"SYP")}</td><td>-</td><td><button class="secondary small" onclick="editRevenue('${r.id}')">تعديل</button><button class="danger small" onclick="deleteRevenue('${r.id}')">حذف</button></td></tr>`).join("");
-        const deliveryRows=dayDels.map(d=>{
+
+      function deliverySortKey(d){
+        return `${String(d.date||"")}__${String(d.createdAt?.seconds||"").padStart(12,"0")}__${String(d.id||"")}`;
+      }
+
+      function getDelegateRegion(name,dayRevs,dayDels){
+        return (dayRevs.find(r=>r.delegateName===name)||dayDels.find(d=>d.delegateName===name)||revenues.find(r=>r.delegateName===name)||deliveries.find(d=>d.delegateName===name)||{}).region||"-";
+      }
+
+      function summarizeDelegateForDay(delegateName,day,dayRevs,dayDels){
+        const revToday=dayRevs.filter(r=>r.delegateName===delegateName).reduce((a,r)=>a+num(r.revenueSyp),0);
+        const revUntil=revenues.filter(r=>r.delegateName===delegateName&&String(r.date||"")<=String(day||"")).reduce((a,r)=>a+num(r.revenueSyp),0);
+
+        let directSypToday=0,cutSypToday=0,cutUsdToday=0,directUsdToday=0,deliveredTodayAsSyp=0;
+        const offices=new Set(),rates=new Set();
+
+        dayDels.filter(d=>d.delegateName===delegateName).forEach(d=>{
           const n=deliveryNumbers(d);
-          const sypDisplay=n.mode==="cut"?`<span class="cut-detail">قص ${fmt(n.cutSyp,"SYP")}</span>`:fmt(n.deliveredSyp,"SYP");
-          const usdLabel=n.mode==="cut"?`${fmtUsd(n.deliveredUsd)} / سعر ${n.rate?n.rate.toLocaleString("en-US"):"-"}`:fmtUsd(n.deliveredUsd);
-          return`<tr><td>تسليم</td><td>${d.delegateName}</td><td>${d.region}</td><td>${n.mode==="cut"?"قص إلى دولار / "+d.officeName:d.officeName}</td><td class="ltr">${sypDisplay}</td><td class="ltr">${usdLabel}</td><td><button class="secondary small" onclick="editDelivery('${d.id}')">تعديل</button><button class="danger small" onclick="deleteDelivery('${d.id}')">حذف</button></td></tr>`;
+          directSypToday+=n.deliveredSyp;
+          cutSypToday+=n.cutSyp;
+          cutUsdToday+=n.cutUsd;
+          directUsdToday+=n.directUsd;
+          deliveredTodayAsSyp+=n.totalAsSyp;
+          if(n.rate>0&&(n.cutSyp>0||n.directUsd>0))rates.add(n.rate.toLocaleString("en-US"));
+          if(d.officeName)offices.add(d.officeName);
+        });
+
+        const deliveredUntil=deliveries.filter(d=>d.delegateName===delegateName&&String(d.date||"")<=String(day||"")).reduce((a,d)=>a+deliveryNumbers(d).totalAsSyp,0);
+        const remaining=revUntil-deliveredUntil;
+        const region=getDelegateRegion(delegateName,dayRevs,dayDels);
+        return{delegateName,region,revToday,revUntil,directSypToday,cutSypToday,cutUsdToday,directUsdToday,deliveredTodayAsSyp,deliveredUntil,remaining,offices,rates};
+      }
+
+      $("dailyGroupedLog").innerHTML=[...days].sort().reverse().map(day=>{
+        const dayRevs=revs.filter(r=>r.date===day);
+        const dayDels=dels.filter(d=>d.date===day);
+        const names=[...new Set([...dayRevs.map(r=>r.delegateName),...dayDels.map(d=>d.delegateName)])].sort((a,b)=>String(a).localeCompare(String(b),"ar"));
+        const rows=names.map(name=>summarizeDelegateForDay(name,day,dayRevs,dayDels));
+
+        const totalRevenueToday=rows.reduce((a,x)=>a+x.revToday,0);
+        const totalDeliveredToday=rows.reduce((a,x)=>a+x.deliveredTodayAsSyp,0);
+        const totalCutSypToday=rows.reduce((a,x)=>a+x.cutSypToday,0);
+        const totalCutUsdToday=rows.reduce((a,x)=>a+x.cutUsdToday,0);
+        const totalRemaining=rows.reduce((a,x)=>a+x.remaining,0);
+        const hidden=collapsedDays.has(day);
+        const detailsOpen=expandedDetailsDays.has(day);
+
+        const summaryRows=rows.map(x=>`<tr>
+          <td>${x.delegateName}</td>
+          <td>${x.region}</td>
+          <td class="ltr revenue-cell">${fmt(x.revToday,"SYP")}</td>
+          <td class="ltr">${fmt(x.directSypToday,"SYP")}</td>
+          <td class="ltr cut-detail">${fmt(x.cutSypToday,"SYP")}</td>
+          <td class="ltr">${fmtUsd(x.cutUsdToday)}</td>
+          <td class="ltr">${fmtUsd(x.directUsdToday)}</td>
+          <td class="ltr total-cell">${fmt(x.deliveredTodayAsSyp,"SYP")}</td>
+          <td class="ltr remain-cell">${fmt(x.remaining,"SYP")}</td>
+          <td>${[...x.offices].join("، ")||"-"}</td>
+        </tr>`).join("");
+
+        const revenueRows=dayRevs.map(r=>`<tr>
+          <td>إيراد</td><td>${r.delegateName}</td><td>${r.region}</td><td>${getTypeLabel(r.revenueType)}</td>
+          <td class="ltr revenue-cell">${fmt(r.revenueSyp,"SYP")}</td><td class="ltr">-</td><td class="ltr">-</td><td>-</td>
+          <td><button class="secondary small" onclick="editRevenue('${r.id}')">تعديل</button><button class="danger small" onclick="deleteRevenue('${r.id}')">حذف</button></td>
+        </tr>`).join("");
+
+        const deliveryRows=dayDels.sort((a,b)=>deliverySortKey(a).localeCompare(deliverySortKey(b))).map(d=>{
+          const n=deliveryNumbers(d);
+          const op=n.mode==="cut"?"قص دولار":"تسليم";
+          const sypText=n.mode==="cut"?`قص ${fmt(n.cutSyp,"SYP")}`:fmt(n.deliveredSyp,"SYP");
+          const usdText=[n.cutUsd>0?`ناتج ${fmtUsd(n.cutUsd)}`:"",n.directUsd>0?`مباشر ${fmtUsd(n.directUsd)}`:""].filter(Boolean).join(" / ")||"-";
+          const rateText=n.rate>0?n.rate.toLocaleString("en-US"):"-";
+          return`<tr>
+            <td>${op}</td><td>${d.delegateName}</td><td>${d.region}</td><td>${d.officeName||"-"}</td>
+            <td class="ltr">${sypText}</td><td class="ltr">${usdText}</td><td class="ltr">${rateText}</td><td>${d.note||"-"}</td>
+            <td><button class="secondary small" onclick="editDelivery('${d.id}')">تعديل</button><button class="danger small" onclick="deleteDelivery('${d.id}')">حذف</button></td>
+          </tr>`;
         }).join("");
-        return`<div class="day-box"><div class="day-head"><div><div class="day-title">إيراد ${day}</div><div class="day-total"><span class="pill">الإيراد: ${fmt(dayRevenue,"SYP")}</span><span class="pill">تسليم السوري: ${fmt(dayDirectSyp,"SYP")}</span><span class="pill">تسليم الدولار: ${fmtUsd(dayUsd)}</span><span class="pill">المتبقي: ${fmt(dayRevenue-dayDeliveredForRemaining,"SYP")}</span></div></div><button class="secondary small" onclick="toggleDay('${day}')">${hidden?"فتح":"إغلاق"}</button></div>${hidden?"":`<div class="table-wrap"><table><thead><tr><th>المندوب</th><th>المنطقة</th><th>إيراد اليوم</th><th>تسليم السوري</th><th>تسليم الدولار</th><th>المتبقي</th><th>المكاتب</th></tr></thead><tbody>${summaryRows}</tbody></table></div><div class="table-wrap" style="margin-top:10px"><table><thead><tr><th>العملية</th><th>المندوب</th><th>المنطقة</th><th>النوع/المكتب</th><th>تسليم السوري / مبلغ القص</th><th>تسليم الدولار/سعر الصرف</th><th>إجراء</th></tr></thead><tbody>${revenueRows}${deliveryRows}</tbody></table></div>`}</div>`;
+
+        return`<div class="day-box clean-day-box">
+          <div class="day-head clean-day-head">
+            <div>
+              <div class="day-title">إيراد ${day}</div>
+              <div class="day-total">
+                <span class="pill">إيراد اليوم: ${fmt(totalRevenueToday,"SYP")}</span>
+                <span class="pill">تسليم اليوم: ${fmt(totalDeliveredToday,"SYP")}</span>
+                <span class="pill">قص سوري: ${fmt(totalCutSypToday,"SYP")}</span>
+                <span class="pill">دولار من القص: ${fmtUsd(totalCutUsdToday)}</span>
+                <span class="pill remain-pill">المتبقي النهائي: ${fmt(totalRemaining,"SYP")}</span>
+              </div>
+            </div>
+            <div class="daily-buttons">
+              <button class="secondary small" onclick="toggleDay('${day}')">${hidden?"فتح الملخص":"إغلاق الملخص"}</button>
+              <button class="secondary small" onclick="toggleDayDetails('${day}')">${detailsOpen?"إخفاء التفاصيل":"تفاصيل الحركات"}</button>
+            </div>
+          </div>
+          ${hidden?"":`
+            <div class="daily-summary-title">ملخص واضح حسب المندوب</div>
+            <div class="table-wrap daily-summary-table">
+              <table>
+                <thead><tr>
+                  <th>المندوب</th><th>المنطقة</th><th>إيراد اليوم</th><th>تسليم سوري</th><th>قص سوري</th><th>دولار من القص</th><th>دولار مباشر</th><th>إجمالي التسليم</th><th>المتبقي النهائي</th><th>المكاتب</th>
+                </tr></thead>
+                <tbody>${summaryRows}</tbody>
+              </table>
+            </div>
+            ${detailsOpen?`<div class="movement-details"><div class="daily-summary-title">تفاصيل الحركات لهذا اليوم</div><div class="table-wrap"><table><thead><tr><th>العملية</th><th>المندوب</th><th>المنطقة</th><th>النوع / المكتب</th><th>المبلغ SYP</th><th>USD</th><th>سعر الصرف</th><th>ملاحظة</th><th>إجراء</th></tr></thead><tbody>${revenueRows}${deliveryRows}</tbody></table></div></div>`:""}
+          `}
+        </div>`;
       }).join("");
     };
-    function collectCutDollarRows(){
+
+function collectCutDollarRows(){
       const rows=[];
       for(const d of deliveries){
         const n=deliveryNumbers(d);
