@@ -1689,6 +1689,26 @@ td{
   }
 }
 
+/* ===== Performance pass: lighter offscreen paint without changing layout ===== */
+.section,.day-box,.office-hub-card,.office-cashbox-card,.office-card,.cash-liquid-card,.card{
+  content-visibility:auto;
+  contain-intrinsic-size:1px 150px;
+}
+.table-wrap{
+  content-visibility:auto;
+  contain-intrinsic-size:1px 420px;
+}
+.view:not(.active){
+  content-visibility:hidden;
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    animation-duration:.01ms !important;
+    animation-iteration-count:1 !important;
+    scroll-behavior:auto !important;
+    transition-duration:.01ms !important;
+  }
+}
 </style>
 </head>
 
@@ -2242,11 +2262,14 @@ td{
         el.style.display="block";
       }
     });
-  const negativeObserver=new MutationObserver(()=>{clearTimeout(window.__negTimer);window.__negTimer=setTimeout(()=>markNegativeAmounts(),40)});negativeObserver.observe(document.body,{childList:true,subtree:true,characterData:true});
-  
-    window.__negObserverFinal=new MutationObserver(()=>{clearTimeout(window.__negFinalTimer);window.__negFinalTimer=setTimeout(()=>markNegativeAmounts(document),30)});
-    window.__negObserverFinal.observe(document.body,{childList:true,subtree:true,characterData:true});
-    setInterval(()=>markNegativeAmounts(document),1200);
+  window.__scheduleNegativeMark=function(root){
+    clearTimeout(window.__negTimer);
+    window.__negTimer=setTimeout(()=>{
+      if(typeof window.markNegativeAmounts==="function")window.markNegativeAmounts(root||document);
+    },120);
+  };
+  const negativeObserver=new MutationObserver(()=>window.__scheduleNegativeMark(document));
+  negativeObserver.observe(document.body,{childList:true,subtree:true});
 
   </script>
 
@@ -2262,7 +2285,9 @@ td{
 
     const delegatesByRegion={"Region 1":["جفان","علي","كاوا","دلخواز","بشار","صالة قامشلو 1","صالة قامشلو 2","صالة عامودا","صالة درباسية","صالة معبدة","صالة ديريك"],"Region 2":["شريف","يوسف","كمال","صالة حسكة 1","صالة حسكة 2","صالة تل تمر","صالة الشدادي"],"Region 3":["جاسم حسو","فرهاد خليل","احمد اومري","صالة الرقة 1","صالة الرقة 2","احمد هنيدي","صالة الطبقة","صالة دير الزور"],"Region 4":["شاهر ابو احمد","عبدو جاسم","صالة منبج","عادل عبدالعزيز","صالة كوباني"]};
     const officesByRegion={"R1":["هوكر تمي ديريك","تبارك رميلان","اسماعيل عبدي","محمد عامودا","شيخاني","عماد تمو","سوار قامشلو","ميداس عامودا","دعدوش درباسية","روهين تربه سبيه","روهين تل تمر","الحديدي تل كوجر","فهد"],"R2":["زين حسكة","سوار حسكة","يارا حسكة","زين 2 حسكة","نورجان حسكة","جاد شداده"],"R3":["العويد للحوالات رقة","الصفا جزرة بوحميد","خريس طبقة","انس العويد","رامي العويد"],"R4":["القصاب منبج","مسرو كوباني","ابو امير منبج"]};
-    let revenues=[],deliveries=[],officeDocs=[],cashboxes=[],cashMoves=[],officeMoves=[],officeCurrencyMode="SYP",officeHubCurrencyMode="ALL",unsubscribers=[];const collapsedDays=new Set();const expandedDetailsDays=new Set();
+    let revenues=[],deliveries=[],officeDocs=[],cashboxes=[],cashMoves=[],officeMoves=[],officeCurrencyMode="SYP",officeHubCurrencyMode="ALL",unsubscribers=[],activeView="dashboard",renderAllTimer=0,dataVersion=0,summaryCache=null,officeBalanceCache=null,cashboxBalanceCache=null;const collapsedDays=new Set();const expandedDetailsDays=new Set();
+    function markDataDirty(){dataVersion++;summaryCache=null;officeBalanceCache=null;cashboxBalanceCache=null}
+    function scheduleRenderAll(){if(renderAllTimer)return;const run=()=>{renderAllTimer=0;renderAll()};renderAllTimer=window.requestAnimationFrame?window.requestAnimationFrame(run):window.setTimeout(run,16)}
     function safeId(text){return String(text).trim().replace(/[^\p{L}\p{N}]+/gu,"_").replace(/^_+|_+$/g,"")}
     const baseDelegates=Object.entries(delegatesByRegion).flatMap(([region,names])=>names.map(name=>({id:safeId(region+"_"+name),name,region,custom:false})));
     const baseOffices=Object.entries(officesByRegion).flatMap(([region,names])=>names.map(name=>({id:safeId(region+"_"+name),name,region,custom:false})));
@@ -2392,7 +2417,7 @@ td{
         const result=await withTimeout(signInWithEmailAndPassword(auth,email,password),25000,"login-request-timeout");
         showApp(result.user);
         setLoginStatus("");
-        setTimeout(()=>{reloadAll().catch(e=>setStatus("تنبيه تحميل البيانات: "+e.message))},50);
+        scheduleRenderAll();
       }catch(e){
         const code=e && e.code ? e.code : "";
         let msg="فشل تسجيل الدخول";
@@ -2413,11 +2438,11 @@ td{
     function showApp(user){if($("loginScreen"))$("loginScreen").style.display=user?"none":"grid";if($("app"))$("app").style.display=user?"block":"none";const nav=document.querySelector(".mobile-nav");if(nav)nav.style.display=user?"":"none";if($("backToAppBtn"))$("backToAppBtn").style.display=user?"block":"none"}
     window.openLoginScreen=function(){if($("loginScreen"))$("loginScreen").style.display="grid";if($("backToAppBtn"))$("backToAppBtn").style.display=auth.currentUser?"block":"none"}
     window.closeLoginScreen=function(){if(auth.currentUser&&$("loginScreen"))$("loginScreen").style.display="none"}
-    const titles={dashboard:["لوحة الإيرادات","الرصيد محسوب من السجلات فقط."],entry:["إدخال الإيراد اليومي","الإيراد لحاله، والتسليم لحاله، والسجل تحته."],cashbox:["الصندوق","قسم محاسبي مستقل للصندوق."],office:["رصيد المكاتب والحوالات","قسم مستقل لحركة المكاتب والتحويلات."],cutDollar:["قص دولار","سجل خاص بقص السوري إلى دولار من المندوبين والمكاتب."],loans:["سلف","سجل السلف والذمم."],delegateMatch:["مطابقة المندوبين","مطابقة الإيراد والتسليم والمتبقي."],settings:["الإعدادات","إضافة مكتب أو مندوب جديد."]};window.showView=function(view){["dashboard","entry","cashbox","office","cutDollar","loans","delegateMatch","settings"].forEach(v=>{$("view"+cap(v)).classList.toggle("active",v===view);$("nav"+cap(v)).classList.toggle("active",v===view);$("mNav"+cap(v)).classList.toggle("active",v===view)});$("pageTitle").textContent=titles[view][0];$("pageSub").textContent=titles[view][1];if(view==="entry")renderDailyLog();if(view==="cashbox"){renderCashboxes();renderCashLog();renderLoanSummary();renderCashReports()}if(view==="office"){renderOfficeHub();renderOfficeLog();renderOfficeReports()}if(view==="cutDollar"){renderCutDollarSection()}if(view==="loans"){renderLoansSection()}if(view==="delegateMatch"){renderDelegateMatch()}if(view==="settings"){renderSettingsSection()}};function cap(x){return x.charAt(0).toUpperCase()+x.slice(1)}
-    function stopLiveSync(){unsubscribers.forEach(u=>{try{u()}catch(_){}});unsubscribers=[]}function startLiveSync(){stopLiveSync();unsubscribers.push(onSnapshot(collection(db,"dailyRevenues"),s=>{revenues=s.docs.map(d=>({id:d.id,...d.data()}));renderAll()},e=>setStatus("تنبيه قراءة الإيرادات: "+e.message)));unsubscribers.push(onSnapshot(collection(db,"officeDeliveries"),s=>{deliveries=s.docs.map(d=>({id:d.id,...d.data()}));renderAll()},e=>setStatus("تنبيه قراءة التسليمات: "+e.message)));unsubscribers.push(onSnapshot(collection(db,"cashboxes"),s=>{cashboxes=s.docs.map(d=>({id:d.id,...d.data()}));renderAll()},e=>setStatus("تنبيه قراءة الصناديق: "+e.message)));unsubscribers.push(onSnapshot(collection(db,"cashboxMovements"),s=>{cashMoves=s.docs.map(d=>({id:d.id,...d.data()}));renderAll()},e=>setStatus("تنبيه قراءة حركة الصندوق: "+e.message)));unsubscribers.push(onSnapshot(collection(db,"officeMovements"),s=>{officeMoves=s.docs.map(d=>({id:d.id,...d.data()}));renderAll()},e=>setStatus("تنبيه قراءة حركات المكاتب: "+e.message)));
-      unsubscribers.push(onSnapshot(collection(db,"customOffices"),s=>{customOffices=s.docs.map(d=>({id:d.id,...d.data()}));rebuildMasterData();fillSelects();renderAll()},e=>setStatus("تنبيه قراءة المكاتب المضافة: "+e.message)));
-      unsubscribers.push(onSnapshot(collection(db,"customDelegates"),s=>{customDelegates=s.docs.map(d=>({id:d.id,...d.data()}));rebuildMasterData();fillSelects();renderAll()},e=>setStatus("تنبيه قراءة المندوبين المضافين: "+e.message)))}
-    async function readCol(name){try{return(await getDocs(collection(db,name))).docs.map(d=>({id:d.id,...d.data()}))}catch(e){setStatus("تم التحديث جزئياً، لم أقرأ "+name+": "+e.message);return[]}}window.reloadAll=async function(){if(!auth.currentUser)return;setStatus("");revenues=await readCol("dailyRevenues");deliveries=await readCol("officeDeliveries");cashboxes=await readCol("cashboxes");cashMoves=await readCol("cashboxMovements");officeMoves=await readCol("officeMovements");customOffices=await readCol("customOffices");customDelegates=await readCol("customDelegates");rebuildMasterData();fillSelects();renderAll();updateOfficeMoveMode();setStatus("")}
+    const titles={dashboard:["لوحة الإيرادات","الرصيد محسوب من السجلات فقط."],entry:["إدخال الإيراد اليومي","الإيراد لحاله، والتسليم لحاله، والسجل تحته."],cashbox:["الصندوق","قسم محاسبي مستقل للصندوق."],office:["رصيد المكاتب والحوالات","قسم مستقل لحركة المكاتب والتحويلات."],cutDollar:["قص دولار","سجل خاص بقص السوري إلى دولار من المندوبين والمكاتب."],loans:["سلف","سجل السلف والذمم."],delegateMatch:["مطابقة المندوبين","مطابقة الإيراد والتسليم والمتبقي."],settings:["الإعدادات","إضافة مكتب أو مندوب جديد."]};window.showView=function(view){activeView=view;["dashboard","entry","cashbox","office","cutDollar","loans","delegateMatch","settings"].forEach(v=>{$("view"+cap(v)).classList.toggle("active",v===view);$("nav"+cap(v)).classList.toggle("active",v===view);$("mNav"+cap(v)).classList.toggle("active",v===view)});$("pageTitle").textContent=titles[view][0];$("pageSub").textContent=titles[view][1];if(view==="entry")renderDailyLog();if(view==="cashbox"){renderCashboxes();renderCashLog();renderLoanSummary();renderCashReports()}if(view==="office"){renderOfficeHub();renderOfficeLog();renderOfficeReports()}if(view==="cutDollar"){renderCutDollarSection()}if(view==="loans"){renderLoansSection()}if(view==="delegateMatch"){renderDelegateMatch()}if(view==="settings"){renderSettingsSection()}};function cap(x){return x.charAt(0).toUpperCase()+x.slice(1)}
+    function stopLiveSync(){unsubscribers.forEach(u=>{try{u()}catch(_){}});unsubscribers=[]}function startLiveSync(){stopLiveSync();unsubscribers.push(onSnapshot(collection(db,"dailyRevenues"),s=>{revenues=s.docs.map(d=>({id:d.id,...d.data()}));markDataDirty();scheduleRenderAll()},e=>setStatus("تنبيه قراءة الإيرادات: "+e.message)));unsubscribers.push(onSnapshot(collection(db,"officeDeliveries"),s=>{deliveries=s.docs.map(d=>({id:d.id,...d.data()}));markDataDirty();scheduleRenderAll()},e=>setStatus("تنبيه قراءة التسليمات: "+e.message)));unsubscribers.push(onSnapshot(collection(db,"cashboxes"),s=>{cashboxes=s.docs.map(d=>({id:d.id,...d.data()}));markDataDirty();scheduleRenderAll()},e=>setStatus("تنبيه قراءة الصناديق: "+e.message)));unsubscribers.push(onSnapshot(collection(db,"cashboxMovements"),s=>{cashMoves=s.docs.map(d=>({id:d.id,...d.data()}));markDataDirty();scheduleRenderAll()},e=>setStatus("تنبيه قراءة حركة الصندوق: "+e.message)));unsubscribers.push(onSnapshot(collection(db,"officeMovements"),s=>{officeMoves=s.docs.map(d=>({id:d.id,...d.data()}));markDataDirty();scheduleRenderAll()},e=>setStatus("تنبيه قراءة حركات المكاتب: "+e.message)));
+      unsubscribers.push(onSnapshot(collection(db,"customOffices"),s=>{customOffices=s.docs.map(d=>({id:d.id,...d.data()}));rebuildMasterData();fillSelects();markDataDirty();scheduleRenderAll()},e=>setStatus("تنبيه قراءة المكاتب المضافة: "+e.message)));
+      unsubscribers.push(onSnapshot(collection(db,"customDelegates"),s=>{customDelegates=s.docs.map(d=>({id:d.id,...d.data()}));rebuildMasterData();fillSelects();markDataDirty();scheduleRenderAll()},e=>setStatus("تنبيه قراءة المندوبين المضافين: "+e.message)))}
+    async function readCol(name){try{return(await getDocs(collection(db,name))).docs.map(d=>({id:d.id,...d.data()}))}catch(e){setStatus("تم التحديث جزئياً، لم أقرأ "+name+": "+e.message);return[]}}window.reloadAll=async function(){if(!auth.currentUser)return;setStatus("");revenues=await readCol("dailyRevenues");deliveries=await readCol("officeDeliveries");cashboxes=await readCol("cashboxes");cashMoves=await readCol("cashboxMovements");officeMoves=await readCol("officeMovements");customOffices=await readCol("customOffices");customDelegates=await readCol("customDelegates");rebuildMasterData();fillSelects();markDataDirty();renderAll();updateOfficeMoveMode();setStatus("")}
 
     const cashboxNames={syp_farhad:"صندوق سوري فرهاد",usd_farhad:"صندوق دولار فرهاد"};
     const cashboxCurrency={syp_farhad:"SYP",usd_farhad:"USD"};
@@ -2812,6 +2837,7 @@ td{
     };
 
     function calculateSummary(){
+      if(summaryCache&&summaryCache.version===dataVersion)return summaryCache.value;
       const s={totalRevenueSyp:0,masarySyp:0,ccbsSyp:0,cutSyp:0,cutUsd:0,officeCutSyp:0,officeCutUsd:0,rateSum:0,rateCount:0,sypFarhad:0,usdFarhad:0};
       revenues.forEach(r=>{
         const a=num(r.revenueSyp);
@@ -2843,6 +2869,7 @@ td{
       const cb=calcCashboxBalances();
       s.sypFarhad=cb.syp_farhad||0;
       s.usdFarhad=cb.usd_farhad||0;
+      summaryCache={version:dataVersion,value:s};
       return s
     }
     function renderKpis(){
@@ -2999,14 +3026,49 @@ td{
       }
       return{officeEffects,cashboxEffects};
     }
+    function getOfficeBalanceMap(){
+      if(officeBalanceCache&&officeBalanceCache.version===dataVersion)return officeBalanceCache.map;
+      const map=new Map(allOffices.map(o=>[o.id,{syp:0,usd:0}]));
+      const officeNameToId=new Map(allOffices.map(o=>[String(o.name||""),o.id]));
+      for(const d of deliveries){
+        const id=d.officeId||officeNameToId.get(String(d.officeName||""));
+        if(!id)continue;
+        if(!map.has(id))map.set(id,{syp:0,usd:0});
+        const b=map.get(id),n=deliveryNumbers(d);
+        b.syp+=n.deliveredSyp;
+        b.usd+=n.deliveredUsd;
+      }
+      for(const m of officeMoves){
+        const effects=getOfficeMoveEffect(m).officeEffects;
+        for(const [id,e] of Object.entries(effects)){
+          if(!map.has(id))map.set(id,{syp:0,usd:0});
+          const b=map.get(id);
+          b.syp+=num(e.syp);
+          b.usd+=Number(e.usd||0);
+        }
+      }
+      officeBalanceCache={version:dataVersion,map};
+      return map;
+    }
     getOfficeBalance=function(id){
-      let syp=0,usd=0;
-      for(const d of getOfficeDeliveries(id)){const n=deliveryNumbers(d);syp+=n.deliveredSyp;usd+=n.deliveredUsd}
-      for(const m of officeMoves){const e=getOfficeMoveEffect(m).officeEffects[id];if(e){syp+=e.syp;usd+=e.usd}}
-      return{syp,usd};
+      const b=getOfficeBalanceMap().get(id);
+      return b?{syp:b.syp,usd:b.usd}:{syp:0,usd:0};
     }
     const _baseCalcCashboxBalances=calcCashboxBalances;
-    calcCashboxBalances=function(excludeId=""){const b=_baseCalcCashboxBalances(excludeId);for(const m of officeMoves){if(m.id===excludeId)continue;const ce=getOfficeMoveEffect(m).cashboxEffects;for(const [box,e] of Object.entries(ce)){if(box==="syp_farhad")b.syp_farhad=(b.syp_farhad||0)+num(e.syp);else if(box==="usd_farhad")b.usd_farhad=(b.usd_farhad||0)+Number(e.usd||0)}}return b}
+    calcCashboxBalances=function(excludeId=""){
+      if(!excludeId&&cashboxBalanceCache&&cashboxBalanceCache.version===dataVersion)return{...cashboxBalanceCache.value};
+      const b=_baseCalcCashboxBalances(excludeId);
+      for(const m of officeMoves){
+        if(m.id===excludeId)continue;
+        const ce=getOfficeMoveEffect(m).cashboxEffects;
+        for(const [box,e] of Object.entries(ce)){
+          if(box==="syp_farhad")b.syp_farhad=(b.syp_farhad||0)+num(e.syp);
+          else if(box==="usd_farhad")b.usd_farhad=(b.usd_farhad||0)+Number(e.usd||0)
+        }
+      }
+      if(!excludeId)cashboxBalanceCache={version:dataVersion,value:{...b}};
+      return b
+    }
     function getOfficeTransferCashboxBalances(){
       const main=calcCashboxBalances();
       const map={
@@ -3240,7 +3302,7 @@ td{
       if($("officeModeText"))$("officeModeText").textContent="يعرض المكاتب التي لديها رصيد سوري أو دولار، والرصيدين داخل نفس البطاقة";
       if(!active.length){
         $("officeGrid").innerHTML=`<div class="empty">حالياً لا يوجد مكاتب لديها رصيد.</div>`;
-        markNegativeAmounts();
+        window.__scheduleNegativeMark?window.__scheduleNegativeMark($("officeGrid")):markNegativeAmounts($("officeGrid"));
         return;
       }
 
@@ -3256,7 +3318,7 @@ td{
           <div class="sub" style="direction:rtl;text-align:right;">اضغط للتفاصيل</div>
         </div>`;
       }).join("");
-      markNegativeAmounts();
+      window.__scheduleNegativeMark?window.__scheduleNegativeMark($("officeGrid")):markNegativeAmounts($("officeGrid"));
     }
     function delegateTotalBalance(delegateName,excludeDeliveryId=""){
       const revenue=revenues.filter(r=>r.delegateName===delegateName).reduce((a,r)=>a+num(r.revenueSyp),0);
@@ -3839,7 +3901,7 @@ function collectCutDollarRows(){
         if(!regRows.length)regEl.innerHTML='<div class="empty">لا يوجد ملخص ريجينات حسب الفلتر.</div>';
         else regEl.innerHTML=`<div class="table-wrap"><table><thead><tr><th>الريجين</th><th>مصاري</th><th>CCBS</th><th>إجمالي الإيراد</th><th>إجمالي التسليم</th><th>إجمالي المتبقي</th></tr></thead><tbody>${regRows.map(x=>`<tr><td>${x.region}</td><td class="ltr">${fmt(x.masary,"SYP")}</td><td class="ltr">${fmt(x.ccbs,"SYP")}</td><td class="ltr">${fmt(x.revenue,"SYP")}</td><td class="ltr">${fmt(x.delivered,"SYP")}</td><td class="ltr">${fmt(x.remaining,"SYP")}</td></tr>`).join("")}</tbody></table></div>`;
       }
-      markNegativeAmounts(document);
+      window.__scheduleNegativeMark?window.__scheduleNegativeMark($("viewDelegateMatch")):markNegativeAmounts($("viewDelegateMatch")||document);
     };
 
 
@@ -3904,6 +3966,7 @@ window.addCustomOffice=async function(){
 
 
 function markNegativeAmounts(root=document){
+      if(!root||!root.querySelectorAll)return;
       const negRe=/-\s*\d[\d,]*(?:\.\d+)?\s*(?:SYP|USD)?/i;
 
       root.querySelectorAll(".negative-amount").forEach(el=>el.classList.remove("negative-amount"));
@@ -3926,8 +3989,23 @@ function markNegativeAmounts(root=document){
       });
     }
 
+    window.markNegativeAmounts=markNegativeAmounts;
 
-    function renderAll(){renderKpis();renderDashboardCashboxes();renderCashboxes();renderOffices();renderDailyLog();renderCashLog();renderLoanSummary();renderCashReports();renderOfficeHub();renderOfficeLog();renderOfficeReports();renderCutDollarSection();renderLoansSection();renderDelegateMatch();renderSettingsSection();updateDeliveryCalculation();onRevFormChange();if($("cashDate")){updateCashboxFormMode();updateCashPreview()}if($("officeMoveDate")){fillOfficeMoveSelects();updateOfficeMovePreview()}}
+    function renderDashboardView(){renderKpis();renderDashboardCashboxes();renderOffices()}
+    function renderActiveView(){
+      if(activeView==="entry"){renderDailyLog();updateDeliveryCalculation();onRevFormChange();return}
+      if(activeView==="cashbox"){renderCashboxes();renderCashLog();renderLoanSummary();renderCashReports();if($("cashDate")){updateCashboxFormMode();updateCashPreview()}return}
+      if(activeView==="office"){renderOfficeHub();renderOfficeLog();renderOfficeReports();if($("officeMoveDate")){fillOfficeMoveSelects();updateOfficeMovePreview()}return}
+      if(activeView==="cutDollar"){renderCutDollarSection();return}
+      if(activeView==="loans"){renderLoansSection();return}
+      if(activeView==="delegateMatch"){renderDelegateMatch();return}
+      if(activeView==="settings"){renderSettingsSection()}
+    }
+    function renderAll(){
+      renderDashboardView();
+      renderActiveView();
+      window.__scheduleNegativeMark?window.__scheduleNegativeMark(document):markNegativeAmounts(document);
+    }
     
     document.addEventListener("keydown",e=>{
       if(e.key!=="Enter")return;
@@ -3936,7 +4014,6 @@ function markNegativeAmounts(root=document){
         if(active && (active.id==="loginEmail" || active.id==="loginPassword")){
           e.preventDefault();
           login();
-      markNegativeAmounts();
         }
         return;
       }
@@ -3947,7 +4024,7 @@ function markNegativeAmounts(root=document){
       }
     });
 
-    onAuthStateChanged(auth,user=>{showApp(user);if(user){setStatus("");fillSelects();if($("revDate"))$("revDate").value=todayString();if($("delDate"))$("delDate").value=todayString();if($("cashDate"))$("cashDate").value=todayString();if($("officeMoveDate"))$("officeMoveDate").value=todayString();startLiveSync();setTimeout(()=>{reloadAll().catch(e=>setStatus("تنبيه تحميل البيانات: "+e.message))},50);setTimeout(onRevFormChange,200)}else{stopLiveSync();setLoginStatus("")}});
+    onAuthStateChanged(auth,user=>{showApp(user);if(user){setStatus("");fillSelects();if($("revDate"))$("revDate").value=todayString();if($("delDate"))$("delDate").value=todayString();if($("cashDate"))$("cashDate").value=todayString();if($("officeMoveDate"))$("officeMoveDate").value=todayString();startLiveSync();scheduleRenderAll();setTimeout(onRevFormChange,200)}else{stopLiveSync();setLoginStatus("")}});
     fillSelects();
   </script>
 </body>
