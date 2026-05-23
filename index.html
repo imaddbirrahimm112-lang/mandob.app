@@ -1988,11 +1988,44 @@ td{
           <div class="section">
             <div class="section-head">
               <div>
-                <h2>تقارير الصندوق السريعة</h2>
-                <small>ملخص الحركة حسب الفلاتر الحالية.</small>
+                <h2>الإغلاق والمحاسبة</h2>
+                <small>إغلاق شهري/سنوي مع تدوير آمن للأرصدة وصافي ربح/خسارة تشغيلي بدون خلط قص الدولار.</small>
+              </div>
+              <div class="head-actions">
+                <button class="secondary" onclick="calculateClosingPreview()">حساب الفترة</button>
+                <button class="good" onclick="saveAccountingClosing()">حفظ الإغلاق</button>
               </div>
             </div>
-            <div id="cashReports" class="cash-summary-grid"></div>
+            <div class="warning-note">
+              التدوير هنا آمن: رصيد نهاية الفترة يُحفظ كرصيد افتتاحي للفترة التالية داخل تقرير الإغلاق، بدون إنشاء حركة صندوق جديدة حتى لا تتضاعف الأرصدة.
+              قص السوري إلى دولار لا يدخل في الربح التشغيلي؛ يظهر ضمن حركة الصندوق فقط.
+            </div>
+            <div class="form-grid">
+              <div class="field"><label>نوع الإغلاق</label><select id="closingType" onchange="updateClosingPeriodFields();calculateClosingPreview()"><option value="month">إغلاق شهر</option><option value="year">إغلاق سنة</option></select></div>
+              <div class="field"><label>السنة</label><input id="closingYear" type="number" min="2020" max="2100" onchange="calculateClosingPreview()"></div>
+              <div class="field" id="closingMonthField"><label>الشهر</label><select id="closingMonth" onchange="calculateClosingPreview()"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option></select></div>
+              <div class="field"><label>سعر تقييم الدولار وقت الإغلاق</label><input id="closingRate" type="text" inputmode="numeric" placeholder="مثلاً 15000" oninput="calculateClosingPreview()"><div class="field-hint">للتقييم المحاسبي فقط: يحوّل USD إلى SYP في الربح/الخسارة وفرق الجرد، ولا يغيّر الرصيد إلا عند حفظ تسوية الجرد.</div></div>
+              <div class="field"><label>الجرد الفعلي SYP</label><input id="closingActualSyp" type="text" inputmode="numeric" placeholder="اكتب ما عدّيته فعلياً أو اتركه فارغ" oninput="calculateClosingPreview()"><div class="field-hint">هذا الرقم من العد اليدوي للصندوق السوري. إذا تركته فارغاً يعتمد الرصيد المحاسبي.</div></div>
+              <div class="field"><label>الجرد الفعلي USD</label><input id="closingActualUsd" type="text" inputmode="decimal" placeholder="اكتب الدولار الموجود فعلياً أو اتركه فارغ" oninput="calculateClosingPreview()"><div class="field-hint">هذا الرقم من العد اليدوي لصندوق الدولار. إذا تركته فارغاً يعتمد الرصيد المحاسبي.</div></div>
+              <div class="field" style="grid-column:1/-1"><label>ملاحظة الإغلاق</label><textarea id="closingNote" placeholder="اختياري: ملاحظات المدير على الإغلاق"></textarea></div>
+            </div>
+            <div id="closingSummaryGrid" class="kpi-grid" style="margin-top:12px"></div>
+            <div class="form-actions">
+              <button class="secondary" onclick="copyClosingReport()">نسخ تقرير الإغلاق</button>
+              <button class="secondary" onclick="exportClosingExcel()">تصدير Excel</button>
+              <button class="secondary" onclick="resetClosingActuals()">مسح الجرد</button>
+            </div>
+            <div id="closingReportBox" style="margin-top:12px"></div>
+          </div>
+
+          <div class="section">
+            <div class="section-head">
+              <div>
+                <h2>سجل الإغلاقات</h2>
+                <small>الإغلاقات المحفوظة تبقى كنسخة رسمية حتى لو تغيرت السجلات لاحقاً.</small>
+              </div>
+            </div>
+            <div id="closingHistoryBox"></div>
           </div>
         </section>
 
@@ -2036,10 +2069,10 @@ td{
               <div class="field"><label>مبلغ USD</label><input id="officeMoveUsd" type="text" inputmode="decimal" placeholder="مثلاً 1000" oninput="updateOfficeMovePreview()"></div>
               <div class="field" id="officeMoveFeeAmountField"><label>العمولة</label><input id="officeMoveFeeAmount" type="text" inputmode="decimal" placeholder="اختياري" oninput="updateOfficeMovePreview()"></div>
               <div class="field" id="officeMoveFeeCurrencyField"><label>عملة العمولة</label><select id="officeMoveFeeCurrency" onchange="updateOfficeMovePreview()"><option value="SYP">سوري</option><option value="USD">دولار</option></select></div>
-              <div class="field"><label>سعر الصرف</label><input id="officeMoveRate" type="text" inputmode="numeric" placeholder="للتحويل/القص" oninput="updateOfficeMovePreview()"></div>
+              <div class="field" id="officeMoveRateField"><label>سعر الصرف</label><input id="officeMoveRate" type="text" inputmode="numeric" placeholder="للتحويل/القص" oninput="updateOfficeMovePreview()"></div>
               <div class="field" style="grid-column:1/-1"><label>ملاحظات</label><textarea id="officeMoveNote" placeholder="اختياري"></textarea></div>
             </div>
-<div class="office-transfer-preview" style="display:none"></div>
+<div id="officeTransferPreview" class="office-transfer-preview" style="display:none"></div>
             <div class="form-actions"><button class="good" onclick="saveOfficeMove()">حفظ الحركة</button><button class="secondary" onclick="resetOfficeMoveForm()">تفريغ</button></div>
           </div>
 
@@ -2265,24 +2298,32 @@ td{
         try{fn(root||document)}catch(e){console.warn("markNegativeAmounts warning:",e)}
       }
     };
+    const negativeObserver=new MutationObserver(()=>{clearTimeout(window.__negTimer);window.__negTimer=setTimeout(()=>window.__imadMarkNegativeAmounts(document),40)});
+    negativeObserver.observe(document.body,{childList:true,subtree:true,characterData:true});
     window.__negObserverFinal=new MutationObserver(()=>{clearTimeout(window.__negFinalTimer);window.__negFinalTimer=setTimeout(()=>window.__imadMarkNegativeAmounts(document),30)});
     window.__negObserverFinal.observe(document.body,{childList:true,subtree:true,characterData:true});
-
   </script>
 
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, setPersistence, indexedDBLocalPersistence, browserLocalPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
     import { getFirestore, collection, doc, setDoc, getDocs, onSnapshot, serverTimestamp, runTransaction, increment, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
     const firebaseConfig = {apiKey:"AIzaSyA9wiCS89YeXlE3eRO5fNThwsJulxnfrgY",authDomain:"frhad11-fb086.firebaseapp.com",projectId:"frhad11-fb086",storageBucket:"frhad11-fb086.firebasestorage.app",messagingSenderId:"12163224746",appId:"1:12163224746:web:32449165eb2e867c4c6cd3",measurementId:"G-VP7L29R9L9"};
-    const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app),$=id=>document.getElementById(id);const authReady=setPersistence(auth,browserLocalPersistence).catch(e=>{console.warn("Auth persistence warning:",e)});
+    const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app),$=id=>document.getElementById(id);
+    async function configureAuthPersistence(){
+      for(const mode of [indexedDBLocalPersistence,browserLocalPersistence,browserSessionPersistence]){
+        try{await setPersistence(auth,mode);return true}catch(e){console.warn("Auth persistence option failed:",e?.message||e)}
+      }
+      return false;
+    }
+    const authReady=configureAuthPersistence();
     window.__imadFirebaseReady=true;
 
     const delegatesByRegion={"Region 1":["جفان","علي","كاوا","دلخواز","بشار","صالة قامشلو 1","صالة قامشلو 2","صالة عامودا","صالة درباسية","صالة معبدة","صالة ديريك"],"Region 2":["شريف","يوسف","كمال","صالة حسكة 1","صالة حسكة 2","صالة تل تمر","صالة الشدادي"],"Region 3":["جاسم حسو","فرهاد خليل","احمد اومري","صالة الرقة 1","صالة الرقة 2","احمد هنيدي","صالة الطبقة","صالة دير الزور"],"Region 4":["شاهر ابو احمد","عبدو جاسم","صالة منبج","عادل عبدالعزيز","صالة كوباني"]};
     const officesByRegion={"R1":["هوكر تمي ديريك","تبارك رميلان","اسماعيل عبدي","محمد عامودا","شيخاني","عماد تمو","سوار قامشلو","ميداس عامودا","دعدوش درباسية","روهين تربه سبيه","روهين تل تمر","الحديدي تل كوجر","فهد"],"R2":["زين حسكة","سوار حسكة","يارا حسكة","زين 2 حسكة","نورجان حسكة","جاد شداده"],"R3":["العويد للحوالات رقة","الصفا جزرة بوحميد","خريس طبقة","انس العويد","رامي العويد"],"R4":["القصاب منبج","مسرو كوباني","ابو امير منبج"]};
-    let revenues=[],deliveries=[],officeDocs=[],cashboxes=[],cashMoves=[],officeMoves=[],officeCurrencyMode="SYP",officeHubCurrencyMode="ALL",unsubscribers=[];const collapsedDays=new Set();const expandedDetailsDays=new Set();
+    let revenues=[],deliveries=[],officeDocs=[],cashboxes=[],cashMoves=[],officeMoves=[],accountingClosings=[],officeCurrencyMode="SYP",officeHubCurrencyMode="ALL",unsubscribers=[];const collapsedDays=new Set();const expandedDetailsDays=new Set();
     function safeId(text){return String(text).trim().replace(/[^\p{L}\p{N}]+/gu,"_").replace(/^_+|_+$/g,"")}
     const baseDelegates=Object.entries(delegatesByRegion).flatMap(([region,names])=>names.map(name=>({id:safeId(region+"_"+name),name,region,custom:false})));
     const baseOffices=Object.entries(officesByRegion).flatMap(([region,names])=>names.map(name=>({id:safeId(region+"_"+name),name,region,custom:false})));
@@ -2293,7 +2334,8 @@ td{
       allOffices=[...baseOffices,...customOffices.filter(x=>x&&x.name).map(x=>({id:x.id||safeId((x.region||"Custom")+"_"+x.name),name:x.name,region:x.region||"Custom",custom:true}))];
     }
     const transferCashboxes=[
-      {id:"box_farhad",name:"صندوق فرهاد",region:"صندوق",isCashbox:true,isFarhad:true},
+      {id:"box_basic",name:"صندوق أساسي",region:"صندوق",isCashbox:true,isMainBasic:true},
+      {id:"box_farhad",name:"صندوق فرهاد",region:"صندوق",boxId:"farhad",isCashbox:true},
       {id:"box_dilan",name:"صندوق ديلان",region:"صندوق",boxId:"dilan",isCashbox:true},
       {id:"box_koran_masary",name:"صندوق كوران مصاري",region:"صندوق",boxId:"koran_masary",isCashbox:true}
     ];
@@ -2325,7 +2367,7 @@ td{
       const timeout=new Promise((_,reject)=>{timer=setTimeout(()=>reject(new Error(message)),ms)});
       return Promise.race([promise,timeout]).finally(()=>clearTimeout(timer));
     }
-    function clean(v){return String(v??"").replace(/[,\s،٬]/g,"").replace(/\.(?=\d{3}(\D|$))/g,"")}function num(v){const raw=clean(v);if(!raw)return 0;const n=Number(raw);return Number.isFinite(n)?n:0}function fmt(v,c=""){const n=num(v);const shown=(Math.abs(n-Math.round(n))<0.000001?Math.round(n):Number(n.toFixed(2)));const txt=shown.toLocaleString("en-US",{maximumFractionDigits:2})+(c?" "+c:"");return n<0?`<span class="neg-money">${txt}</span>`:txt}function fmtUsd(v){const n=Number(v)||0;const txt=Number(n.toFixed(2)).toLocaleString("en-US")+" USD";return n<0?`<span class="neg-money">${txt}</span>`:txt}function todayString(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`}function getTypeLabel(t){return t==="masary"?"مصاري":t==="ccbs"?"CCBS":t==="private"?"مخصوص":"-"}function getDelegate(n){return allDelegates.find(d=>d.name===n)||null}function getOffice(n){return allOffices.find(o=>o.name===n)||null}function getOfficeBalance(id){const office=allOffices.find(o=>o.id===id)||{};let syp=0,usd=0;for(const d of deliveries){const sameOffice=d.officeId===id||String(d.officeName||"")===String(office.name||"");if(!sameOffice)continue;const n=deliveryNumbers(d);syp+=n.deliveredSyp;usd+=n.deliveredUsd}return{syp,usd}}function getCashbox(id){return cashboxes.find(c=>c.id===id)||{}}function deliveryNumbers(d){
+    function clean(v){return String(v??"").replace(/[,\s،٬]/g,"").replace(/\.(?=\d{3}(\D|$))/g,"")}function num(v){const raw=clean(v);if(!raw)return 0;const n=Number(raw);return Number.isFinite(n)?n:0}function fmt(v,c=""){const n=num(v);const shown=(Math.abs(n-Math.round(n))<0.000001?Math.round(n):Number(n.toFixed(2)));const txt=shown.toLocaleString("en-US",{maximumFractionDigits:2})+(c?" "+c:"");return n<0?`<span class="neg-money">${txt}</span>`:txt}function fmtUsd(v){const n=Number(v)||0;const txt=Number(n.toFixed(2)).toLocaleString("en-US")+" USD";return n<0?`<span class="neg-money">${txt}</span>`:txt}function todayString(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`}function getTypeLabel(t){return t==="masary"?"مصاري":t==="ccbs"?"CCBS":t==="private"?"مخصوص":"-"}function getDelegate(n,region=""){const name=String(n||"").trim();const reg=String(region||"").trim();if(!name)return null;return allDelegates.find(d=>d.name===name&&(!reg||d.region===reg))||allDelegates.find(d=>d.name===name)||null}function getOffice(n){return allOffices.find(o=>o.name===n)||null}function getOfficeBalance(id){const office=allOffices.find(o=>o.id===id)||{};let syp=0,usd=0;for(const d of deliveries){const sameOffice=d.officeId===id||String(d.officeName||"")===String(office.name||"");if(!sameOffice)continue;const n=deliveryNumbers(d);syp+=n.deliveredSyp;usd+=n.deliveredUsd}return{syp,usd}}function getCashbox(id){return cashboxes.find(c=>c.id===id)||{}}function deliveryNumbers(d){
       const mode=d.mode||"direct";
       const rate=num(d.exchangeRate);
       const deliveredSyp=mode==="cut"?0:num(d.deliveredSyp);
@@ -2336,18 +2378,32 @@ td{
       const totalAsSyp=deliveredSyp+cutSyp+(rate>0?directUsd*rate:0);
       return{mode,rate,exchangeRate:rate,deliveredSyp,directUsd,cutSyp,cutUsd,deliveredUsd,totalAsSyp,totalDeliveredAsSyp:totalAsSyp,deliveredUsdAsSyp:rate>0?directUsd*rate:0};
     }
+
     function escapeHTML(v){
       return String(v??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
     }
-    function jsString(v){
-      return String(v??"").replace(/\\/g,"\\\\").replace(/'/g,"\\'").replace(/\r/g,"\\r").replace(/\n/g,"\\n").replace(/\u2028/g,"\\u2028").replace(/\u2029/g,"\\u2029");
-    }
+    function displayText(v,fallback="-"){const t=String(v??"").trim();return escapeHTML(t||fallback)}
+    function displayJoined(values,sep="، "){return [...(values||[])].filter(Boolean).map(v=>escapeHTML(v)).join(sep)||"-"}
+    function jsString(v){return String(v??"").replace(/\\/g,"\\\\").replace(/'/g,"\\'").replace(/\r/g,"\\r").replace(/\n/g,"\\n").replace(/\u2028/g,"\\u2028").replace(/\u2029/g,"\\u2029")}
     function inlineArg(v){return escapeHTML(jsString(v))}
     function optionHTML(value,label){return `<option value="${escapeHTML(value)}">${escapeHTML(label)}</option>`}
-    function displayText(v,fallback="-"){const s=String(v??"").trim();return escapeHTML(s||fallback)}
-    function displayJoined(values,sep="، "){const arr=[...values].filter(Boolean).map(v=>escapeHTML(v));return arr.length?arr.join(sep):"-"}
-    function cutOperationLabel(type){return type==="cut"?"قص فعلي":"دولار مباشر"}
-    function getOfficeMoveDisplayUsd(m){const rate=num(m.exchangeRate),amountSyp=num(m.amountSyp),amountUsd=Number(m.amountUsd||0);return m.type==="office_convert_syp_to_usd"&&amountUsd<=0&&rate>0?amountSyp/rate:amountUsd}
+    function normalizeNameKey(v){return String(v??"").trim().replace(/\s+/g," ").replace(/[إأآا]/g,"ا").replace(/ى/g,"ي").replace(/ة/g,"ه").toLowerCase()}
+    function getSelectedDelegate(prefix){
+      const name=String($(prefix+"Delegate")?.value||"").trim();
+      const region=String($(prefix+"Region")?.value||"").trim();
+      if(!name)return null;
+      return getDelegate(name,region) || allDelegates.find(d=>normalizeNameKey(d.name)===normalizeNameKey(name)&&(!region||d.region===region)) || null;
+    }
+    function sameDelegateRecord(row,delegate){
+      if(!row||!delegate)return false;
+      const rowName=String(row.delegateName||"").trim();
+      const rowId=String(row.delegateId||"").trim();
+      const rowRegion=String(row.region||row.delegateRegion||"").trim();
+      const idOk=rowId&&delegate.id&&rowId===String(delegate.id);
+      const nameOk=normalizeNameKey(rowName)===normalizeNameKey(delegate.name);
+      const regionOk=!rowRegion||!delegate.region||rowRegion===delegate.region;
+      return (idOk&&regionOk) || (nameOk&&regionOk);
+    }
     function delegateRegionList(){
       return [...new Set(allDelegates.map(d=>d.region).filter(Boolean))]
         .sort((a,b)=>String(a).localeCompare(String(b),undefined,{numeric:true}));
@@ -2383,7 +2439,7 @@ td{
     function fillDailyNameFilter(){
       const el=$("nameFilter");if(!el||el.tagName!=="SELECT")return;
       const keep=el.value;
-      el.innerHTML='<option value="">كل المندوبين</option>'+allDelegates.map(d=>optionHTML(d.name,`${d.region} - ${d.name}`)).join("");
+      el.innerHTML='<option value="">كل المندوبين</option>'+allDelegates.map(d=>`<option value="${d.name}">${d.region} - ${d.name}</option>`).join("");
       if([...el.options].some(o=>o.value===keep))el.value=keep;
     }
 
@@ -2396,7 +2452,7 @@ td{
     function fillOfficeMoveRegionFilter(){
       const el=$("officeMoveRegionFilter");if(!el)return;
       const keep=el.value;
-      el.innerHTML='<option value="">كل المناطق</option>'+officeFilterRegions().map(r=>optionHTML(r,r)).join("");
+      el.innerHTML='<option value="">كل المناطق</option>'+officeFilterRegions().map(r=>`<option value="${r}">${r}</option>`).join("");
       if([...el.options].some(o=>o.value===keep))el.value=keep;
     }
 
@@ -2408,7 +2464,7 @@ td{
       fillDelegateSelect("rev");
       fillDelegateSelect("del");
 
-      const os='<option value="">اختر المكتب</option>'+allOffices.map(o=>optionHTML(o.name,`${o.region} - ${o.name}`)).join("");
+      const os='<option value="">اختر المكتب</option>'+allOffices.map(o=>`<option value="${o.name}">${o.region} - ${o.name}</option>`).join("");
       const officeEl=$("delOffice");if(!officeEl)return;
       const keepOffice=officeEl.value;officeEl.innerHTML=os;
       if([...officeEl.options].some(o=>o.value===keepOffice))officeEl.value=keepOffice;
@@ -2500,6 +2556,7 @@ td{
       watch("cashboxes",data=>{cashboxes=data},"تنبيه قراءة الصناديق: ");
       watch("cashboxMovements",data=>{cashMoves=data},"تنبيه قراءة حركة الصندوق: ");
       watch("officeMovements",data=>{officeMoves=data},"تنبيه قراءة حركات المكاتب: ");
+      watch("accountingClosings",data=>{accountingClosings=data},"تنبيه قراءة الإغلاقات: ");
       unsubscribers.push(onSnapshot(collection(db,"customOffices"),s=>{customOffices=s.docs.map(d=>({id:d.id,...d.data()}));scheduleMasterRefresh()},e=>setStatus("تنبيه قراءة المكاتب المضافة: "+e.message)));
       unsubscribers.push(onSnapshot(collection(db,"customDelegates"),s=>{customDelegates=s.docs.map(d=>({id:d.id,...d.data()}));scheduleMasterRefresh()},e=>setStatus("تنبيه قراءة المندوبين المضافين: "+e.message)));
     }
@@ -2512,16 +2569,17 @@ td{
     window.reloadAll=async function(){
       if(!auth.currentUser)return;
       setStatus("");
-      const [r,d,cb,cm,om,co,cd]=await Promise.all([
+      const [r,d,cb,cm,om,ac,co,cd]=await Promise.all([
         readCol("dailyRevenues"),
         readCol("officeDeliveries"),
         readCol("cashboxes"),
         readCol("cashboxMovements"),
         readCol("officeMovements"),
+        readCol("accountingClosings"),
         readCol("customOffices"),
         readCol("customDelegates")
       ]);
-      revenues=r;deliveries=d;cashboxes=cb;cashMoves=cm;officeMoves=om;customOffices=co;customDelegates=cd;
+      revenues=r;deliveries=d;cashboxes=cb;cashMoves=cm;officeMoves=om;accountingClosings=ac;customOffices=co;customDelegates=cd;
       rebuildMasterData();
       fillSelects();
       renderAll();
@@ -2529,7 +2587,7 @@ td{
       setStatus("");
     }
 
-    const cashboxNames={syp_farhad:"صندوق سوري فرهاد",usd_farhad:"صندوق دولار فرهاد"};
+    const cashboxNames={syp_farhad:"صندوق سوري الأساسي",usd_farhad:"صندوق دولار الأساسي"};
     const cashboxCurrency={syp_farhad:"SYP",usd_farhad:"USD"};
 
     const cashMoveDefs={
@@ -2549,8 +2607,8 @@ td{
       convert_usd_to_syp:{label:"تحويل دولار إلى سوري",group:"transfer",category:"custody",box:"usd_farhad",usd:"out",syp:"in",rate:true}
     };
 
-    const cashCategoryLabels={people:"أشخاص",suppliers:"موردين",loans:"سلف",custody:"عهد",expenses:"مصروفات",offices:"مكاتب"};
-    const cashGroupLabels={receive:"قبض",pay:"صرف",expense:"مصروفات",loans:"سلف",transfer:"تحويلات",office:"سحوبات مكاتب"};
+    const cashCategoryLabels={people:"أشخاص",suppliers:"موردين",loans:"سلف",custody:"عهد",expenses:"مصروفات",offices:"مكاتب",adjustment:"تسوية جرد"};
+    const cashGroupLabels={receive:"قبض",pay:"صرف",expense:"مصروفات",loans:"سلف",transfer:"تحويلات",office:"سحوبات مكاتب",closing:"إغلاق"};
     const cashMoveLabels=Object.fromEntries(Object.entries(cashMoveDefs).map(([k,v])=>[k,v.label]));
 
     function moneyFmtByCurrency(value,currency){return currency==="USD"?fmtUsd(value):fmt(value,"SYP")}
@@ -2579,6 +2637,7 @@ td{
 
     function getCashMoveEffect(m){
       if(m.officeLinked)return{syp:num(m.effectSyp),usd:Number(m.effectUsd||0)};
+      if((m.type||"")==="closing_adjustment")return{syp:num(m.effectSyp),usd:Number(m.effectUsd||0)};
       const type=m.type||"opening_syp";
       const def=cashMoveDefs[type];
       if(!def)return getLegacyCashEffect(m);
@@ -2604,13 +2663,13 @@ td{
       return{syp,usd};
     }
 
-    function calcCashboxBalances(excludeId=""){
+    function calcCashboxBalancesFromCashMoves(excludeId=""){
       const b={syp_farhad:0,usd_farhad:0};
       for(const m of cashMoves){
         if(m.id===excludeId)continue;
         const e=getCashMoveEffect(m);
-        b.syp_farhad+=e.syp;
-        b.usd_farhad+=e.usd;
+        b.syp_farhad+=num(e.syp);
+        b.usd_farhad+=Number(e.usd||0);
       }
       return b;
     }
@@ -2809,8 +2868,8 @@ td{
         const after=running[m.id]||{syp:0,usd:0};
         const cat=m.category||cashMoveDefaultCategory(m.type);
         const label=m.label||cashMoveLabel(m.type);
-        const action=m.officeLinked?'<button class="secondary small" onclick="showView(\'office\')">من سجل المكاتب</button>':`<button class="secondary small" onclick="editCashMove('${inlineArg(m.id)}')">تعديل</button><button class="danger small" onclick="deleteCashMove('${inlineArg(m.id)}')">حذف</button>`;
-        const noteText=(m.refNo?("سند: "+displayText(m.refNo)+" - "):"")+displayText(m.note||"-");
+        const action=m.officeLinked?`<button class="secondary small" onclick="showView('office')">من سجل المكاتب</button>`:`<button class="secondary small" onclick="editCashMove('${inlineArg(m.id)}')">تعديل</button><button class="danger small" onclick="deleteCashMove('${inlineArg(m.id)}')">حذف</button>`;
+        const noteText=(m.refNo?(`سند: ${displayText(m.refNo)} - `):"")+displayText(m.note||"-");
         return`<tr><td>${displayText(m.date||"-")}</td><td>${displayText(label)}</td><td>${displayText(m.party||"-")}</td><td>${displayText(cashCategoryLabels[cat]||m.categoryLabel||cat||"-")}</td><td class="ltr">${fmt(e.syp,"SYP")}</td><td class="ltr">${fmtUsd(e.usd)}</td><td class="ltr">${num(m.exchangeRate)?num(m.exchangeRate).toLocaleString("en-US"):"-"}</td><td class="ltr">${fmt(after.syp,"SYP")} / ${fmtUsd(after.usd)}</td><td>${noteText}</td><td>${action}</td></tr>`
       }).join("")}</tbody></table></div>`;
     };
@@ -2882,14 +2941,14 @@ td{
       if($("summaryLoans"))$("summaryLoans").textContent=`${rows.length}`;
       const el=$("loanSummary");if(!el)return;
       if(!rows.length){el.innerHTML='<div class="empty">لا توجد سلف مفتوحة حالياً.</div>';return}
-      el.innerHTML=`<div class="table-wrap"><table><thead><tr><th>الشخص / الاسم</th><th>التصنيف</th><th>سلفة مفتوحة SYP</th><th>سلفة مفتوحة USD</th><th>آخر حركة</th><th>الحالة</th></tr></thead><tbody>${rows.map(x=>`<tr><td>${displayText(x.party)}</td><td>${displayText(cashCategoryLabels[x.category]||x.category)}</td><td class="ltr">${fmt(x.syp,"SYP")}</td><td class="ltr">${fmtUsd(x.usd)}</td><td>${displayText(x.last||"-")}</td><td>${x.syp<0||x.usd<0?"زيادة إرجاع":"مفتوحة"}</td></tr>`).join("")}</tbody></table></div>`;
+      el.innerHTML=`<div class="table-wrap"><table><thead><tr><th>الشخص / الاسم</th><th>التصنيف</th><th>سلفة مفتوحة SYP</th><th>سلفة مفتوحة USD</th><th>آخر حركة</th><th>الحالة</th></tr></thead><tbody>${rows.map(x=>`<tr><td>${x.party}</td><td>${cashCategoryLabels[x.category]||x.category}</td><td class="ltr">${fmt(x.syp,"SYP")}</td><td class="ltr">${fmtUsd(x.usd)}</td><td>${x.last||"-"}</td><td>${x.syp<0||x.usd<0?"زيادة إرجاع":"مفتوحة"}</td></tr>`).join("")}</tbody></table></div>`;
     };
 
     window.copyCashReport=async function(){
       const rows=getFilteredCashRows(),r=calculateCashReports(rows),b=calcCashboxBalances();
       const textReport=`تقرير الصندوق
-صندوق سوري فرهاد: ${fmt(b.syp_farhad,"SYP")}
-صندوق دولار فرهاد: ${fmtUsd(b.usd_farhad)}
+صندوق سوري الأساسي: ${fmt(b.syp_farhad,"SYP")}
+صندوق دولار الأساسي: ${fmtUsd(b.usd_farhad)}
 إجمالي قبض: ${fmt(r.receiveSyp,"SYP")} / ${fmtUsd(r.receiveUsd)}
 إجمالي صرف: ${fmt(r.paySyp,"SYP")} / ${fmtUsd(r.payUsd)}
 إجمالي مصروفات: ${fmt(r.expenseSyp,"SYP")} / ${fmtUsd(r.expenseUsd)}
@@ -2922,6 +2981,302 @@ td{
       );
     };
 
+
+
+    function closingDefaultRate(){
+      const s=calculateSummary();
+      return s.avgRate?Math.round(s.avgRate):0;
+    }
+
+    function initClosingDefaults(){
+      const now=new Date();
+      if($("closingYear")&&!$("closingYear").value)$("closingYear").value=String(now.getFullYear());
+      if($("closingMonth")&&!$("closingMonth").value)$("closingMonth").value=String(now.getMonth()+1);
+      if($("closingRate")&&!$("closingRate").value){
+        const r=closingDefaultRate();
+        if(r>0)$("closingRate").value=String(r);
+      }
+      updateClosingPeriodFields();
+    }
+
+    window.updateClosingPeriodFields=function(){
+      const type=$("closingType")?.value||"month";
+      if($("closingMonthField"))$("closingMonthField").style.display=type==="month"?"flex":"none";
+    };
+
+    function lastDayOfMonth(year,month){return new Date(Number(year),Number(month),0).getDate()}
+    function closingPeriodFromForm(){
+      const type=$("closingType")?.value||"month";
+      const year=Number($("closingYear")?.value)||new Date().getFullYear();
+      const month=Number($("closingMonth")?.value)||1;
+      if(type==="year")return{type,year,month:0,start:`${year}-01-01`,end:`${year}-12-31`,label:`إغلاق سنة ${year}`,key:`year_${year}`};
+      const mm=String(month).padStart(2,"0");
+      const endDay=String(lastDayOfMonth(year,month)).padStart(2,"0");
+      return{type,year,month,start:`${year}-${mm}-01`,end:`${year}-${mm}-${endDay}`,label:`إغلاق شهر ${mm}/${year}`,key:`month_${year}_${mm}`};
+    }
+
+    function rowDateKey(row){return isoDateValue(row?.date||row?.createdDate||row?.day||"")}
+    function inDateRange(date,start,end){return (!start||date>=start)&&(!end||date<=end)}
+
+    function cashLedgerRowsWithEffects(excludeId=""){
+      return allCashLedgerRows()
+        .filter(row=>!excludeId || row.id!==excludeId)
+        .map(row=>({row,date:rowDateKey(row),effect:getCashMoveEffect(row)}))
+        .filter(x=>x.date);
+    }
+
+    function cashBalanceAt(endDate,excludeId=""){
+      const out={syp:0,usd:0};
+      for(const x of cashLedgerRowsWithEffects(excludeId)){
+        if(endDate && x.date>endDate)continue;
+        out.syp+=num(x.effect.syp);
+        out.usd+=Number(x.effect.usd||0);
+      }
+      return out;
+    }
+
+    function cashBalanceBefore(startDate,excludeId=""){
+      const out={syp:0,usd:0};
+      for(const x of cashLedgerRowsWithEffects(excludeId)){
+        if(startDate && x.date>=startDate)continue;
+        out.syp+=num(x.effect.syp);
+        out.usd+=Number(x.effect.usd||0);
+      }
+      return out;
+    }
+
+    function calcPeriodCashBreakdown(start,end,excludeId=""){
+      const rows=cashLedgerRowsWithEffects(excludeId).filter(x=>inDateRange(x.date,start,end));
+      const out={cashInSyp:0,cashInUsd:0,cashOutSyp:0,cashOutUsd:0,expenseSyp:0,expenseUsd:0,paySyp:0,payUsd:0,loanOutSyp:0,loanOutUsd:0,loanReturnSyp:0,loanReturnUsd:0,transferSyp:0,transferUsd:0,netSyp:0,netUsd:0,count:rows.length};
+      for(const x of rows){
+        const m=x.row,e=x.effect,g=m.group||cashMoveGroup(m.type);
+        out.netSyp+=num(e.syp);out.netUsd+=Number(e.usd||0);
+        if(e.syp>0)out.cashInSyp+=e.syp; else out.cashOutSyp+=Math.abs(e.syp);
+        if(e.usd>0)out.cashInUsd+=e.usd; else out.cashOutUsd+=Math.abs(e.usd);
+        if(g==="expense"){out.expenseSyp+=Math.abs(e.syp);out.expenseUsd+=Math.abs(e.usd)}
+        else if(g==="pay"){out.paySyp+=Math.abs(e.syp);out.payUsd+=Math.abs(e.usd)}
+        else if(g==="loans"&&String(m.type||"").includes("loan_out")){out.loanOutSyp+=Math.abs(e.syp);out.loanOutUsd+=Math.abs(e.usd)}
+        else if(g==="loans"&&String(m.type||"").includes("loan_return")){out.loanReturnSyp+=Math.abs(e.syp);out.loanReturnUsd+=Math.abs(e.usd)}
+        else if(g==="transfer"){out.transferSyp+=Math.abs(e.syp);out.transferUsd+=Math.abs(e.usd)}
+      }
+      return out;
+    }
+
+    function calcPeriodRevenue(start,end){
+      let revenueSyp=0,masarySyp=0,ccbsSyp=0,privateSyp=0,count=0;
+      for(const r of revenues){
+        const d=isoDateValue(r.date||"");
+        if(!d||!inDateRange(d,start,end))continue;
+        const a=num(r.revenueSyp);revenueSyp+=a;count++;
+        if(r.revenueType==="masary")masarySyp+=a;
+        else if(r.revenueType==="ccbs")ccbsSyp+=a;
+        else privateSyp+=a;
+      }
+      return{revenueSyp,masarySyp,ccbsSyp,privateSyp,count};
+    }
+
+    function calcPeriodOfficeFees(start,end){
+      let feeSyp=0,feeUsd=0,count=0;
+      for(const m of officeMoves){
+        const d=isoDateValue(m.date||"");
+        if(!d||!inDateRange(d,start,end))continue;
+        const fs=num(m.feeSyp),fu=Number(m.feeUsd||0);
+        if(fs||fu){feeSyp+=fs;feeUsd+=fu;count++}
+      }
+      return{feeSyp,feeUsd,count};
+    }
+
+    function calcOpenLoansAt(end){
+      const map={};
+      for(const m of cashMoves){
+        const d=isoDateValue(m.date||"");
+        if(end&&d&&d>end)continue;
+        if(!String(m.type||"").includes("loan_"))continue;
+        const party=(m.party||"بدون اسم").trim();
+        if(!map[party])map[party]={syp:0,usd:0};
+        const e=getCashMoveEffect(m);
+        if(String(m.type||"").includes("loan_out")){map[party].syp+=Math.abs(e.syp);map[party].usd+=Math.abs(e.usd)}
+        if(String(m.type||"").includes("loan_return")){map[party].syp-=Math.abs(e.syp);map[party].usd-=Math.abs(e.usd)}
+      }
+      const vals=Object.values(map);
+      return{count:vals.filter(x=>Math.abs(x.syp)>0.0001||Math.abs(x.usd)>0.0001).length,syp:vals.reduce((a,x)=>a+x.syp,0),usd:vals.reduce((a,x)=>a+x.usd,0)};
+    }
+
+    function calculateClosingData(){
+      initClosingDefaults();
+      const p=closingPeriodFromForm();
+      const rate=num($("closingRate")?.value);
+      const currentAdjustmentId="closing_adjust_"+p.key;
+      const opening=cashBalanceBefore(p.start,currentAdjustmentId);
+      const ending=cashBalanceAt(p.end,currentAdjustmentId);
+      const cash=calcPeriodCashBreakdown(p.start,p.end,currentAdjustmentId);
+      const rev=calcPeriodRevenue(p.start,p.end);
+      const fees=calcPeriodOfficeFees(p.start,p.end);
+      const loans=calcOpenLoansAt(p.end);
+      const actualSypRaw=String($("closingActualSyp")?.value||"").trim();
+      const actualUsdRaw=String($("closingActualUsd")?.value||"").trim();
+      const actualSyp=actualSypRaw?num(actualSypRaw):ending.syp;
+      const actualUsd=actualUsdRaw?Number(clean(actualUsdRaw)||0):ending.usd;
+      const diffSyp=actualSyp-ending.syp;
+      const diffUsd=actualUsd-ending.usd;
+      const operatingProfitSyp=rev.revenueSyp+fees.feeSyp+(rate>0?fees.feeUsd*rate:0)-cash.expenseSyp-(rate>0?cash.expenseUsd*rate:0);
+      const useActual=(!!actualSypRaw||!!actualUsdRaw);
+      const rollover={syp:useActual?actualSyp:ending.syp,usd:useActual?actualUsd:ending.usd,mode:useActual?"actual_inventory_with_adjustment":"book_balance_snapshot"};
+      return{period:p,rate,currentAdjustmentId,opening,ending,cash,rev,fees,loans,actual:{syp:actualSyp,usd:actualUsd,hasSyp:!!actualSypRaw,hasUsd:!!actualUsdRaw},diff:{syp:diffSyp,usd:diffUsd},rollover,operatingProfitSyp,note:$("closingNote")?.value.trim()||""};
+    }
+
+    function closingCards(data){
+      const c=data.cash,r=data.rev,f=data.fees;
+      return[
+        ["الفترة",`${displayText(data.period.start)} → ${displayText(data.period.end)}`,data.period.label],
+        ["رصيد بداية الفترة",`${fmt(data.opening.syp,"SYP")} / ${fmtUsd(data.opening.usd)}`,"قبل أول يوم بالفترة"],
+        ["إجمالي الإيرادات",fmt(r.revenueSyp,"SYP"),`${r.count} سجل إيراد`],
+        ["إجمالي العمولات",`${fmt(f.feeSyp,"SYP")} / ${fmtUsd(f.feeUsd)}`,"تدخل ضمن الربح التشغيلي"],
+        ["إجمالي المصروفات",`${fmt(c.expenseSyp,"SYP")} / ${fmtUsd(c.expenseUsd)}`,"تنقص الربح التشغيلي"],
+        ["صافي الربح / الخسارة",fmt(data.operatingProfitSyp,"SYP"),data.rate>0?`بسعر تقييم ${data.rate.toLocaleString("en-US")}`:"USD غير مقيم لأن السعر فارغ"],
+        ["رصيد نهاية الفترة",`${fmt(data.ending.syp,"SYP")} / ${fmtUsd(data.ending.usd)}`,"محاسبي قبل تسوية الجرد"],
+        ["فرق الجرد",`${fmt(data.diff.syp,"SYP")} / ${fmtUsd(data.diff.usd)}`,data.actual.hasSyp||data.actual.hasUsd?"تُحفظ كتسوية إذا حفظت الإغلاق":"لم يتم إدخال جرد فعلي"],
+        ["السلف المفتوحة",`${fmt(data.loans.syp,"SYP")} / ${fmtUsd(data.loans.usd)}`,`${data.loans.count} جهة`],
+        ["رصيد التدوير",`${fmt(data.rollover.syp,"SYP")} / ${fmtUsd(data.rollover.usd)}`,data.rollover.mode==="actual_inventory_with_adjustment"?"حسب الجرد الفعلي":"حسب الرصيد المحاسبي"],
+        ["عدد حركات الصندوق",String(c.count),"ضمن الفترة"]
+      ];
+    }
+
+    window.calculateClosingPreview=function(){
+      if(!$("closingSummaryGrid"))return;
+      const data=calculateClosingData();
+      $("closingSummaryGrid").innerHTML=closingCards(data).map(x=>`<div class="card"><div class="label">${x[0]}</div><div class="value">${x[1]}</div><div class="sub">${x[2]}</div></div>`).join("");
+      const c=data.cash,r=data.rev,f=data.fees;
+      $("closingReportBox").innerHTML=`<div class="table-wrap"><table><thead><tr><th>البند</th><th>SYP</th><th>USD</th><th>ملاحظة</th></tr></thead><tbody>
+        <tr><td>رصيد البداية</td><td class="ltr">${fmt(data.opening.syp,"SYP")}</td><td class="ltr">${fmtUsd(data.opening.usd)}</td><td>قبل ${displayText(data.period.start)}</td></tr>
+        <tr><td>حركة قبض داخل الفترة</td><td class="ltr">${fmt(c.cashInSyp,"SYP")}</td><td class="ltr">${fmtUsd(c.cashInUsd)}</td><td>كل الداخل للصندوق</td></tr>
+        <tr><td>حركة صرف داخل الفترة</td><td class="ltr">${fmt(c.cashOutSyp,"SYP")}</td><td class="ltr">${fmtUsd(c.cashOutUsd)}</td><td>كل الخارج من الصندوق</td></tr>
+        <tr><td>الإيرادات التشغيلية</td><td class="ltr">${fmt(r.revenueSyp,"SYP")}</td><td class="ltr">-</td><td>مصاري/CCBS/مخصوص</td></tr>
+        <tr><td>عمولات المكاتب</td><td class="ltr">${fmt(f.feeSyp,"SYP")}</td><td class="ltr">${fmtUsd(f.feeUsd)}</td><td>تدخل بالربح</td></tr>
+        <tr><td>المصروفات التشغيلية</td><td class="ltr">${fmt(c.expenseSyp,"SYP")}</td><td class="ltr">${fmtUsd(c.expenseUsd)}</td><td>تنقص الربح</td></tr>
+        <tr><td>صرف غير مصنف كمصروف</td><td class="ltr">${fmt(c.paySyp,"SYP")}</td><td class="ltr">${fmtUsd(c.payUsd)}</td><td>لا يدخل بالربح حتى تصنفه كمصروف</td></tr>
+        <tr><td>السلف المعطاة</td><td class="ltr">${fmt(c.loanOutSyp,"SYP")}</td><td class="ltr">${fmtUsd(c.loanOutUsd)}</td><td>ذمة لا تعتبر خسارة</td></tr>
+        <tr><td>السلف الراجعة</td><td class="ltr">${fmt(c.loanReturnSyp,"SYP")}</td><td class="ltr">${fmtUsd(c.loanReturnUsd)}</td><td>رجوع ذمة لا يعتبر ربح</td></tr>
+        <tr><td>رصيد النهاية المحسوب</td><td class="ltr">${fmt(data.ending.syp,"SYP")}</td><td class="ltr">${fmtUsd(data.ending.usd)}</td><td>محاسبي قبل التسوية</td></tr>
+        <tr><td>الجرد الفعلي</td><td class="ltr">${fmt(data.actual.syp,"SYP")}</td><td class="ltr">${fmtUsd(data.actual.usd)}</td><td>${data.actual.hasSyp||data.actual.hasUsd?"مدخل يدوياً":"مساوي للمحاسبي"}</td></tr>
+        <tr><td>فرق الصندوق</td><td class="ltr">${fmt(data.diff.syp,"SYP")}</td><td class="ltr">${fmtUsd(data.diff.usd)}</td><td>فعلي - محسوب، ويُسجل كتسوية عند الحفظ</td></tr>
+        <tr><td>رصيد التدوير</td><td class="ltr">${fmt(data.rollover.syp,"SYP")}</td><td class="ltr">${fmtUsd(data.rollover.usd)}</td><td>${data.rollover.mode==="actual_inventory_with_adjustment"?"حسب الجرد الفعلي":"حسب الرصيد المحاسبي"}</td></tr>
+      </tbody></table></div>`;
+      renderClosingHistory();
+    };
+
+    window.resetClosingActuals=function(){
+      if($("closingActualSyp"))$("closingActualSyp").value="";
+      if($("closingActualUsd"))$("closingActualUsd").value="";
+      calculateClosingPreview();
+    };
+
+    window.saveAccountingClosing=async function(){
+      try{
+        if(!auth.currentUser)return;
+        const data=calculateClosingData();
+        const existing=accountingClosings.find(x=>x.id===data.period.key);
+        if(existing&&!confirm("يوجد إغلاق محفوظ لهذه الفترة. هل تريد تحديثه؟"))return;
+        await setDoc(doc(db,"accountingClosings",data.period.key),{
+          id:data.period.key,
+          periodKey:data.period.key,
+          periodType:data.period.type,
+          periodLabel:data.period.label,
+          year:data.period.year,
+          month:data.period.month,
+          startDate:data.period.start,
+          endDate:data.period.end,
+          closeRate:data.rate,
+          opening:data.opening,
+          ending:data.ending,
+          cash:data.cash,
+          revenue:data.rev,
+          fees:data.fees,
+          loans:data.loans,
+          actual:data.actual,
+          difference:data.diff,
+          operatingProfitSyp:data.operatingProfitSyp,
+          rollover:{nextOpeningSyp:data.rollover.syp,nextOpeningUsd:data.rollover.usd,mode:data.rollover.mode},
+          note:data.note,
+          createdBy:auth.currentUser.uid,
+          updatedAt:serverTimestamp(),
+          ...(existing?{}:{createdAt:serverTimestamp()})
+        },{merge:true});
+
+        const needsAdjustment=(data.actual.hasSyp||data.actual.hasUsd)&&(Math.abs(data.diff.syp)>0.0001||Math.abs(data.diff.usd)>0.0001);
+        const adjustmentRef=doc(db,"cashboxMovements",data.currentAdjustmentId);
+        if(needsAdjustment){
+          await setDoc(adjustmentRef,{
+            id:data.currentAdjustmentId,
+            type:"closing_adjustment",
+            label:"تسوية فرق جرد الإغلاق",
+            group:"closing",
+            category:"adjustment",
+            categoryLabel:"تسوية جرد",
+            date:data.period.end,
+            party:data.period.label,
+            amountSyp:Math.abs(data.diff.syp),
+            amountUsd:Math.abs(data.diff.usd),
+            effectSyp:data.diff.syp,
+            effectUsd:data.diff.usd,
+            exchangeRate:data.rate,
+            refNo:data.period.key,
+            note:"تسوية تلقائية من الإغلاق: فعلي - محاسبي",
+            closingPeriodKey:data.period.key,
+            officeLinked:false,
+            createdBy:auth.currentUser.uid,
+            updatedAt:serverTimestamp(),
+            createdAt:serverTimestamp()
+          },{merge:true});
+        }else{
+          try{await deleteDoc(adjustmentRef)}catch(_){/* لا توجد تسوية سابقة */}
+        }
+        toast("تم حفظ الإغلاق والتدوير مع تسوية الجرد عند الحاجة.","success");
+        await reloadAll();
+      }catch(e){setStatus("فشل حفظ الإغلاق: "+e.message)}
+    };
+
+    function closingReportText(data){
+      return `${data.period.label}\nمن ${data.period.start} إلى ${data.period.end}\nرصيد بداية: ${fmt(data.opening.syp,"SYP")} / ${fmtUsd(data.opening.usd)}\nإيرادات: ${fmt(data.rev.revenueSyp,"SYP")}\nعمولات: ${fmt(data.fees.feeSyp,"SYP")} / ${fmtUsd(data.fees.feeUsd)}\nمصروفات: ${fmt(data.cash.expenseSyp,"SYP")} / ${fmtUsd(data.cash.expenseUsd)}\nصافي ربح/خسارة تشغيلي: ${fmt(data.operatingProfitSyp,"SYP")}\nرصيد نهاية: ${fmt(data.ending.syp,"SYP")} / ${fmtUsd(data.ending.usd)}\nفرق الجرد: ${fmt(data.diff.syp,"SYP")} / ${fmtUsd(data.diff.usd)}\nالتدوير: رصيد النهاية هو افتتاح الفترة التالية بدون حركة مضاعفة.`.replace(/<[^>]*>/g,"");
+    }
+
+    window.copyClosingReport=async function(){
+      const data=calculateClosingData();
+      try{await navigator.clipboard.writeText(closingReportText(data));toast("تم نسخ تقرير الإغلاق.","success")}catch(e){setStatus("لم أقدر أنسخ تقرير الإغلاق.")}
+    };
+
+    window.exportClosingExcel=function(){
+      const data=calculateClosingData();
+      const rows=[
+        ["نوع الإغلاق",data.period.label,"",""],
+        ["من",data.period.start,"إلى",data.period.end],
+        ["سعر التقييم",data.rate,"",""],
+        ["رصيد البداية",Math.round(data.opening.syp),Number(data.opening.usd||0).toFixed(2),"قبل الفترة"],
+        ["إيرادات",Math.round(data.rev.revenueSyp),"","تشغيلي"],
+        ["عمولات",Math.round(data.fees.feeSyp),Number(data.fees.feeUsd||0).toFixed(2),"تشغيلي"],
+        ["مصروفات",Math.round(data.cash.expenseSyp),Number(data.cash.expenseUsd||0).toFixed(2),"تشغيلي"],
+        ["صافي ربح/خسارة",Math.round(data.operatingProfitSyp),"","SYP"],
+        ["رصيد النهاية",Math.round(data.ending.syp),Number(data.ending.usd||0).toFixed(2),"محاسبي"],
+        ["الجرد الفعلي",Math.round(data.actual.syp),Number(data.actual.usd||0).toFixed(2),"فعلي"],
+        ["فرق الجرد",Math.round(data.diff.syp),Number(data.diff.usd||0).toFixed(2),"فعلي - محاسبي"],
+        ["رصيد التدوير",Math.round(data.rollover.syp),Number(data.rollover.usd||0).toFixed(2),data.rollover.mode]
+      ];
+      downloadExcelTable("accounting_closing_"+data.period.key,"الإغلاق والمحاسبة",["البند","SYP","USD","ملاحظة"],rows);
+    };
+
+    function renderClosingHistory(){
+      const el=$("closingHistoryBox");if(!el)return;
+      const rows=[...accountingClosings].sort((a,b)=>String(b.endDate||"").localeCompare(String(a.endDate||"")));
+      if(!rows.length){el.innerHTML='<div class="empty">لا توجد إغلاقات محفوظة حتى الآن.</div>';return}
+      el.innerHTML=`<div class="table-wrap"><table><thead><tr><th>الفترة</th><th>من</th><th>إلى</th><th>ربح/خسارة</th><th>رصيد نهاية SYP</th><th>رصيد نهاية USD</th><th>فرق الجرد</th><th>ملاحظة</th></tr></thead><tbody>${rows.map(x=>`<tr><td>${displayText(x.periodLabel||x.id)}</td><td>${displayText(x.startDate)}</td><td>${displayText(x.endDate)}</td><td class="ltr">${fmt(x.operatingProfitSyp,"SYP")}</td><td class="ltr">${fmt(x.ending?.syp,"SYP")}</td><td class="ltr">${fmtUsd(x.ending?.usd)}</td><td class="ltr">${fmt(x.difference?.syp,"SYP")} / ${fmtUsd(x.difference?.usd)}</td><td>${displayText(x.note||"-")}</td></tr>`).join("")}</tbody></table></div>`;
+    }
+
+    function renderClosingSection(){
+      if(!$("closingSummaryGrid"))return;
+      initClosingDefaults();
+      calculateClosingPreview();
+    }
+
     function calculateSummary(){
       const s={totalRevenueSyp:0,masarySyp:0,ccbsSyp:0,cutSyp:0,cutUsd:0,officeCutSyp:0,officeCutUsd:0,rateWeightedSum:0,rateWeight:0,sypFarhad:0,usdFarhad:0};
       revenues.forEach(r=>{
@@ -2936,6 +3291,7 @@ td{
         const actualCutUsd=Number(n.cutUsd||0);
         const directUsdAsSyp=num(n.deliveredUsdAsSyp);
         const directUsd=Number(n.directUsd||0);
+        // الإجمالي يظهر القص الفعلي + الدولار المباشر، لكن متوسط الصرف يعتمد على القص الفعلي فقط.
         s.cutSyp+=actualCutSyp+directUsdAsSyp;
         s.cutUsd+=actualCutUsd+directUsd;
         if(n.rate>0 && actualCutSyp>0){s.rateWeightedSum+=n.rate*actualCutSyp;s.rateWeight+=actualCutSyp}
@@ -2966,15 +3322,15 @@ td{
         ["إجمالي قص السوري",fmt(s.totalCutSyp,"SYP"),`مندوبون: ${fmt(s.cutSyp)} — مكاتب: ${fmt(s.officeCutSyp)}`],
         ["إجمالي قص الدولار",fmtUsd(s.totalCutUsd),`مندوبون: ${fmtUsd(s.cutUsd)} — مكاتب: ${fmtUsd(s.officeCutUsd)}`],
         ["سعر الصرف الوسطي",s.avgRate?Math.round(s.avgRate).toLocaleString("en-US"):"0","رقم سعر فقط"],
-        ["رصيد سوري فرهاد",fmt(s.sypFarhad,"SYP"),"من الصندوق والحوالات"],
-        ["رصيد دولار فرهاد",fmtUsd(s.usdFarhad),"من الصندوق والحوالات"]
+        ["رصيد سوري",fmt(s.sypFarhad,"SYP"),"من الصندوق الأساسي والحوالات"],
+        ["رصيد دولار",fmtUsd(s.usdFarhad),"من الصندوق الأساسي والحوالات"]
       ];
       $("kpiGrid").innerHTML=cards.map(c=>`<div class="card"><div class="label">${c[0]}</div><div class="value">${c[1]}</div><div class="sub">${c[2]}</div></div>`).join("");
     }
-    function renderCashboxes(){const s=calculateSummary();const el=$("cashboxGrid");if(!el)return;el.innerHTML=`<div class="cash-liquid-card syp-card"><div class="cash-card-title">صندوق سوري فرهاد</div><div class="cash-card-amount">${fmt(s.sypFarhad)}</div><div class="cash-card-currency">SYP</div></div><div class="cash-liquid-card usd-card"><div class="cash-card-title">صندوق دولار فرهاد</div><div class="cash-card-amount">${fmtUsd(s.usdFarhad)}</div><div class="cash-card-currency">USD</div></div>`}
+    function renderCashboxes(){const s=calculateSummary();const el=$("cashboxGrid");if(!el)return;el.innerHTML=`<div class="cash-liquid-card syp-card"><div class="cash-card-title">صندوق سوري الأساسي</div><div class="cash-card-amount">${fmt(s.sypFarhad)}</div><div class="cash-card-currency">SYP</div></div><div class="cash-liquid-card usd-card"><div class="cash-card-title">صندوق دولار الأساسي</div><div class="cash-card-amount">${fmtUsd(s.usdFarhad)}</div><div class="cash-card-currency">USD</div></div>`}
     
 
-    const officeCashboxNames={box_farhad:"صندوق فرهاد",box_dilan:"صندوق ديلان",box_koran_masary:"صندوق كوران مصاري"};
+    const officeCashboxNames={box_basic:"صندوق أساسي",box_farhad:"صندوق فرهاد",box_dilan:"صندوق ديلان",box_koran_masary:"صندوق كوران مصاري"};
     const officeMoveLabels={office_to_office:"تحويل من مكتب إلى مكتب",office_to_cashbox:"تحويل من مكتب إلى صندوق",office_convert_syp_to_usd:"قص رصيد مكتب سوري إلى دولار",office_to_external:"حوالة من مكتب إلى جاري كردستان / خارجي",office_payout:"تصريف من رصيد مكتب لشخص / جهة",office_adjust_plus:"تعديل زيادة رصيد مكتب",office_adjust_minus:"تعديل نقص رصيد مكتب"};
     function officeByIdOrName(id,name){return allOffices.find(o=>o.id===id)||allOffices.find(o=>String(o.name)===String(name||id||""))||null}
     function transferTargetByIdOrName(id,name){
@@ -2983,6 +3339,10 @@ td{
     }
     function normalizeTransferTargetId(id,name){return transferTargetByIdOrName(id,name)?.id||id||name||""}
     function cashboxLabel(id){return officeCashboxNames[id]||cashboxNames?.[id]||id||"-"}
+    function getOfficeMoveDisplayUsd(m){
+      const rate=num(m.exchangeRate),amountSyp=num(m.amountSyp),amountUsd=Number(m.amountUsd||0);
+      return m.type==="office_convert_syp_to_usd"&&amountUsd<=0&&rate>0?amountSyp/rate:amountUsd;
+    }
 
     function escExcel(v){
       return String(v??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;");
@@ -3077,7 +3437,7 @@ td{
 
       function addCashboxEffect(target,syp=0,usd=0){
         if(!target)return;
-        if(target.isFarhad){
+        if(target.isMainBasic){
           addEffect(cashboxEffects,"syp_farhad",syp,0);
           addEffect(cashboxEffects,"usd_farhad",0,usd);
         }else{
@@ -3117,12 +3477,23 @@ td{
       for(const m of officeMoves){const e=getOfficeMoveEffect(m).officeEffects[id];if(e){syp+=e.syp;usd+=e.usd}}
       return{syp,usd};
     }
-    const _baseCalcCashboxBalances=calcCashboxBalances;
-    calcCashboxBalances=function(excludeId=""){const b=_baseCalcCashboxBalances(excludeId);for(const m of officeMoves){if(m.id===excludeId)continue;const ce=getOfficeMoveEffect(m).cashboxEffects;for(const [box,e] of Object.entries(ce)){if(box==="syp_farhad")b.syp_farhad=(b.syp_farhad||0)+num(e.syp);else if(box==="usd_farhad")b.usd_farhad=(b.usd_farhad||0)+Number(e.usd||0)}}return b}
+    function calcCashboxBalances(excludeId=""){
+      const b=calcCashboxBalancesFromCashMoves(excludeId);
+      for(const m of officeMoves){
+        if(m.id===excludeId)continue;
+        const ce=getOfficeMoveEffect(m).cashboxEffects;
+        for(const [box,e] of Object.entries(ce)){
+          if(box==="syp_farhad")b.syp_farhad=(b.syp_farhad||0)+num(e.syp);
+          else if(box==="usd_farhad")b.usd_farhad=(b.usd_farhad||0)+Number(e.usd||0);
+        }
+      }
+      return b;
+    }
     function getOfficeTransferCashboxBalances(){
       const main=calcCashboxBalances();
       const map={
-        box_farhad:{syp:num(main.syp_farhad),usd:Number(main.usd_farhad||0)},
+        box_basic:{syp:num(main.syp_farhad),usd:Number(main.usd_farhad||0)},
+        box_farhad:{syp:0,usd:0},
         box_dilan:{syp:0,usd:0},
         box_koran_masary:{syp:0,usd:0}
       };
@@ -3137,7 +3508,7 @@ td{
       }
       return map;
     }
-    function renderDashboardCashboxes(){return}
+    function renderDashboardCashboxes(){renderKpis();if(currentView==="dashboard")renderOffices()}
     function fillOfficeMoveSelects(){
       const targetOptions='<option value="">اختر المكتب / الصندوق</option>'+officeTransferTargets().map(o=>optionHTML(o.id,`${o.region} - ${o.name}`)).join("");
       ["officeFromOffice","officeToOffice"].forEach(id=>{const el=$(id);if(!el)return;const keep=el.value;el.innerHTML=targetOptions;if([...el.options].some(o=>o.value===keep))el.value=keep});
@@ -3156,7 +3527,7 @@ td{
         seen.add(id);
         list.push(o);
       });
-      el.innerHTML='<option value="">كل المكاتب والصناديق</option>'+list.map(o=>optionHTML(o.id,`${o.region} - ${o.name}`)).join("");
+      el.innerHTML='<option value="">كل المكاتب والصناديق</option>'+list.map(o=>`<option value="${o.id}">${o.region} - ${o.name}</option>`).join("");
       if([...el.options].some(o=>o.value===keep))el.value=keep;else el.value="";
     }
 
@@ -3189,9 +3560,10 @@ td{
       const t=transferTargetById(targetId);
       const out=new Set();
       [targetId,t?.id,t?.name,t?.boxId].forEach(v=>{if(v)out.add(normKey(v))});
-      if(t?.isFarhad){
-        ["صندوق فرهاد","صندوق سوري فرهاد","صندوق دولار فرهاد","syp_farhad","usd_farhad","box_farhad"].forEach(v=>out.add(normKey(v)));
+      if(t?.isMainBasic||targetId==="box_basic"){
+        ["صندوق أساسي","صندوق سوري الأساسي","صندوق دولار الأساسي","syp_farhad","usd_farhad","box_basic"].forEach(v=>out.add(normKey(v)));
       }
+      if(t?.boxId==="farhad"||targetId==="box_farhad")["صندوق فرهاد","farhad","box_farhad"].forEach(v=>out.add(normKey(v)));
       if(t?.boxId==="dilan"||targetId==="box_dilan")["صندوق ديلان","dilan","box_dilan"].forEach(v=>out.add(normKey(v)));
       if(t?.boxId==="koran_masary"||targetId==="box_koran_masary")["صندوق كوران مصاري","كوران مصاري","koran_masary","box_koran_masary"].forEach(v=>out.add(normKey(v)));
       return out;
@@ -3228,7 +3600,7 @@ td{
       if(boxWrap){
         boxWrap.innerHTML=transferCashboxes.map(x=>{
           const b=boxBalances[x.id]||{syp:0,usd:0};
-          return`<div class="office-cashbox-card"><div class="box-name">${displayText(x.name)}</div><div class="box-tag">صندوق ضمن رصيد المكاتب والحوالات</div><div class="box-balance">${fmt(b.syp,"SYP")} / ${fmtUsd(b.usd)}</div></div>`;
+          return`<div class="office-cashbox-card"><div class="box-name">${x.name}</div><div class="box-tag">صندوق ضمن رصيد المكاتب والحوالات</div><div class="box-balance">${fmt(b.syp,"SYP")} / ${fmtUsd(b.usd)}</div></div>`;
         }).join("");
       }
       el.innerHTML=allOffices.map(o=>{
@@ -3237,10 +3609,9 @@ td{
         if(officeHubCurrencyMode==="SYP")body=`<div class="office-hub-amount">${fmt(b.syp,"SYP")}</div>`;
         else if(officeHubCurrencyMode==="USD")body=`<div class="office-hub-amount">${fmtUsd(b.usd)}</div>`;
         else body=`<div class="office-hub-dual"><div><span>SYP</span><b>${fmt(b.syp)}</b></div><div><span>USD</span><b>${fmtUsd(b.usd)}</b></div></div>`;
-        return`<div class="office-hub-card" onclick="showOfficeDetails('${inlineArg(o.id)}')"><div class="office-hub-name">${displayText(o.name)}</div><div class="office-hub-region">${displayText(o.region)}</div>${body}</div>`;
+        return`<div class="office-hub-card" onclick="showOfficeDetails('${o.id}')"><div class="office-hub-name">${o.name}</div><div class="office-hub-region">${o.region}</div>${body}</div>`;
       }).join("");
     }
-
     function toggleField(id,show){const el=$(id);if(el)el.style.display=show?"":"none"}
     function readOfficeFeeParts(){const feeAmount=num($("officeMoveFeeAmount")?.value);const feeCurrency=$("officeMoveFeeCurrency")?.value||"SYP";return feeCurrency==="USD"?{feeSyp:0,feeUsd:feeAmount}:{feeSyp:feeAmount,feeUsd:0}}
     const officeMoveModeRules={
@@ -3253,23 +3624,27 @@ td{
       office_adjust_minus:{from:true,amountSyp:true,amountUsd:true}
     };
     function officeMoveUses(type){return officeMoveModeRules[type]||officeMoveModeRules.office_to_office}
-    function officeEffectHasValue(effectMap){
-      return Object.values(effectMap||{}).some(e=>Math.abs(num(e.syp))>0.0001||Math.abs(Number(e.usd||0))>0.0001);
-    }
+    function officeEffectHasValue(effectMap){return Object.values(effectMap||{}).some(e=>Math.abs(num(e.syp))>0.0001||Math.abs(Number(e.usd||0))>0.0001)}
     function validateOfficeMove(m){
       const uses=officeMoveUses(m.type);
       if(uses.from&&!m.fromOfficeId)return "اختر مكتب/صندوق المصدر.";
       if(uses.to&&!m.toOfficeId)return "اختر مكتب/صندوق الوجهة.";
+      if((m.amountSyp<0)||(m.amountUsd<0)||(m.feeSyp<0)||(m.feeUsd<0))return "لا تستخدم أرقام سالبة في حقول الحركة. اختر نوع الحركة الصحيح.";
+      if(m.exchangeRate<0)return "سعر الصرف لا يمكن أن يكون سالباً.";
       if(m.type==="office_to_office"){
         if(isCashboxTarget(m.fromOfficeId)||isCashboxTarget(m.toOfficeId))return "تحويل مكتب لمكتب يحتاج مكتبين، وليس صندوق.";
         if(m.fromOfficeId===m.toOfficeId)return "لا يمكن تحويل المكتب إلى نفسه.";
       }
-      if(m.type==="office_to_cashbox"&&!isCashboxTarget(m.toOfficeId))return "اختر صندوقاً كوجهة لهذه الحركة.";
+      if(m.type==="office_to_cashbox"){
+        if(isCashboxTarget(m.fromOfficeId))return "مصدر تحويل مكتب إلى صندوق يجب أن يكون مكتباً.";
+        if(!isCashboxTarget(m.toOfficeId))return "اختر صندوقاً كوجهة لهذه الحركة.";
+      }
       if(m.type==="office_convert_syp_to_usd"){
+        if(isCashboxTarget(m.fromOfficeId))return "قص رصيد مكتب يحتاج مكتباً، وليس صندوق.";
         if(m.amountSyp<=0)return "اكتب المبلغ السوري المراد قصه.";
-        if(m.exchangeRate<=0)return "اكتب سعر الصرف لقص المكتب.";
-      }else if(m.amountSyp<=0&&m.amountUsd<=0){
-        return "اكتب مبلغ SYP أو USD.";
+        if(m.exchangeRate<=0)return "اكتب سعر صرف موجب لقص المكتب.";
+      }else if(m.amountSyp<=0&&m.amountUsd<=0&&m.feeSyp<=0&&m.feeUsd<=0){
+        return "اكتب مبلغ SYP أو USD أو عمولة.";
       }
       const effects=getOfficeMoveEffect(m);
       if(!officeEffectHasValue(effects.officeEffects)&&!officeEffectHasValue(effects.cashboxEffects))return "هذه الحركة لا تؤثر على أي رصيد. راجع المكتب أو الصندوق.";
@@ -3277,15 +3652,28 @@ td{
     }
     function updateOfficeMoveMode(){
       const type=$("officeMoveType")?.value||"office_to_office";
-      toggleField("officeFromOfficeField",["office_to_office","office_to_cashbox","office_convert_syp_to_usd","office_to_external","office_payout","office_adjust_minus"].includes(type));
-      toggleField("officeToOfficeField",["office_to_office","office_to_cashbox","office_adjust_plus"].includes(type));
-      toggleField("officeMovePartyField",["office_to_external","office_payout"].includes(type));
-      toggleField("officeMoveRateField",["office_convert_syp_to_usd"].includes(type));
-      toggleField("officeMoveFeeAmountField",["office_to_office","office_to_cashbox","office_to_external","office_payout"].includes(type));
-      toggleField("officeMoveFeeCurrencyField",["office_to_office","office_to_cashbox","office_to_external","office_payout"].includes(type));
+      const uses=officeMoveUses(type);
+      toggleField("officeFromOfficeField",!!uses.from);
+      toggleField("officeToOfficeField",!!uses.to);
+      toggleField("officeMovePartyField",!!uses.party);
+      toggleField("officeMoveRateField",!!uses.rate);
+      toggleField("officeMoveFeeAmountField",!!uses.fee);
+      toggleField("officeMoveFeeCurrencyField",!!uses.fee);
     }
     window.updateOfficeMoveMode=updateOfficeMoveMode;
-    window.updateOfficeMovePreview=function(){return}
+    window.updateOfficeMovePreview=function(){
+      const el=$("officeTransferPreview");
+      if(!el)return;
+      const m=readOfficeMoveForm();
+      const effects=getOfficeMoveEffect(m);
+      const officeLines=Object.entries(effects.officeEffects||{}).map(([id,e])=>`<div class="calc-item"><b>${displayText(targetDisplayName(id))}</b><span>${fmt(e.syp,"SYP")} / ${fmtUsd(e.usd)}</span></div>`);
+      const cashLines=Object.entries(effects.cashboxEffects||{}).map(([id,e])=>`<div class="calc-item"><b>${displayText(cashboxLabel(id))}</b><span>${fmt(e.syp,"SYP")} / ${fmtUsd(e.usd)}</span></div>`);
+      const validation=validateOfficeMove(m);
+      const lines=[...officeLines,...cashLines];
+      el.style.display=lines.length||validation?"grid":"none";
+      el.innerHTML=(validation?`<div class="calc-item"><b>تنبيه</b><span>${displayText(validation)}</span></div>`:"")+lines.join("");
+      markNegativeAmounts(el);
+    };
     function readOfficeMoveForm(includeId=true){
       const type=$("officeMoveType")?.value||"office_to_office";
       const uses=officeMoveUses(type);
@@ -3308,8 +3696,20 @@ td{
         note:$("officeMoveNote")?.value.trim()||""
       }
     }
-
-    window.saveOfficeMove=async function(){try{if(!auth.currentUser)return;const m=readOfficeMoveForm();const validation=validateOfficeMove(m);if(validation)return setStatus(validation);const ref=m.id?doc(db,"officeMovements",m.id):doc(collection(db,"officeMovements"));const from=targetDisplayName(m.fromOfficeId)||"",to=targetDisplayName(m.toOfficeId)||"";await setDoc(ref,{...m,id:ref.id,label:officeMoveLabels[m.type]||m.type,fromOfficeName:from,toOfficeName:to,fromCashboxName:"",toCashboxName:"",createdBy:auth.currentUser.uid,updatedAt:serverTimestamp(),...(m.id?{}:{createdAt:serverTimestamp()})},{merge:true});resetOfficeMoveForm();renderOfficeHub();renderOfficeLog();renderOfficeReports();renderDashboardCashboxes();renderCashboxes()}catch(e){setStatus("فشل حفظ حركة المكتب: "+e.message)}}
+    window.saveOfficeMove=async function(){
+      try{
+        if(!auth.currentUser)return;
+        const m=readOfficeMoveForm();
+        const validation=validateOfficeMove(m);
+        if(validation)return setStatus(validation);
+        const ref=m.id?doc(db,"officeMovements",m.id):doc(collection(db,"officeMovements"));
+        const from=targetDisplayName(m.fromOfficeId)||"",to=targetDisplayName(m.toOfficeId)||"";
+        const payload={...m,id:ref.id,label:officeMoveLabels[m.type]||m.type,fromOfficeName:from,toOfficeName:to,fromCashboxName:"",toCashboxName:"",createdBy:auth.currentUser.uid,updatedAt:serverTimestamp(),...(m.id?{}:{createdAt:serverTimestamp()})};
+        if(m.type==="office_convert_syp_to_usd"&&m.amountUsd<=0&&m.exchangeRate>0)payload.amountUsd=m.amountSyp/m.exchangeRate;
+        await setDoc(ref,payload,{merge:true});
+        resetOfficeMoveForm();renderOfficeHub();renderOfficeLog();renderOfficeReports();renderCashboxes();
+      }catch(e){setStatus("فشل حفظ حركة المكتب: "+e.message)}
+    }
     window.resetOfficeMoveForm=function(){
       if(!$("editingOfficeMoveId"))return;
       $("editingOfficeMoveId").value="";
@@ -3319,6 +3719,7 @@ td{
       ["officeMoveParty","officeMoveSyp","officeMoveUsd","officeMoveFeeAmount","officeMoveRate","officeMoveNote"].forEach(id=>{if($(id))$(id).value=""});
       if($("officeMoveFeeCurrency"))$("officeMoveFeeCurrency").value="SYP";
       updateOfficeMoveMode();
+      updateOfficeMovePreview();
     }
     window.editOfficeMove=function(id){
       const m=officeMoves.find(x=>x.id===id);if(!m)return;
@@ -3335,6 +3736,7 @@ td{
       $("officeMoveRate").value=num(m.exchangeRate)||"";
       $("officeMoveNote").value=m.note||"";
       updateOfficeMoveMode();
+      updateOfficeMovePreview();
     }
     window.deleteOfficeMove=async function(id){try{if(!confirm("حذف حركة المكتب؟ سيتم إعادة حساب الأرصدة من السجل."))return;await deleteDoc(doc(db,"officeMovements",id));renderOfficeHub();renderOfficeLog();renderOfficeReports();renderDashboardCashboxes();renderCashboxes()}catch(e){setStatus("فشل حذف حركة المكتب: "+e.message)}}
     function getFilteredOfficeMoves(){
@@ -3358,8 +3760,12 @@ td{
       officeLogRenderTimer=setTimeout(()=>renderOfficeLog(),0);
     };
 
-    function renderOfficeLog(){const el=$("officeMovementLog");if(!el)return;const rows=getFilteredOfficeMoves();if(!rows.length){el.innerHTML='<div class="empty">لا توجد حركات مكاتب حالياً.</div>';return}el.innerHTML=`<div class="table-wrap"><table><thead><tr><th>التاريخ</th><th>العملية</th><th>من</th><th>إلى</th><th>الاسم</th><th>SYP</th><th>USD</th><th>عمولة</th><th>سعر الصرف</th><th>سند/ملاحظات</th><th>إجراء</th></tr></thead><tbody>${rows.map(m=>{const usd=getOfficeMoveDisplayUsd(m);return `<tr><td>${displayText(m.date||"-")}</td><td>${displayText(officeMoveLabels[m.type]||m.type)}</td><td>${displayText(m.fromOfficeName||m.fromCashboxName||targetDisplayName(m.fromOfficeId)||"-")}</td><td>${displayText(m.toOfficeName||m.toCashboxName||targetDisplayName(m.toOfficeId)||"-")}</td><td>${displayText(m.party||"-")}</td><td class="ltr">${fmt(m.amountSyp,"SYP")}</td><td class="ltr">${fmtUsd(usd)}</td><td class="ltr">${num(m.feeUsd)>0?fmtUsd(m.feeUsd):fmt(m.feeSyp,"SYP")}</td><td class="ltr">${num(m.exchangeRate)?num(m.exchangeRate).toLocaleString("en-US"):"-"}</td><td>${displayText(m.note||"-")}</td><td><button class="secondary small" onclick="editOfficeMove('${inlineArg(m.id)}')">تعديل</button><button class="danger small" onclick="deleteOfficeMove('${inlineArg(m.id)}')">حذف</button></td></tr>`}).join("")}</tbody></table></div>`}
-
+    function renderOfficeLog(){
+      const el=$("officeMovementLog");if(!el)return;
+      const rows=getFilteredOfficeMoves();
+      if(!rows.length){el.innerHTML='<div class="empty">لا توجد حركات مكاتب حالياً.</div>';return}
+      el.innerHTML=`<div class="table-wrap"><table><thead><tr><th>التاريخ</th><th>العملية</th><th>من</th><th>إلى</th><th>الاسم</th><th>SYP</th><th>USD</th><th>عمولة</th><th>سعر الصرف</th><th>سند/ملاحظات</th><th>إجراء</th></tr></thead><tbody>${rows.map(m=>`<tr><td>${displayText(m.date||"-")}</td><td>${displayText(officeMoveLabels[m.type]||m.type)}</td><td>${displayText(m.fromOfficeName||m.fromCashboxName||targetDisplayName(m.fromOfficeId)||"-")}</td><td>${displayText(m.toOfficeName||m.toCashboxName||targetDisplayName(m.toOfficeId)||"-")}</td><td>${displayText(m.party||"-")}</td><td class="ltr">${fmt(m.amountSyp,"SYP")}</td><td class="ltr">${fmtUsd(getOfficeMoveDisplayUsd(m))}</td><td class="ltr">${num(m.feeUsd)>0?fmtUsd(m.feeUsd):fmt(m.feeSyp,"SYP")}</td><td class="ltr">${num(m.exchangeRate)?num(m.exchangeRate).toLocaleString("en-US"):"-"}</td><td>${displayText(m.note||"-")}</td><td><button class="secondary small" onclick="editOfficeMove('${inlineArg(m.id)}')">تعديل</button><button class="danger small" onclick="deleteOfficeMove('${inlineArg(m.id)}')">حذف</button></td></tr>`).join("")}</tbody></table></div>`
+    }
     window.toggleOfficeLog=function(){const el=$("officeLogBox");if(el)el.style.display=el.style.display==="none"?"block":"none"}
     window.clearOfficeMoveFilters=function(){["officeMoveRegionFilter","officeMoveNameFilter","officeMoveTypeFilter","officeMoveFromDate","officeMoveToDate"].forEach(id=>{if($(id))$(id).value=""});renderOfficeLog()}
     function renderOfficeReports(){const el=$("officeReportsGrid");if(!el)return;let feesSyp=0,feesUsd=0;for(const m of officeMoves){feesSyp+=num(m.feeSyp);feesUsd+=num(m.feeUsd)}const totalOfficeSyp=allOffices.reduce((a,o)=>a+getOfficeBalance(o.id).syp,0),totalOfficeUsd=allOffices.reduce((a,o)=>a+getOfficeBalance(o.id).usd,0),activeCount=allOffices.filter(o=>getOfficeBalance(o.id).syp!==0||getOfficeBalance(o.id).usd!==0).length;const cards=[["إجمالي أرصدة المكاتب SYP",fmt(totalOfficeSyp,"SYP")],["إجمالي أرصدة المكاتب USD",fmtUsd(totalOfficeUsd)],["إجمالي العمولات",`${fmt(feesSyp,"SYP")} / ${fmtUsd(feesUsd)}`],["عدد الحركات",String(officeMoves.length||0)],["المكاتب النشطة",String(activeCount)]];el.innerHTML=cards.map(c=>`<div class="card"><div class="label">${c[0]}</div><div class="value">${c[1]}</div><div class="sub">حسب كل السجلات</div></div>`).join("")}
@@ -3395,9 +3801,9 @@ td{
 
       $("officeGrid").innerHTML=active.map(o=>{
         const b=getOfficeBalance(o.id);
-        return `<div class="card office-card office-dual-balance-card" onclick="showOfficeDetails('${inlineArg(o.id)}')">
-          <div class="label">${displayText(o.region)}</div>
-          <div class="value office-name-value" style="direction:rtl;text-align:right;">${displayText(o.name)}</div>
+        return `<div class="card office-card office-dual-balance-card" onclick="showOfficeDetails('${o.id}')">
+          <div class="label">${o.region}</div>
+          <div class="value office-name-value" style="direction:rtl;text-align:right;">${o.name}</div>
           <div class="office-hub-dual office-dashboard-dual">
             <div><span>رصيد SYP</span><b>${fmt(b.syp,"SYP")}</b></div>
             <div><span>رصيد USD</span><b>${fmtUsd(b.usd)}</b></div>
@@ -3407,10 +3813,10 @@ td{
       }).join("");
       markNegativeAmounts();
     }
-
     function delegateTotalBalance(delegateName,excludeDeliveryId=""){
-      const revenue=revenues.filter(r=>r.delegateName===delegateName).reduce((a,r)=>a+num(r.revenueSyp),0);
-      const delivered=deliveries.filter(d=>d.delegateName===delegateName&&d.id!==excludeDeliveryId).reduce((a,d)=>a+deliveryNumbers(d).totalAsSyp,0);
+      const delegate=getDelegate(delegateName,$("delRegion")?.value||"");
+      const revenue=revenues.filter(r=>sameDelegateRecord(r,delegate)).reduce((a,r)=>a+num(r.revenueSyp),0);
+      const delivered=deliveries.filter(d=>sameDelegateRecord(d,delegate)&&d.id!==excludeDeliveryId).reduce((a,d)=>a+deliveryNumbers(d).totalAsSyp,0);
       return{revenue,delivered,remaining:revenue-delivered};
     }
     function updateDeliveryModeUi(){
@@ -3450,7 +3856,7 @@ td{
     window.saveDelivery=async function(){
       try{
         if(!auth.currentUser)return;
-        const delegate=getDelegate($("delDelegate").value),office=getOffice($("delOffice").value);
+        const delegate=getSelectedDelegate("del"),office=getOffice($("delOffice").value);
         if(!delegate)return setStatus("اختر اسم المندوب للتسليم.");
         if(!office)return setStatus("اختر المكتب الذي استلم.");
         const cut=$("cutMode").value==="1";
@@ -3489,7 +3895,7 @@ td{
       try{
         if(!auth.currentUser)return toast("يجب تسجيل الدخول أولاً","error");
         const delegateName=String($("revDelegate")?.value||"").trim();
-        const delegate=allDelegates.find(d=>d.name===delegateName)||null;
+        const delegate=getSelectedDelegate("rev");
         if(!delegate)return toast("اختر اسم المندوب.","error");
         const date=$("revDate")?.value||todayString();
         const revenueType=$("revType")?.value||"masary";
@@ -3538,18 +3944,20 @@ td{
     /* ====== Live balance badge + duplicate warning on revenue form ====== */
     window.onRevFormChange=function(){
       const delegateName=String($("revDelegate")?.value||"").trim();
+      const delegate=getSelectedDelegate("rev");
       const date=$("revDate")?.value||todayString();
-      if(!delegateName){
+      if(!delegateName||!delegate){
         if($("revBalanceBadge"))$("revBalanceBadge").style.display="none";
         if($("revDupWarn"))$("revDupWarn").style.display="none";
         return;
       }
       const editId=$("editingRevenueId")?.value||"";
-      const dayRevs=revenues.filter(r=>r.delegateName===delegateName&&r.date===date&&r.id!==editId);
+      const dayRevs=revenues.filter(r=>sameDelegateRecord(r,delegate)&&r.date===date&&r.id!==editId);
       const total=dayRevs.reduce((a,r)=>a+num(r.revenueSyp),0);
+      const hasTypedAmount=num($("revAmount")?.value)>0;
       if($("revBalanceBadge"))$("revBalanceBadge").style.display=total>0?"flex":"none";
       if($("revTodayTotal"))$("revTodayTotal").innerHTML=fmt(total,"SYP");
-      if($("revDupWarn"))$("revDupWarn").style.display=dayRevs.length>0?"block":"none";
+      if($("revDupWarn"))$("revDupWarn").style.display=dayRevs.length>0&&hasTypedAmount?"block":"none";
     };
 
     /* ====== Toast notification system ====== */
@@ -3614,7 +4022,7 @@ td{
         html+=`<div class="table-wrap" style="margin-top:12px;"><table><thead><tr><th colspan="6">تسليمات المندوبين إلى المكتب</th></tr><tr><th>التاريخ</th><th>المندوب</th><th>سوري مباشر</th><th>دولار للمكتب</th><th>سعر الصرف</th><th>المحسوب على المندوب</th></tr></thead><tbody>${related.map(d=>{const n=deliveryNumbers(d);return`<tr><td>${displayText(d.date||"-")}</td><td>${displayText(d.delegateName||"-")}</td><td class="ltr">${fmt(n.deliveredSyp,"SYP")}</td><td class="ltr">${fmtUsd(n.deliveredUsd)}</td><td class="ltr">${n.exchangeRate?fmt(n.exchangeRate,"SYP"):"-"}</td><td class="ltr">${fmt(n.totalAsSyp,"SYP")}</td></tr>`}).join("")}</tbody></table></div>`;
       }
       if(moves.length){
-        html+=`<div class="table-wrap" style="margin-top:12px;"><table><thead><tr><th colspan="7">حركات المكتب والحوالات</th></tr><tr><th>التاريخ</th><th>العملية</th><th>من</th><th>إلى</th><th>أثر SYP</th><th>أثر USD</th><th>ملاحظات</th></tr></thead><tbody>${moves.map(({m,e})=>`<tr><td>${displayText(m.date||"-")}</td><td>${displayText(officeMoveLabels[m.type]||m.type||"-")}</td><td>${displayText(m.fromOfficeName||m.fromCashboxName||targetDisplayName(m.fromOfficeId)||"-")}</td><td>${displayText(m.toOfficeName||m.toCashboxName||targetDisplayName(m.toOfficeId)||"-")}</td><td class="ltr">${fmt(e.syp,"SYP")}</td><td class="ltr">${fmtUsd(e.usd)}</td><td>${displayText(m.note||"-")}</td></tr>`).join("")}</tbody></table></div>`;
+        html+=`<div class="table-wrap" style="margin-top:12px;"><table><thead><tr><th colspan="7">حركات المكتب والحوالات</th></tr><tr><th>التاريخ</th><th>العملية</th><th>من</th><th>إلى</th><th>أثر SYP</th><th>أثر USD</th><th>ملاحظات</th></tr></thead><tbody>${moves.map(({m,e})=>`<tr><td>${m.date||"-"}</td><td>${displayText(officeMoveLabels[m.type]||m.type||"-")}</td><td>${displayText(m.fromOfficeName||m.fromCashboxName||targetDisplayName(m.fromOfficeId)||"-")}</td><td>${displayText(m.toOfficeName||m.toCashboxName||targetDisplayName(m.toOfficeId)||"-")}</td><td class="ltr">${fmt(e.syp,"SYP")}</td><td class="ltr">${fmtUsd(e.usd)}</td><td>${displayText(m.note||"-")}</td></tr>`).join("")}</tbody></table></div>`;
       }
       $("modalContent").innerHTML=html;$("officeModal").classList.add("show");
     };window.hideOfficeModal=function(){$("officeModal").classList.remove("show")};window.closeOfficeModal=function(e){if(e.target.id==="officeModal")hideOfficeModal()};
@@ -3630,23 +4038,20 @@ td{
         return `${String(d.date||"")}__${String(d.createdAt?.seconds||"").padStart(12,"0")}__${String(d.id||"")}`;
       }
 
-      function getDelegateRegion(name,dayRevs,dayDels){
-        return (dayRevs.find(r=>r.delegateName===name)||dayDels.find(d=>d.delegateName===name)||revenues.find(r=>r.delegateName===name)||deliveries.find(d=>d.delegateName===name)||{}).region||"-";
-      }
-
-      function summarizeDelegateForDay(delegateName,day,dayRevs,dayDels){
-        const delegateDayRevs=dayRevs.filter(r=>r.delegateName===delegateName);
+      function summarizeDelegateForDay(delegateKey,day,dayRevs,dayDels){
+        const info=delegateInfoFromKey(delegateKey,dayRevs,dayDels);
+        const delegateDayRevs=dayRevs.filter(r=>delegateRecordKey(r)===delegateKey);
         const revToday=delegateDayRevs.reduce((a,r)=>a+num(r.revenueSyp),0);
         const masaryToday=delegateDayRevs.filter(r=>r.revenueType==="masary").reduce((a,r)=>a+num(r.revenueSyp),0);
         const ccbsToday=delegateDayRevs.filter(r=>r.revenueType==="ccbs").reduce((a,r)=>a+num(r.revenueSyp),0);
         const privateToday=delegateDayRevs.filter(r=>r.revenueType==="private").reduce((a,r)=>a+num(r.revenueSyp),0);
         const revTypeSummary=[masaryToday>0?`مصاري ${fmt(masaryToday,"SYP")}`:"",ccbsToday>0?`CCBS ${fmt(ccbsToday,"SYP")}`:"",privateToday>0?`مخصوص ${fmt(privateToday,"SYP")}`:""].filter(Boolean).join(" / ")||"-";
-        const revUntil=revenues.filter(r=>r.delegateName===delegateName&&String(r.date||"")<=String(day||"")).reduce((a,r)=>a+num(r.revenueSyp),0);
+        const revUntil=revenues.filter(r=>delegateRecordKey(r)===delegateKey&&String(r.date||"")<=String(day||"")).reduce((a,r)=>a+num(r.revenueSyp),0);
 
         let directSypToday=0,cutSypToday=0,cutUsdToday=0,directUsdToday=0,deliveredTodayAsSyp=0;
         const offices=new Set(),rates=new Set();
 
-        dayDels.filter(d=>d.delegateName===delegateName).forEach(d=>{
+        dayDels.filter(d=>delegateRecordKey(d)===delegateKey).forEach(d=>{
           const n=deliveryNumbers(d);
           directSypToday+=n.deliveredSyp;
           cutSypToday+=n.cutSyp;
@@ -3657,17 +4062,16 @@ td{
           if(d.officeName)offices.add(d.officeName);
         });
 
-        const deliveredUntil=deliveries.filter(d=>d.delegateName===delegateName&&String(d.date||"")<=String(day||"")).reduce((a,d)=>a+deliveryNumbers(d).totalAsSyp,0);
+        const deliveredUntil=deliveries.filter(d=>delegateRecordKey(d)===delegateKey&&String(d.date||"")<=String(day||"")).reduce((a,d)=>a+deliveryNumbers(d).totalAsSyp,0);
         const remaining=revUntil-deliveredUntil;
-        const region=getDelegateRegion(delegateName,dayRevs,dayDels);
-        return{delegateName,region,revToday,masaryToday,ccbsToday,privateToday,revTypeSummary,revUntil,directSypToday,cutSypToday,cutUsdToday,directUsdToday,deliveredTodayAsSyp,deliveredUntil,remaining,offices,rates};
+        return{delegateName:info.name,region:info.region,revToday,masaryToday,ccbsToday,privateToday,revTypeSummary,revUntil,directSypToday,cutSypToday,cutUsdToday,directUsdToday,deliveredTodayAsSyp,deliveredUntil,remaining,offices,rates};
       }
 
       $("dailyGroupedLog").innerHTML=[...days].sort().reverse().map(day=>{
         const dayRevs=revs.filter(r=>r.date===day);
         const dayDels=dels.filter(d=>d.date===day);
-        const names=[...new Set([...dayRevs.map(r=>r.delegateName),...dayDels.map(d=>d.delegateName)])].sort((a,b)=>String(a).localeCompare(String(b),"ar"));
-        const rows=names.map(name=>summarizeDelegateForDay(name,day,dayRevs,dayDels));
+        const delegateKeys=[...new Set([...dayRevs.map(delegateRecordKey),...dayDels.map(delegateRecordKey)])].sort((a,b)=>String(delegateInfoFromKey(a,dayRevs,dayDels).name).localeCompare(String(delegateInfoFromKey(b,dayRevs,dayDels).name),"ar")||String(delegateInfoFromKey(a,dayRevs,dayDels).region).localeCompare(String(delegateInfoFromKey(b,dayRevs,dayDels).region),"ar"));
+        const rows=delegateKeys.map(key=>summarizeDelegateForDay(key,day,dayRevs,dayDels));
 
         const totalRevenueToday=rows.reduce((a,x)=>a+x.revToday,0);
         const totalMasaryToday=rows.reduce((a,x)=>a+x.masaryToday,0);
@@ -3696,7 +4100,7 @@ td{
         </tr>`).join("");
 
         const revenueRows=dayRevs.map(r=>`<tr>
-          <td>إيراد</td><td>${displayText(r.delegateName)}</td><td>${displayText(r.region)}</td><td>${getTypeLabel(r.revenueType)}</td>
+          <td>إيراد</td><td>${displayText(r.delegateName)}</td><td>${displayText(r.region)}</td><td>${displayText(getTypeLabel(r.revenueType))}</td>
           <td class="ltr revenue-cell">${fmt(r.revenueSyp,"SYP")}</td><td class="ltr">-</td><td class="ltr">-</td><td>-</td>
           <td class="record-actions"><button class="secondary small edit-btn" onclick="editRevenue('${inlineArg(r.id)}')">تعديل</button><button class="danger small" onclick="deleteRevenue('${inlineArg(r.id)}')">حذف</button></td>
         </tr>`).join("");
@@ -3717,7 +4121,7 @@ td{
         return`<div class="day-box clean-day-box">
           <div class="day-head clean-day-head">
             <div>
-              <div class="day-title">إيراد ${displayText(day)}</div>
+              <div class="day-title">إيراد ${day}</div>
               <div class="day-total">
                 <span class="pill">إيراد اليوم: ${fmt(totalRevenueToday,"SYP")}</span>
                 <span class="pill">مصاري: ${fmt(totalMasaryToday,"SYP")}</span>
@@ -3729,8 +4133,8 @@ td{
               </div>
             </div>
             <div class="daily-buttons">
-              <button class="secondary small" onclick="toggleDay('${inlineArg(day)}')">${hidden?"فتح الملخص":"إغلاق الملخص"}</button>
-              <button class="secondary small" onclick="toggleDayDetails('${inlineArg(day)}')">${detailsOpen?"إخفاء التفاصيل":"تفاصيل الحركات"}</button>
+              <button class="secondary small" onclick="toggleDay('${day}')">${hidden?"فتح الملخص":"إغلاق الملخص"}</button>
+              <button class="secondary small" onclick="toggleDayDetails('${day}')">${detailsOpen?"إخفاء التفاصيل":"تفاصيل الحركات"}</button>
             </div>
           </div>
           ${hidden?"":`
@@ -3753,40 +4157,30 @@ function collectCutDollarRows(){
       const rows=[];
       for(const d of deliveries){
         const n=deliveryNumbers(d);
-        if(num(n.cutSyp)>0 || Number(n.cutUsd||0)>0){
-          const detail=`قص سوري ${fmt(n.cutSyp,"SYP")} / دولار من القص ${fmtUsd(n.cutUsd)}`;
+        const actualCutSyp=num(n.cutSyp);
+        const actualCutUsd=Number(n.cutUsd||0);
+        const directUsdAsSyp=num(n.deliveredUsdAsSyp);
+        const directUsd=Number(n.directUsd||0);
+        const delegateCutSyp=actualCutSyp+directUsdAsSyp;
+        const delegateCutUsd=actualCutUsd+directUsd;
+        if(delegateCutSyp>0 || delegateCutUsd>0){
+          const parts=[];
+          if(num(n.cutSyp)>0)parts.push(`قص سوري ${fmt(n.cutSyp,"SYP")}`);
+          if(Number(n.cutUsd||0)>0)parts.push(`دولار من القص ${fmtUsd(n.cutUsd)}`);
+          if(Number(n.directUsd||0)>0)parts.push(`دولار مباشر ${fmtUsd(n.directUsd)}`);
           rows.push({
-            id:"delivery_cut_"+(d.id||""),
+            id:"delivery_"+(d.id||""),
             date:d.date||"",
             source:"delegate",
             sourceLabel:"مندوب",
-            operationType:"cut",
-            operationLabel:cutOperationLabel("cut"),
             name:d.delegateName||"-",
             target:d.officeName||"-",
-            cutSyp:num(n.cutSyp),
-            usd:Number(n.cutUsd||0),
+            cutSyp:delegateCutSyp,
+            usd:delegateCutUsd,
+            weightSyp:actualCutSyp,
             rate:n.rate,
-            note:d.note||detail,
-            detail
-          });
-        }
-        if(Number(n.directUsd||0)>0){
-          const detail=`دولار مباشر ${fmtUsd(n.directUsd)} / يغطي ${fmt(n.deliveredUsdAsSyp,"SYP")} من المتبقي`;
-          rows.push({
-            id:"delivery_direct_"+(d.id||""),
-            date:d.date||"",
-            source:"delegate",
-            sourceLabel:"مندوب",
-            operationType:"directUsd",
-            operationLabel:cutOperationLabel("directUsd"),
-            name:d.delegateName||"-",
-            target:d.officeName||"-",
-            cutSyp:num(n.deliveredUsdAsSyp),
-            usd:Number(n.directUsd||0),
-            rate:n.rate,
-            note:d.note||detail,
-            detail
+            note:d.note||parts.join(" / "),
+            detail:parts.join(" / ")
           });
         }
       }
@@ -3794,18 +4188,17 @@ function collectCutDollarRows(){
         if(m.type!=="office_convert_syp_to_usd")continue;
         const amountSyp=num(m.amountSyp);
         const rate=num(m.exchangeRate);
-        const amountUsd=getOfficeMoveDisplayUsd(m);
+        const amountUsd=Number(m.amountUsd||0) || (rate>0?amountSyp/rate:0);
         rows.push({
           id:"office_"+(m.id||""),
           date:m.date||"",
           source:"office",
           sourceLabel:"مكتب",
-          operationType:"cut",
-          operationLabel:cutOperationLabel("cut"),
           name:targetDisplayName(m.fromOfficeId)||m.fromOfficeName||"-",
           target:targetDisplayName(m.toOfficeId)||m.toOfficeName||"-",
           cutSyp:amountSyp,
           usd:amountUsd,
+          weightSyp:amountSyp,
           rate,
           note:m.note||"",
           detail:`قص ${fmt(amountSyp,"SYP")} إلى ${fmtUsd(amountUsd)}`
@@ -3838,21 +4231,18 @@ function collectCutDollarRows(){
       const rows=getFilteredCutDollarRows();
       const totalSyp=rows.reduce((a,r)=>a+num(r.cutSyp),0);
       const totalUsd=rows.reduce((a,r)=>a+Number(r.usd||0),0);
-      const weightedRows=rows.filter(r=>r.operationType==="cut"&&num(r.rate)>0&&num(r.cutSyp)>0);
-      const avgRate=weightedRows.reduce((a,r)=>a+(num(r.rate)*num(r.cutSyp)),0)/(weightedRows.reduce((a,r)=>a+num(r.cutSyp),0)||1);
+      const weightedRows=rows.filter(r=>num(r.rate)>0&&num(r.weightSyp)>0);
+      const avgRate=weightedRows.reduce((a,r)=>a+(num(r.rate)*num(r.weightSyp)),0)/(weightedRows.reduce((a,r)=>a+num(r.weightSyp),0)||1);
 
       if($("cutTotalSyp"))$("cutTotalSyp").innerHTML=fmt(totalSyp,"SYP");
       if($("cutTotalUsd"))$("cutTotalUsd").innerHTML=fmtUsd(totalUsd);
       if($("cutCount"))$("cutCount").textContent=String(rows.length);
-      if($("cutAvgRate"))$("cutAvgRate").textContent=weightedRows.length?Math.round(avgRate).toLocaleString("en-US"):"0";
+      if($("cutAvgRate"))$("cutAvgRate").textContent=rows.some(r=>num(r.rate)>0)?Math.round(avgRate).toLocaleString("en-US"):"0";
 
       const el=$("cutDollarLog");if(!el)return;
       if(!rows.length){el.innerHTML='<div class="empty">لا توجد حركات قص دولار حسب الفلتر الحالي.</div>';return}
-      el.innerHTML=`<div class="table-wrap"><table><thead><tr><th>التاريخ</th><th>المصدر</th><th>نوع العملية</th><th>المندوب / المكتب</th><th>الاسم / المكتب</th><th>قص السوري</th><th>الدولار الناتج</th><th>سعر الصرف</th><th>ملاحظات</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${displayText(r.date||"-")}</td><td>${displayText(r.sourceLabel)}</td><td>${displayText(r.operationLabel)}</td><td>${displayText(r.name)}</td><td>${displayText(r.target)}</td><td class="ltr cut-detail">${fmt(r.cutSyp,"SYP")}</td><td class="ltr">${fmtUsd(r.usd)}</td><td class="ltr">${num(r.rate)?num(r.rate).toLocaleString("en-US"):"-"}</td><td>${displayText(r.note||r.detail||"-")}</td></tr>`).join("")}</tbody></table></div>`;
+      el.innerHTML=`<div class="table-wrap"><table><thead><tr><th>التاريخ</th><th>المصدر</th><th>المندوب / المكتب</th><th>الاسم / المكتب</th><th>قص السوري</th><th>الدولار الناتج</th><th>سعر الصرف</th><th>ملاحظات</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${r.date||"-"}</td><td>${r.sourceLabel}</td><td>${r.name}</td><td>${r.target}</td><td class="ltr cut-detail">${fmt(r.cutSyp,"SYP")}</td><td class="ltr">${fmtUsd(r.usd)}</td><td class="ltr">${num(r.rate)?num(r.rate).toLocaleString("en-US"):"-"}</td><td>${r.note||r.detail||"-"}</td></tr>`).join("")}</tbody></table></div>`;
     };
-
-
-    
 
 
     
@@ -3948,14 +4338,15 @@ function collectCutDollarRows(){
       const{revs,dels,baseRevs,type}=filteredDelegateMatchData();
       const map={};
 
-      function ensure(name,region){
-        if(!map[name])map[name]={name,region:region||"-",revenue:0,masary:0,ccbs:0,privateRevenue:0,delivered:0,deliveredUsd:0,remaining:0};
-        return map[name];
+      function ensureFromRecord(rec){
+        const info=delegateInfoFromRecord(rec);
+        if(!map[info.key])map[info.key]={key:info.key,name:info.name,region:info.region||"-",revenue:0,masary:0,ccbs:0,privateRevenue:0,delivered:0,deliveredUsd:0,remaining:0};
+        return map[info.key];
       }
 
       // أعمدة مصاري/CCBS تُحسب دائماً من كل الإيرادات ضمن الفلتر العام، حتى لو اخترت نوع محدد
       for(const r of baseRevs){
-        const x=ensure(r.delegateName,r.region);
+        const x=ensureFromRecord(r);
         if(r.revenueType==="masary")x.masary+=num(r.revenueSyp);
         else if(r.revenueType==="ccbs")x.ccbs+=num(r.revenueSyp);
         else if(r.revenueType==="private")x.privateRevenue+=num(r.revenueSyp);
@@ -3963,13 +4354,13 @@ function collectCutDollarRows(){
 
       // إجمالي الإيراد يتأثر بفلتر النوع
       for(const r of revs){
-        const x=ensure(r.delegateName,r.region);
+        const x=ensureFromRecord(r);
         x.revenue+=num(r.revenueSyp);
       }
 
       for(const d of dels){
         const n=deliveryNumbers(d);
-        const x=ensure(d.delegateName,d.region);
+        const x=ensureFromRecord(d);
         x.delivered+=n.totalAsSyp;
         x.deliveredUsd+=n.deliveredUsd;
       }
@@ -3998,7 +4389,7 @@ function collectCutDollarRows(){
       const el=$("delegateMatchTable");
       if(el){
         if(!rows.length)el.innerHTML='<div class="empty">لا توجد بيانات مطابقة حسب الفلتر.</div>';
-        else el.innerHTML=`<div class="table-wrap"><table><thead><tr><th>المندوب</th><th>الريجين</th><th>مصاري</th><th>CCBS</th><th>إجمالي الإيراد حسب الفلتر</th><th>إجمالي التسليم</th><th>تسليم دولار</th><th>إجمالي المتبقي</th></tr></thead><tbody>${rows.map(x=>`<tr><td><b>${displayText(x.name)}</b><div class="delegate-type-mini">مصاري: ${fmt(x.masary,"SYP")} / CCBS: ${fmt(x.ccbs,"SYP")}</div></td><td>${displayText(x.region)}</td><td class="ltr type-masary-cell">${fmt(x.masary,"SYP")}</td><td class="ltr type-ccbs-cell">${fmt(x.ccbs,"SYP")}</td><td class="ltr">${fmt(x.revenue,"SYP")}</td><td class="ltr">${fmt(x.delivered,"SYP")}</td><td class="ltr">${fmtUsd(x.deliveredUsd)}</td><td class="ltr">${fmt(x.remaining,"SYP")}</td></tr>`).join("")}</tbody></table></div>`;
+        else el.innerHTML=`<div class="table-wrap"><table><thead><tr><th>المندوب</th><th>الريجين</th><th>مصاري</th><th>CCBS</th><th>إجمالي الإيراد حسب الفلتر</th><th>إجمالي التسليم</th><th>تسليم دولار</th><th>إجمالي المتبقي</th></tr></thead><tbody>${rows.map(x=>`<tr><td><b>${x.name}</b><div class="delegate-type-mini">مصاري: ${fmt(x.masary,"SYP")} / CCBS: ${fmt(x.ccbs,"SYP")}</div></td><td>${x.region}</td><td class="ltr type-masary-cell">${fmt(x.masary,"SYP")}</td><td class="ltr type-ccbs-cell">${fmt(x.ccbs,"SYP")}</td><td class="ltr">${fmt(x.revenue,"SYP")}</td><td class="ltr">${fmt(x.delivered,"SYP")}</td><td class="ltr">${fmtUsd(x.deliveredUsd)}</td><td class="ltr">${fmt(x.remaining,"SYP")}</td></tr>`).join("")}</tbody></table></div>`;
       }
 
       const regionMap={};
@@ -4014,7 +4405,7 @@ function collectCutDollarRows(){
       const regEl=$("regionMatchTable");
       if(regEl){
         if(!regRows.length)regEl.innerHTML='<div class="empty">لا يوجد ملخص ريجينات حسب الفلتر.</div>';
-        else regEl.innerHTML=`<div class="table-wrap"><table><thead><tr><th>الريجين</th><th>مصاري</th><th>CCBS</th><th>إجمالي الإيراد</th><th>إجمالي التسليم</th><th>إجمالي المتبقي</th></tr></thead><tbody>${regRows.map(x=>`<tr><td>${displayText(x.region)}</td><td class="ltr">${fmt(x.masary,"SYP")}</td><td class="ltr">${fmt(x.ccbs,"SYP")}</td><td class="ltr">${fmt(x.revenue,"SYP")}</td><td class="ltr">${fmt(x.delivered,"SYP")}</td><td class="ltr">${fmt(x.remaining,"SYP")}</td></tr>`).join("")}</tbody></table></div>`;
+        else regEl.innerHTML=`<div class="table-wrap"><table><thead><tr><th>الريجين</th><th>مصاري</th><th>CCBS</th><th>إجمالي الإيراد</th><th>إجمالي التسليم</th><th>إجمالي المتبقي</th></tr></thead><tbody>${regRows.map(x=>`<tr><td>${x.region}</td><td class="ltr">${fmt(x.masary,"SYP")}</td><td class="ltr">${fmt(x.ccbs,"SYP")}</td><td class="ltr">${fmt(x.revenue,"SYP")}</td><td class="ltr">${fmt(x.delivered,"SYP")}</td><td class="ltr">${fmt(x.remaining,"SYP")}</td></tr>`).join("")}</tbody></table></div>`;
       }
       markNegativeAmounts(document);
     };
@@ -4052,8 +4443,8 @@ window.addCustomOffice=async function(){
       if($("settingsCustomOfficeCount"))$("settingsCustomOfficeCount").textContent=String(customOffices.length);
       if($("settingsCustomDelegateCount"))$("settingsCustomDelegateCount").textContent=String(customDelegates.length);
       const el=$("settingsLists");if(!el)return;
-      const officeRows=customOffices.map(o=>`<tr><td>${displayText(o.name)}</td><td>${displayText(o.region||"-")}</td><td>مكتب</td></tr>`).join("");
-      const delegateRows=customDelegates.map(d=>`<tr><td>${displayText(d.name)}</td><td>${displayText(d.region||"-")}</td><td>مندوب</td></tr>`).join("");
+      const officeRows=customOffices.map(o=>`<tr><td>${o.name}</td><td>${o.region||"-"}</td><td>مكتب</td></tr>`).join("");
+      const delegateRows=customDelegates.map(d=>`<tr><td>${d.name}</td><td>${d.region||"-"}</td><td>مندوب</td></tr>`).join("");
       if(!officeRows&&!delegateRows){el.innerHTML='<div class="empty">لم تضف مكاتب أو مندوبين بعد.</div>';return}
       el.innerHTML=`<div class="table-wrap"><table><thead><tr><th>الاسم</th><th>الريجين</th><th>النوع</th></tr></thead><tbody>${officeRows}${delegateRows}</tbody></table></div>`;
     };
@@ -4061,8 +4452,8 @@ window.addCustomOffice=async function(){
 
     
     window.exportCutDollarExcel=function(){
-      const rows=getFilteredCutDollarRows().map(r=>[r.date||"",r.sourceLabel||"",r.operationLabel||"",r.name||"",r.target||"",num(r.cutSyp),Number(r.usd||0).toFixed(2),num(r.rate)||"",r.note||r.detail||""]);
-      downloadExcelTable("cut_dollar_log","سجل قص الدولار",["التاريخ","المصدر","نوع العملية","المندوب / المكتب","الاسم / المكتب","قص السوري","الدولار الناتج","سعر الصرف","ملاحظات"],rows,excelDateRangeMeta("cutFromDate","cutToDate"));
+      const rows=getFilteredCutDollarRows().map(r=>[r.date||"",r.sourceLabel||"",r.name||"",r.target||"",num(r.cutSyp),Number(r.usd||0).toFixed(2),num(r.rate)||"",r.note||r.detail||""]);
+      downloadExcelTable("cut_dollar_log","سجل قص الدولار",["التاريخ","المصدر","المندوب / المكتب","الاسم / المكتب","قص السوري","الدولار الناتج","سعر الصرف","ملاحظات"],rows,excelDateRangeMeta("cutFromDate","cutToDate"));
     };
 
     window.exportLoansExcel=function(){
@@ -4081,7 +4472,6 @@ window.addCustomOffice=async function(){
 
 
 function markNegativeAmounts(root=document){
-      if(!root||!root.querySelectorAll)return;
       const negRe=/-\s*\d[\d,]*(?:\.\d+)?\s*(?:SYP|USD)?/i;
 
       root.querySelectorAll(".negative-amount").forEach(el=>el.classList.remove("negative-amount"));
@@ -4119,6 +4509,7 @@ function markNegativeAmounts(root=document){
         renderCashLog();
         renderLoanSummary();
         renderCashReports();
+        renderClosingSection();
         if($("cashDate")){updateCashboxFormMode();updateCashPreview()}
       }else if(currentView==="office"){
         fillOfficeMoveSelects();
@@ -4156,7 +4547,6 @@ function markNegativeAmounts(root=document){
         if(active && (active.id==="loginEmail" || active.id==="loginPassword")){
           e.preventDefault();
           login();
-      markNegativeAmounts();
         }
         return;
       }
