@@ -2259,11 +2259,14 @@ td{
         el.style.display="block";
       }
     });
-  const negativeObserver=new MutationObserver(()=>{clearTimeout(window.__negTimer);window.__negTimer=setTimeout(()=>markNegativeAmounts(),40)});negativeObserver.observe(document.body,{childList:true,subtree:true,characterData:true});
-  
-    window.__negObserverFinal=new MutationObserver(()=>{clearTimeout(window.__negFinalTimer);window.__negFinalTimer=setTimeout(()=>markNegativeAmounts(document),30)});
+    window.__imadMarkNegativeAmounts=function(root){
+      const fn=window.markNegativeAmounts;
+      if(typeof fn==="function"){
+        try{fn(root||document)}catch(e){console.warn("markNegativeAmounts warning:",e)}
+      }
+    };
+    window.__negObserverFinal=new MutationObserver(()=>{clearTimeout(window.__negFinalTimer);window.__negFinalTimer=setTimeout(()=>window.__imadMarkNegativeAmounts(document),30)});
     window.__negObserverFinal.observe(document.body,{childList:true,subtree:true,characterData:true});
-    setInterval(()=>markNegativeAmounts(document),1200);
 
   </script>
 
@@ -2333,6 +2336,18 @@ td{
       const totalAsSyp=deliveredSyp+cutSyp+(rate>0?directUsd*rate:0);
       return{mode,rate,exchangeRate:rate,deliveredSyp,directUsd,cutSyp,cutUsd,deliveredUsd,totalAsSyp,totalDeliveredAsSyp:totalAsSyp,deliveredUsdAsSyp:rate>0?directUsd*rate:0};
     }
+    function escapeHTML(v){
+      return String(v??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
+    }
+    function jsString(v){
+      return String(v??"").replace(/\\/g,"\\\\").replace(/'/g,"\\'").replace(/\r/g,"\\r").replace(/\n/g,"\\n").replace(/\u2028/g,"\\u2028").replace(/\u2029/g,"\\u2029");
+    }
+    function inlineArg(v){return escapeHTML(jsString(v))}
+    function optionHTML(value,label){return `<option value="${escapeHTML(value)}">${escapeHTML(label)}</option>`}
+    function displayText(v,fallback="-"){const s=String(v??"").trim();return escapeHTML(s||fallback)}
+    function displayJoined(values,sep="، "){const arr=[...values].filter(Boolean).map(v=>escapeHTML(v));return arr.length?arr.join(sep):"-"}
+    function cutOperationLabel(type){return type==="cut"?"قص فعلي":"دولار مباشر"}
+    function getOfficeMoveDisplayUsd(m){const rate=num(m.exchangeRate),amountSyp=num(m.amountSyp),amountUsd=Number(m.amountUsd||0);return m.type==="office_convert_syp_to_usd"&&amountUsd<=0&&rate>0?amountSyp/rate:amountUsd}
     function delegateRegionList(){
       return [...new Set(allDelegates.map(d=>d.region).filter(Boolean))]
         .sort((a,b)=>String(a).localeCompare(String(b),undefined,{numeric:true}));
@@ -2341,7 +2356,7 @@ td{
     function fillDelegateRegionSelect(id){
       const el=$(id);if(!el)return;
       const keep=el.value;
-      const opts='<option value="">كل المناطق</option>'+delegateRegionList().map(r=>`<option value="${r}">${r}</option>`).join("");
+      const opts='<option value="">كل المناطق</option>'+delegateRegionList().map(r=>optionHTML(r,r)).join("");
       el.innerHTML=opts;
       if([...el.options].some(o=>o.value===keep))el.value=keep;
     }
@@ -2353,7 +2368,7 @@ td{
       const region=regionEl?regionEl.value:"";
       const keep=keepValue || delegateEl.value;
       const list=region?allDelegates.filter(d=>d.region===region):allDelegates;
-      delegateEl.innerHTML='<option value="">اختر المندوب</option>'+list.map(d=>`<option value="${d.name}">${d.name}</option>`).join("");
+      delegateEl.innerHTML='<option value="">اختر المندوب</option>'+list.map(d=>optionHTML(d.name,d.name)).join("");
       if([...delegateEl.options].some(o=>o.value===keep))delegateEl.value=keep;
       else delegateEl.value="";
     }
@@ -2368,7 +2383,7 @@ td{
     function fillDailyNameFilter(){
       const el=$("nameFilter");if(!el||el.tagName!=="SELECT")return;
       const keep=el.value;
-      el.innerHTML='<option value="">كل المندوبين</option>'+allDelegates.map(d=>`<option value="${d.name}">${d.region} - ${d.name}</option>`).join("");
+      el.innerHTML='<option value="">كل المندوبين</option>'+allDelegates.map(d=>optionHTML(d.name,`${d.region} - ${d.name}`)).join("");
       if([...el.options].some(o=>o.value===keep))el.value=keep;
     }
 
@@ -2381,7 +2396,7 @@ td{
     function fillOfficeMoveRegionFilter(){
       const el=$("officeMoveRegionFilter");if(!el)return;
       const keep=el.value;
-      el.innerHTML='<option value="">كل المناطق</option>'+officeFilterRegions().map(r=>`<option value="${r}">${r}</option>`).join("");
+      el.innerHTML='<option value="">كل المناطق</option>'+officeFilterRegions().map(r=>optionHTML(r,r)).join("");
       if([...el.options].some(o=>o.value===keep))el.value=keep;
     }
 
@@ -2393,7 +2408,7 @@ td{
       fillDelegateSelect("rev");
       fillDelegateSelect("del");
 
-      const os='<option value="">اختر المكتب</option>'+allOffices.map(o=>`<option value="${o.name}">${o.region} - ${o.name}</option>`).join("");
+      const os='<option value="">اختر المكتب</option>'+allOffices.map(o=>optionHTML(o.name,`${o.region} - ${o.name}`)).join("");
       const officeEl=$("delOffice");if(!officeEl)return;
       const keepOffice=officeEl.value;officeEl.innerHTML=os;
       if([...officeEl.options].some(o=>o.value===keepOffice))officeEl.value=keepOffice;
@@ -2636,10 +2651,10 @@ td{
       const temp={id,type,amountSyp:cashboxAmountSypFromForm(),amountUsd:cashboxAmountUsdFromForm(),exchangeRate:num($("cashRate")?.value)};
       const e=getCashMoveEffect(temp);
       const before=calcCashboxBalances(id);
-      if($("cashEffectSypPreview"))$("cashEffectSypPreview").textContent=fmt(e.syp,"SYP");
-      if($("cashEffectUsdPreview"))$("cashEffectUsdPreview").textContent=fmtUsd(e.usd);
-      if($("cashAfterSypPreview"))$("cashAfterSypPreview").textContent=fmt(before.syp_farhad+e.syp,"SYP");
-      if($("cashAfterUsdPreview"))$("cashAfterUsdPreview").textContent=fmtUsd(before.usd_farhad+e.usd);
+      if($("cashEffectSypPreview"))$("cashEffectSypPreview").innerHTML=fmt(e.syp,"SYP");
+      if($("cashEffectUsdPreview"))$("cashEffectUsdPreview").innerHTML=fmtUsd(e.usd);
+      if($("cashAfterSypPreview"))$("cashAfterSypPreview").innerHTML=fmt(before.syp_farhad+e.syp,"SYP");
+      if($("cashAfterUsdPreview"))$("cashAfterUsdPreview").innerHTML=fmtUsd(before.usd_farhad+e.usd);
     };
 
     window.saveCashMove=async function(){
@@ -2794,8 +2809,9 @@ td{
         const after=running[m.id]||{syp:0,usd:0};
         const cat=m.category||cashMoveDefaultCategory(m.type);
         const label=m.label||cashMoveLabel(m.type);
-        const action=m.officeLinked?'<button class="secondary small" onclick="showView(\'office\')">من سجل المكاتب</button>':`<button class="secondary small" onclick="editCashMove('${m.id}')">تعديل</button><button class="danger small" onclick="deleteCashMove('${m.id}')">حذف</button>`;
-        return`<tr><td>${m.date||"-"}</td><td>${label}</td><td>${m.party||"-"}</td><td>${cashCategoryLabels[cat]||m.categoryLabel||cat||"-"}</td><td class="ltr">${fmt(e.syp,"SYP")}</td><td class="ltr">${fmtUsd(e.usd)}</td><td class="ltr">${num(m.exchangeRate)?num(m.exchangeRate).toLocaleString("en-US"):"-"}</td><td class="ltr">${fmt(after.syp,"SYP")} / ${fmtUsd(after.usd)}</td><td>${m.refNo?("سند: "+m.refNo+" - "):""}${m.note||"-"}</td><td>${action}</td></tr>`
+        const action=m.officeLinked?'<button class="secondary small" onclick="showView(\'office\')">من سجل المكاتب</button>':`<button class="secondary small" onclick="editCashMove('${inlineArg(m.id)}')">تعديل</button><button class="danger small" onclick="deleteCashMove('${inlineArg(m.id)}')">حذف</button>`;
+        const noteText=(m.refNo?("سند: "+displayText(m.refNo)+" - "):"")+displayText(m.note||"-");
+        return`<tr><td>${displayText(m.date||"-")}</td><td>${displayText(label)}</td><td>${displayText(m.party||"-")}</td><td>${displayText(cashCategoryLabels[cat]||m.categoryLabel||cat||"-")}</td><td class="ltr">${fmt(e.syp,"SYP")}</td><td class="ltr">${fmtUsd(e.usd)}</td><td class="ltr">${num(m.exchangeRate)?num(m.exchangeRate).toLocaleString("en-US"):"-"}</td><td class="ltr">${fmt(after.syp,"SYP")} / ${fmtUsd(after.usd)}</td><td>${noteText}</td><td>${action}</td></tr>`
       }).join("")}</tbody></table></div>`;
     };
 
@@ -2846,8 +2862,8 @@ td{
         ["حركة صافية USD",fmtUsd(r.netUsd)]
       ].map(x=>`<div class="card mini-summary"><div class="label">${x[0]}</div><div class="value">${x[1]}</div><div class="sub">حسب الفلاتر</div></div>`).join("");
       if($("cashReports"))$("cashReports").innerHTML=html;
-      if($("summaryReceive"))$("summaryReceive").textContent=`${fmt(r.receiveSyp,"SYP")} / ${fmtUsd(r.receiveUsd)}`;
-      if($("summaryPay"))$("summaryPay").textContent=`${fmt(r.paySyp+r.expenseSyp,"SYP")} / ${fmtUsd(r.payUsd+r.expenseUsd)}`;
+      if($("summaryReceive"))$("summaryReceive").innerHTML=`${fmt(r.receiveSyp,"SYP")} / ${fmtUsd(r.receiveUsd)}`;
+      if($("summaryPay"))$("summaryPay").innerHTML=`${fmt(r.paySyp+r.expenseSyp,"SYP")} / ${fmtUsd(r.payUsd+r.expenseUsd)}`;
       if($("summaryCashMovesCount"))$("summaryCashMovesCount").textContent=String(rows.length||0);
     };
 
@@ -2866,7 +2882,7 @@ td{
       if($("summaryLoans"))$("summaryLoans").textContent=`${rows.length}`;
       const el=$("loanSummary");if(!el)return;
       if(!rows.length){el.innerHTML='<div class="empty">لا توجد سلف مفتوحة حالياً.</div>';return}
-      el.innerHTML=`<div class="table-wrap"><table><thead><tr><th>الشخص / الاسم</th><th>التصنيف</th><th>سلفة مفتوحة SYP</th><th>سلفة مفتوحة USD</th><th>آخر حركة</th><th>الحالة</th></tr></thead><tbody>${rows.map(x=>`<tr><td>${x.party}</td><td>${cashCategoryLabels[x.category]||x.category}</td><td class="ltr">${fmt(x.syp,"SYP")}</td><td class="ltr">${fmtUsd(x.usd)}</td><td>${x.last||"-"}</td><td>${x.syp<0||x.usd<0?"زيادة إرجاع":"مفتوحة"}</td></tr>`).join("")}</tbody></table></div>`;
+      el.innerHTML=`<div class="table-wrap"><table><thead><tr><th>الشخص / الاسم</th><th>التصنيف</th><th>سلفة مفتوحة SYP</th><th>سلفة مفتوحة USD</th><th>آخر حركة</th><th>الحالة</th></tr></thead><tbody>${rows.map(x=>`<tr><td>${displayText(x.party)}</td><td>${displayText(cashCategoryLabels[x.category]||x.category)}</td><td class="ltr">${fmt(x.syp,"SYP")}</td><td class="ltr">${fmtUsd(x.usd)}</td><td>${displayText(x.last||"-")}</td><td>${x.syp<0||x.usd<0?"زيادة إرجاع":"مفتوحة"}</td></tr>`).join("")}</tbody></table></div>`;
     };
 
     window.copyCashReport=async function(){
@@ -2916,12 +2932,13 @@ td{
       });
       deliveries.forEach(d=>{
         const n=deliveryNumbers(d);
-        // يدخل هنا قص السوري للدولار + أي دولار مباشر سلّمه المندوب حسب سعر الصرف
-        const delegateCutSyp=num(n.cutSyp)+num(n.deliveredUsdAsSyp);
-        const delegateCutUsd=Number(n.cutUsd||0)+Number(n.directUsd||0);
-        s.cutSyp+=delegateCutSyp;
-        s.cutUsd+=delegateCutUsd;
-        if(n.rate>0 && delegateCutSyp>0){s.rateWeightedSum+=n.rate*delegateCutSyp;s.rateWeight+=delegateCutSyp}
+        const actualCutSyp=num(n.cutSyp);
+        const actualCutUsd=Number(n.cutUsd||0);
+        const directUsdAsSyp=num(n.deliveredUsdAsSyp);
+        const directUsd=Number(n.directUsd||0);
+        s.cutSyp+=actualCutSyp+directUsdAsSyp;
+        s.cutUsd+=actualCutUsd+directUsd;
+        if(n.rate>0 && actualCutSyp>0){s.rateWeightedSum+=n.rate*actualCutSyp;s.rateWeight+=actualCutSyp}
       });
       officeMoves.forEach(m=>{
         if(m.type!=="office_convert_syp_to_usd")return;
@@ -3122,7 +3139,7 @@ td{
     }
     function renderDashboardCashboxes(){return}
     function fillOfficeMoveSelects(){
-      const targetOptions='<option value="">اختر المكتب / الصندوق</option>'+officeTransferTargets().map(o=>`<option value="${o.id}">${o.region} - ${o.name}</option>`).join("");
+      const targetOptions='<option value="">اختر المكتب / الصندوق</option>'+officeTransferTargets().map(o=>optionHTML(o.id,`${o.region} - ${o.name}`)).join("");
       ["officeFromOffice","officeToOffice"].forEach(id=>{const el=$(id);if(!el)return;const keep=el.value;el.innerHTML=targetOptions;if([...el.options].some(o=>o.value===keep))el.value=keep});
       fillOfficeLogNameFilter();
     }
@@ -3139,7 +3156,7 @@ td{
         seen.add(id);
         list.push(o);
       });
-      el.innerHTML='<option value="">كل المكاتب والصناديق</option>'+list.map(o=>`<option value="${o.id}">${o.region} - ${o.name}</option>`).join("");
+      el.innerHTML='<option value="">كل المكاتب والصناديق</option>'+list.map(o=>optionHTML(o.id,`${o.region} - ${o.name}`)).join("");
       if([...el.options].some(o=>o.value===keep))el.value=keep;else el.value="";
     }
 
@@ -3211,7 +3228,7 @@ td{
       if(boxWrap){
         boxWrap.innerHTML=transferCashboxes.map(x=>{
           const b=boxBalances[x.id]||{syp:0,usd:0};
-          return`<div class="office-cashbox-card"><div class="box-name">${x.name}</div><div class="box-tag">صندوق ضمن رصيد المكاتب والحوالات</div><div class="box-balance">${fmt(b.syp,"SYP")} / ${fmtUsd(b.usd)}</div></div>`;
+          return`<div class="office-cashbox-card"><div class="box-name">${displayText(x.name)}</div><div class="box-tag">صندوق ضمن رصيد المكاتب والحوالات</div><div class="box-balance">${fmt(b.syp,"SYP")} / ${fmtUsd(b.usd)}</div></div>`;
         }).join("");
       }
       el.innerHTML=allOffices.map(o=>{
@@ -3220,11 +3237,44 @@ td{
         if(officeHubCurrencyMode==="SYP")body=`<div class="office-hub-amount">${fmt(b.syp,"SYP")}</div>`;
         else if(officeHubCurrencyMode==="USD")body=`<div class="office-hub-amount">${fmtUsd(b.usd)}</div>`;
         else body=`<div class="office-hub-dual"><div><span>SYP</span><b>${fmt(b.syp)}</b></div><div><span>USD</span><b>${fmtUsd(b.usd)}</b></div></div>`;
-        return`<div class="office-hub-card" onclick="showOfficeDetails('${o.id}')"><div class="office-hub-name">${o.name}</div><div class="office-hub-region">${o.region}</div>${body}</div>`;
+        return`<div class="office-hub-card" onclick="showOfficeDetails('${inlineArg(o.id)}')"><div class="office-hub-name">${displayText(o.name)}</div><div class="office-hub-region">${displayText(o.region)}</div>${body}</div>`;
       }).join("");
     }
+
     function toggleField(id,show){const el=$(id);if(el)el.style.display=show?"":"none"}
     function readOfficeFeeParts(){const feeAmount=num($("officeMoveFeeAmount")?.value);const feeCurrency=$("officeMoveFeeCurrency")?.value||"SYP";return feeCurrency==="USD"?{feeSyp:0,feeUsd:feeAmount}:{feeSyp:feeAmount,feeUsd:0}}
+    const officeMoveModeRules={
+      office_to_office:{from:true,to:true,fee:true,amountSyp:true,amountUsd:true},
+      office_to_cashbox:{from:true,to:true,fee:true,amountSyp:true,amountUsd:true},
+      office_convert_syp_to_usd:{from:true,rate:true,amountSyp:true,amountUsd:true},
+      office_to_external:{from:true,party:true,fee:true,amountSyp:true,amountUsd:true},
+      office_payout:{from:true,party:true,fee:true,amountSyp:true,amountUsd:true},
+      office_adjust_plus:{to:true,amountSyp:true,amountUsd:true},
+      office_adjust_minus:{from:true,amountSyp:true,amountUsd:true}
+    };
+    function officeMoveUses(type){return officeMoveModeRules[type]||officeMoveModeRules.office_to_office}
+    function officeEffectHasValue(effectMap){
+      return Object.values(effectMap||{}).some(e=>Math.abs(num(e.syp))>0.0001||Math.abs(Number(e.usd||0))>0.0001);
+    }
+    function validateOfficeMove(m){
+      const uses=officeMoveUses(m.type);
+      if(uses.from&&!m.fromOfficeId)return "اختر مكتب/صندوق المصدر.";
+      if(uses.to&&!m.toOfficeId)return "اختر مكتب/صندوق الوجهة.";
+      if(m.type==="office_to_office"){
+        if(isCashboxTarget(m.fromOfficeId)||isCashboxTarget(m.toOfficeId))return "تحويل مكتب لمكتب يحتاج مكتبين، وليس صندوق.";
+        if(m.fromOfficeId===m.toOfficeId)return "لا يمكن تحويل المكتب إلى نفسه.";
+      }
+      if(m.type==="office_to_cashbox"&&!isCashboxTarget(m.toOfficeId))return "اختر صندوقاً كوجهة لهذه الحركة.";
+      if(m.type==="office_convert_syp_to_usd"){
+        if(m.amountSyp<=0)return "اكتب المبلغ السوري المراد قصه.";
+        if(m.exchangeRate<=0)return "اكتب سعر الصرف لقص المكتب.";
+      }else if(m.amountSyp<=0&&m.amountUsd<=0){
+        return "اكتب مبلغ SYP أو USD.";
+      }
+      const effects=getOfficeMoveEffect(m);
+      if(!officeEffectHasValue(effects.officeEffects)&&!officeEffectHasValue(effects.cashboxEffects))return "هذه الحركة لا تؤثر على أي رصيد. راجع المكتب أو الصندوق.";
+      return "";
+    }
     function updateOfficeMoveMode(){
       const type=$("officeMoveType")?.value||"office_to_office";
       toggleField("officeFromOfficeField",["office_to_office","office_to_cashbox","office_convert_syp_to_usd","office_to_external","office_payout","office_adjust_minus"].includes(type));
@@ -3237,26 +3287,29 @@ td{
     window.updateOfficeMoveMode=updateOfficeMoveMode;
     window.updateOfficeMovePreview=function(){return}
     function readOfficeMoveForm(includeId=true){
-      const fees=readOfficeFeeParts();
+      const type=$("officeMoveType")?.value||"office_to_office";
+      const uses=officeMoveUses(type);
+      const fees=uses.fee?readOfficeFeeParts():{feeSyp:0,feeUsd:0};
       return{
         id:includeId?($("editingOfficeMoveId")?.value||""):"",
-        type:$("officeMoveType")?.value||"office_to_office",
+        type,
         date:$("officeMoveDate")?.value||todayString(),
-        fromOfficeId:$("officeFromOffice")?.value||"",
-        toOfficeId:$("officeToOffice")?.value||"",
+        fromOfficeId:uses.from?($("officeFromOffice")?.value||""):"",
+        toOfficeId:uses.to?($("officeToOffice")?.value||""):"",
         fromCashboxId:"",
         toCashboxId:"",
-        party:$("officeMoveParty")?.value.trim()||"",
-        amountSyp:num($("officeMoveSyp")?.value),
-        amountUsd:Number(clean($("officeMoveUsd")?.value)||0),
+        party:uses.party?($("officeMoveParty")?.value.trim()||""):"",
+        amountSyp:uses.amountSyp?num($("officeMoveSyp")?.value):0,
+        amountUsd:uses.amountUsd?Number(clean($("officeMoveUsd")?.value)||0):0,
         feeSyp:fees.feeSyp,
         feeUsd:fees.feeUsd,
-        exchangeRate:num($("officeMoveRate")?.value),
+        exchangeRate:uses.rate?num($("officeMoveRate")?.value):0,
         refNo:"",
         note:$("officeMoveNote")?.value.trim()||""
       }
     }
-    window.saveOfficeMove=async function(){try{if(!auth.currentUser)return;const m=readOfficeMoveForm();if(m.amountSyp<=0&&m.amountUsd<=0)return setStatus("اكتب مبلغ SYP أو USD.");if(m.type==="office_convert_syp_to_usd"&&m.exchangeRate<=0&&m.amountUsd<=0)return setStatus("اكتب سعر الصرف أو مبلغ الدولار الناتج.");const ref=m.id?doc(db,"officeMovements",m.id):doc(collection(db,"officeMovements"));const from=targetDisplayName(m.fromOfficeId)||"",to=targetDisplayName(m.toOfficeId)||"";await setDoc(ref,{...m,id:ref.id,label:officeMoveLabels[m.type]||m.type,fromOfficeName:from,toOfficeName:to,fromCashboxName:"",toCashboxName:"",createdBy:auth.currentUser.uid,updatedAt:serverTimestamp(),...(m.id?{}:{createdAt:serverTimestamp()})},{merge:true});resetOfficeMoveForm();renderOfficeHub();renderOfficeLog();renderOfficeReports();renderDashboardCashboxes();renderCashboxes()}catch(e){setStatus("فشل حفظ حركة المكتب: "+e.message)}}
+
+    window.saveOfficeMove=async function(){try{if(!auth.currentUser)return;const m=readOfficeMoveForm();const validation=validateOfficeMove(m);if(validation)return setStatus(validation);const ref=m.id?doc(db,"officeMovements",m.id):doc(collection(db,"officeMovements"));const from=targetDisplayName(m.fromOfficeId)||"",to=targetDisplayName(m.toOfficeId)||"";await setDoc(ref,{...m,id:ref.id,label:officeMoveLabels[m.type]||m.type,fromOfficeName:from,toOfficeName:to,fromCashboxName:"",toCashboxName:"",createdBy:auth.currentUser.uid,updatedAt:serverTimestamp(),...(m.id?{}:{createdAt:serverTimestamp()})},{merge:true});resetOfficeMoveForm();renderOfficeHub();renderOfficeLog();renderOfficeReports();renderDashboardCashboxes();renderCashboxes()}catch(e){setStatus("فشل حفظ حركة المكتب: "+e.message)}}
     window.resetOfficeMoveForm=function(){
       if(!$("editingOfficeMoveId"))return;
       $("editingOfficeMoveId").value="";
@@ -3305,7 +3358,8 @@ td{
       officeLogRenderTimer=setTimeout(()=>renderOfficeLog(),0);
     };
 
-    function renderOfficeLog(){const el=$("officeMovementLog");if(!el)return;const rows=getFilteredOfficeMoves();if(!rows.length){el.innerHTML='<div class="empty">لا توجد حركات مكاتب حالياً.</div>';return}el.innerHTML=`<div class="table-wrap"><table><thead><tr><th>التاريخ</th><th>العملية</th><th>من</th><th>إلى</th><th>الاسم</th><th>SYP</th><th>USD</th><th>عمولة</th><th>سعر الصرف</th><th>سند/ملاحظات</th><th>إجراء</th></tr></thead><tbody>${rows.map(m=>`<tr><td>${m.date||"-"}</td><td>${officeMoveLabels[m.type]||m.type}</td><td>${m.fromOfficeName||m.fromCashboxName||"-"}</td><td>${m.toOfficeName||m.toCashboxName||"-"}</td><td>${m.party||"-"}</td><td class="ltr">${fmt(m.amountSyp,"SYP")}</td><td class="ltr">${fmtUsd(m.amountUsd)}</td><td class="ltr">${num(m.feeUsd)>0?fmtUsd(m.feeUsd):fmt(m.feeSyp,"SYP")}</td><td class="ltr">${num(m.exchangeRate)?num(m.exchangeRate).toLocaleString("en-US"):"-"}</td><td>${m.note||"-"}</td><td><button class="secondary small" onclick="editOfficeMove('${m.id}')">تعديل</button><button class="danger small" onclick="deleteOfficeMove('${m.id}')">حذف</button></td></tr>`).join("")}</tbody></table></div>`}
+    function renderOfficeLog(){const el=$("officeMovementLog");if(!el)return;const rows=getFilteredOfficeMoves();if(!rows.length){el.innerHTML='<div class="empty">لا توجد حركات مكاتب حالياً.</div>';return}el.innerHTML=`<div class="table-wrap"><table><thead><tr><th>التاريخ</th><th>العملية</th><th>من</th><th>إلى</th><th>الاسم</th><th>SYP</th><th>USD</th><th>عمولة</th><th>سعر الصرف</th><th>سند/ملاحظات</th><th>إجراء</th></tr></thead><tbody>${rows.map(m=>{const usd=getOfficeMoveDisplayUsd(m);return `<tr><td>${displayText(m.date||"-")}</td><td>${displayText(officeMoveLabels[m.type]||m.type)}</td><td>${displayText(m.fromOfficeName||m.fromCashboxName||targetDisplayName(m.fromOfficeId)||"-")}</td><td>${displayText(m.toOfficeName||m.toCashboxName||targetDisplayName(m.toOfficeId)||"-")}</td><td>${displayText(m.party||"-")}</td><td class="ltr">${fmt(m.amountSyp,"SYP")}</td><td class="ltr">${fmtUsd(usd)}</td><td class="ltr">${num(m.feeUsd)>0?fmtUsd(m.feeUsd):fmt(m.feeSyp,"SYP")}</td><td class="ltr">${num(m.exchangeRate)?num(m.exchangeRate).toLocaleString("en-US"):"-"}</td><td>${displayText(m.note||"-")}</td><td><button class="secondary small" onclick="editOfficeMove('${inlineArg(m.id)}')">تعديل</button><button class="danger small" onclick="deleteOfficeMove('${inlineArg(m.id)}')">حذف</button></td></tr>`}).join("")}</tbody></table></div>`}
+
     window.toggleOfficeLog=function(){const el=$("officeLogBox");if(el)el.style.display=el.style.display==="none"?"block":"none"}
     window.clearOfficeMoveFilters=function(){["officeMoveRegionFilter","officeMoveNameFilter","officeMoveTypeFilter","officeMoveFromDate","officeMoveToDate"].forEach(id=>{if($(id))$(id).value=""});renderOfficeLog()}
     function renderOfficeReports(){const el=$("officeReportsGrid");if(!el)return;let feesSyp=0,feesUsd=0;for(const m of officeMoves){feesSyp+=num(m.feeSyp);feesUsd+=num(m.feeUsd)}const totalOfficeSyp=allOffices.reduce((a,o)=>a+getOfficeBalance(o.id).syp,0),totalOfficeUsd=allOffices.reduce((a,o)=>a+getOfficeBalance(o.id).usd,0),activeCount=allOffices.filter(o=>getOfficeBalance(o.id).syp!==0||getOfficeBalance(o.id).usd!==0).length;const cards=[["إجمالي أرصدة المكاتب SYP",fmt(totalOfficeSyp,"SYP")],["إجمالي أرصدة المكاتب USD",fmtUsd(totalOfficeUsd)],["إجمالي العمولات",`${fmt(feesSyp,"SYP")} / ${fmtUsd(feesUsd)}`],["عدد الحركات",String(officeMoves.length||0)],["المكاتب النشطة",String(activeCount)]];el.innerHTML=cards.map(c=>`<div class="card"><div class="label">${c[0]}</div><div class="value">${c[1]}</div><div class="sub">حسب كل السجلات</div></div>`).join("")}
@@ -3318,7 +3372,7 @@ td{
         m.toOfficeName||m.toCashboxName||"",
         m.party||"",
         num(m.amountSyp),
-        Number(m.amountUsd||0).toFixed(2),
+        Number(getOfficeMoveDisplayUsd(m)||0).toFixed(2),
         num(m.feeUsd)>0?Number(m.feeUsd||0).toFixed(2):num(m.feeSyp),
         num(m.exchangeRate)||"",
         m.note||""
@@ -3341,9 +3395,9 @@ td{
 
       $("officeGrid").innerHTML=active.map(o=>{
         const b=getOfficeBalance(o.id);
-        return `<div class="card office-card office-dual-balance-card" onclick="showOfficeDetails('${o.id}')">
-          <div class="label">${o.region}</div>
-          <div class="value office-name-value" style="direction:rtl;text-align:right;">${o.name}</div>
+        return `<div class="card office-card office-dual-balance-card" onclick="showOfficeDetails('${inlineArg(o.id)}')">
+          <div class="label">${displayText(o.region)}</div>
+          <div class="value office-name-value" style="direction:rtl;text-align:right;">${displayText(o.name)}</div>
           <div class="office-hub-dual office-dashboard-dual">
             <div><span>رصيد SYP</span><b>${fmt(b.syp,"SYP")}</b></div>
             <div><span>رصيد USD</span><b>${fmtUsd(b.usd)}</b></div>
@@ -3353,6 +3407,7 @@ td{
       }).join("");
       markNegativeAmounts();
     }
+
     function delegateTotalBalance(delegateName,excludeDeliveryId=""){
       const revenue=revenues.filter(r=>r.delegateName===delegateName).reduce((a,r)=>a+num(r.revenueSyp),0);
       const delivered=deliveries.filter(d=>d.delegateName===delegateName&&d.id!==excludeDeliveryId).reduce((a,d)=>a+deliveryNumbers(d).totalAsSyp,0);
@@ -3382,12 +3437,12 @@ td{
       const directUsdAsSyp=rate>0?directUsd*rate:0;
       const totalDecrease=inputSyp+directUsdAsSyp;
       const needsRate=(cut&&inputSyp>0)||directUsd>0;
-      $("calcBefore").textContent=fmt(before,"SYP");
+      $("calcBefore").innerHTML=fmt(before,"SYP");
       $("calcRate").textContent=rate?rate.toLocaleString("en-US"):(needsRate?"مطلوب":"0");
-      $("calcCutUsd").textContent=cut?fmtUsd(cutUsd):fmtUsd(0);
-      if($("calcDirectUsdAsSyp"))$("calcDirectUsdAsSyp").textContent=fmt(directUsdAsSyp,"SYP");
-      if($("calcTotalDelivered"))$("calcTotalDelivered").textContent=fmt(totalDecrease,"SYP");
-      $("calcAfter").textContent=fmt(before-totalDecrease,"SYP");
+      $("calcCutUsd").innerHTML=cut?fmtUsd(cutUsd):fmtUsd(0);
+      if($("calcDirectUsdAsSyp"))$("calcDirectUsdAsSyp").innerHTML=fmt(directUsdAsSyp,"SYP");
+      if($("calcTotalDelivered"))$("calcTotalDelivered").innerHTML=fmt(totalDecrease,"SYP");
+      $("calcAfter").innerHTML=fmt(before-totalDecrease,"SYP");
       if($("delRate"))$("delRate").classList.toggle("rate-required",needsRate&&rate<=0);
       if($("delRateHint"))$("delRateHint").textContent=needsRate&&rate<=0?"اكتب سعر الصرف حتى يكتمل حساب القص/الدولار.":"اكتبه عند القص أو عند وجود دولار مباشر.";
       updateDeliveryModeUi();
@@ -3493,7 +3548,7 @@ td{
       const dayRevs=revenues.filter(r=>r.delegateName===delegateName&&r.date===date&&r.id!==editId);
       const total=dayRevs.reduce((a,r)=>a+num(r.revenueSyp),0);
       if($("revBalanceBadge"))$("revBalanceBadge").style.display=total>0?"flex":"none";
-      if($("revTodayTotal"))$("revTodayTotal").textContent=fmt(total,"SYP");
+      if($("revTodayTotal"))$("revTodayTotal").innerHTML=fmt(total,"SYP");
       if($("revDupWarn"))$("revDupWarn").style.display=dayRevs.length>0?"block":"none";
     };
 
@@ -3502,7 +3557,7 @@ td{
       const icons={success:"✅",error:"❌",info:"ℹ️",warn:"⚠️"};
       const el=document.createElement("div");
       el.className="toast "+type;
-      el.innerHTML=`<span class="toast-icon">${icons[type]||"ℹ️"}</span><span>${msg}</span>`;
+      el.innerHTML=`<span class="toast-icon">${icons[type]||"ℹ️"}</span><span>${escapeHTML(msg)}</span>`;
       const container=$("toastContainer");if(!container)return;
       container.appendChild(el);
       setTimeout(()=>{el.classList.add("removing");setTimeout(()=>el.remove(),240)},duration);
@@ -3556,10 +3611,10 @@ td{
       let html=`<div class="money-row"><span>الرصيد السوري</span><span>${fmt(b.syp,"SYP")}</span></div><div class="money-row"><span>الرصيد الدولار</span><span>${fmtUsd(b.usd)}</span></div>`;
       if(!related.length&&!moves.length)html+=`<div class="empty" style="margin-top:12px;">لا توجد تسليمات أو حركات لهذا المكتب.</div>`;
       if(related.length){
-        html+=`<div class="table-wrap" style="margin-top:12px;"><table><thead><tr><th colspan="6">تسليمات المندوبين إلى المكتب</th></tr><tr><th>التاريخ</th><th>المندوب</th><th>سوري مباشر</th><th>دولار للمكتب</th><th>سعر الصرف</th><th>المحسوب على المندوب</th></tr></thead><tbody>${related.map(d=>{const n=deliveryNumbers(d);return`<tr><td>${d.date||"-"}</td><td>${d.delegateName||"-"}</td><td class="ltr">${fmt(n.deliveredSyp,"SYP")}</td><td class="ltr">${fmtUsd(n.deliveredUsd)}</td><td class="ltr">${n.exchangeRate?fmt(n.exchangeRate,"SYP"):"-"}</td><td class="ltr">${fmt(n.totalAsSyp,"SYP")}</td></tr>`}).join("")}</tbody></table></div>`;
+        html+=`<div class="table-wrap" style="margin-top:12px;"><table><thead><tr><th colspan="6">تسليمات المندوبين إلى المكتب</th></tr><tr><th>التاريخ</th><th>المندوب</th><th>سوري مباشر</th><th>دولار للمكتب</th><th>سعر الصرف</th><th>المحسوب على المندوب</th></tr></thead><tbody>${related.map(d=>{const n=deliveryNumbers(d);return`<tr><td>${displayText(d.date||"-")}</td><td>${displayText(d.delegateName||"-")}</td><td class="ltr">${fmt(n.deliveredSyp,"SYP")}</td><td class="ltr">${fmtUsd(n.deliveredUsd)}</td><td class="ltr">${n.exchangeRate?fmt(n.exchangeRate,"SYP"):"-"}</td><td class="ltr">${fmt(n.totalAsSyp,"SYP")}</td></tr>`}).join("")}</tbody></table></div>`;
       }
       if(moves.length){
-        html+=`<div class="table-wrap" style="margin-top:12px;"><table><thead><tr><th colspan="7">حركات المكتب والحوالات</th></tr><tr><th>التاريخ</th><th>العملية</th><th>من</th><th>إلى</th><th>أثر SYP</th><th>أثر USD</th><th>ملاحظات</th></tr></thead><tbody>${moves.map(({m,e})=>`<tr><td>${m.date||"-"}</td><td>${officeMoveLabels[m.type]||m.type||"-"}</td><td>${m.fromOfficeName||m.fromCashboxName||targetDisplayName(m.fromOfficeId)||"-"}</td><td>${m.toOfficeName||m.toCashboxName||targetDisplayName(m.toOfficeId)||"-"}</td><td class="ltr">${fmt(e.syp,"SYP")}</td><td class="ltr">${fmtUsd(e.usd)}</td><td>${m.note||"-"}</td></tr>`).join("")}</tbody></table></div>`;
+        html+=`<div class="table-wrap" style="margin-top:12px;"><table><thead><tr><th colspan="7">حركات المكتب والحوالات</th></tr><tr><th>التاريخ</th><th>العملية</th><th>من</th><th>إلى</th><th>أثر SYP</th><th>أثر USD</th><th>ملاحظات</th></tr></thead><tbody>${moves.map(({m,e})=>`<tr><td>${displayText(m.date||"-")}</td><td>${displayText(officeMoveLabels[m.type]||m.type||"-")}</td><td>${displayText(m.fromOfficeName||m.fromCashboxName||targetDisplayName(m.fromOfficeId)||"-")}</td><td>${displayText(m.toOfficeName||m.toCashboxName||targetDisplayName(m.toOfficeId)||"-")}</td><td class="ltr">${fmt(e.syp,"SYP")}</td><td class="ltr">${fmtUsd(e.usd)}</td><td>${displayText(m.note||"-")}</td></tr>`).join("")}</tbody></table></div>`;
       }
       $("modalContent").innerHTML=html;$("officeModal").classList.add("show");
     };window.hideOfficeModal=function(){$("officeModal").classList.remove("show")};window.closeOfficeModal=function(e){if(e.target.id==="officeModal")hideOfficeModal()};
@@ -3625,8 +3680,8 @@ td{
         const detailsOpen=expandedDetailsDays.has(day);
 
         const summaryRows=rows.map(x=>`<tr>
-          <td>${x.delegateName}</td>
-          <td>${x.region}</td>
+          <td>${displayText(x.delegateName)}</td>
+          <td>${displayText(x.region)}</td>
           <td class="ltr revenue-cell">${fmt(x.revToday,"SYP")}</td>
           <td class="ltr type-masary-cell">${fmt(x.masaryToday,"SYP")}</td>
           <td class="ltr type-ccbs-cell">${fmt(x.ccbsToday,"SYP")}</td>
@@ -3636,14 +3691,14 @@ td{
           <td class="ltr">${fmtUsd(x.directUsdToday)}</td>
           <td class="ltr total-cell">${fmt(x.deliveredTodayAsSyp,"SYP")}</td>
           <td class="ltr remain-cell">${fmt(x.remaining,"SYP")}</td>
-          <td>${[...x.offices].join("، ")||"-"}</td>
-          <td><button class="secondary small action-open" onclick="openDayDetails('${day}')">تعديل / حذف</button></td>
+          <td>${displayJoined(x.offices)}</td>
+          <td><button class="secondary small action-open" onclick="openDayDetails('${inlineArg(day)}')">تعديل / حذف</button></td>
         </tr>`).join("");
 
         const revenueRows=dayRevs.map(r=>`<tr>
-          <td>إيراد</td><td>${r.delegateName}</td><td>${r.region}</td><td>${getTypeLabel(r.revenueType)}</td>
+          <td>إيراد</td><td>${displayText(r.delegateName)}</td><td>${displayText(r.region)}</td><td>${getTypeLabel(r.revenueType)}</td>
           <td class="ltr revenue-cell">${fmt(r.revenueSyp,"SYP")}</td><td class="ltr">-</td><td class="ltr">-</td><td>-</td>
-          <td class="record-actions"><button class="secondary small edit-btn" onclick="editRevenue('${r.id}')">تعديل</button><button class="danger small" onclick="deleteRevenue('${r.id}')">حذف</button></td>
+          <td class="record-actions"><button class="secondary small edit-btn" onclick="editRevenue('${inlineArg(r.id)}')">تعديل</button><button class="danger small" onclick="deleteRevenue('${inlineArg(r.id)}')">حذف</button></td>
         </tr>`).join("");
 
         const deliveryRows=dayDels.sort((a,b)=>deliverySortKey(a).localeCompare(deliverySortKey(b))).map(d=>{
@@ -3653,16 +3708,16 @@ td{
           const usdText=[n.cutUsd>0?`ناتج ${fmtUsd(n.cutUsd)}`:"",n.directUsd>0?`مباشر ${fmtUsd(n.directUsd)}`:""].filter(Boolean).join(" / ")||"-";
           const rateText=n.rate>0?n.rate.toLocaleString("en-US"):"-";
           return`<tr>
-            <td>${op}</td><td>${d.delegateName}</td><td>${d.region}</td><td>${d.officeName||"-"}</td>
-            <td class="ltr">${sypText}</td><td class="ltr">${usdText}</td><td class="ltr">${rateText}</td><td>${d.note||"-"}</td>
-            <td class="record-actions"><button class="secondary small edit-btn" onclick="editDelivery('${d.id}')">تعديل</button><button class="danger small" onclick="deleteDelivery('${d.id}')">حذف</button></td>
+            <td>${displayText(op)}</td><td>${displayText(d.delegateName)}</td><td>${displayText(d.region)}</td><td>${displayText(d.officeName||"-")}</td>
+            <td class="ltr">${sypText}</td><td class="ltr">${usdText}</td><td class="ltr">${rateText}</td><td>${displayText(d.note||"-")}</td>
+            <td class="record-actions"><button class="secondary small edit-btn" onclick="editDelivery('${inlineArg(d.id)}')">تعديل</button><button class="danger small" onclick="deleteDelivery('${inlineArg(d.id)}')">حذف</button></td>
           </tr>`;
         }).join("");
 
         return`<div class="day-box clean-day-box">
           <div class="day-head clean-day-head">
             <div>
-              <div class="day-title">إيراد ${day}</div>
+              <div class="day-title">إيراد ${displayText(day)}</div>
               <div class="day-total">
                 <span class="pill">إيراد اليوم: ${fmt(totalRevenueToday,"SYP")}</span>
                 <span class="pill">مصاري: ${fmt(totalMasaryToday,"SYP")}</span>
@@ -3674,8 +3729,8 @@ td{
               </div>
             </div>
             <div class="daily-buttons">
-              <button class="secondary small" onclick="toggleDay('${day}')">${hidden?"فتح الملخص":"إغلاق الملخص"}</button>
-              <button class="secondary small" onclick="toggleDayDetails('${day}')">${detailsOpen?"إخفاء التفاصيل":"تفاصيل الحركات"}</button>
+              <button class="secondary small" onclick="toggleDay('${inlineArg(day)}')">${hidden?"فتح الملخص":"إغلاق الملخص"}</button>
+              <button class="secondary small" onclick="toggleDayDetails('${inlineArg(day)}')">${detailsOpen?"إخفاء التفاصيل":"تفاصيل الحركات"}</button>
             </div>
           </div>
           ${hidden?"":`
@@ -3698,25 +3753,40 @@ function collectCutDollarRows(){
       const rows=[];
       for(const d of deliveries){
         const n=deliveryNumbers(d);
-        const delegateCutSyp=num(n.cutSyp)+num(n.deliveredUsdAsSyp);
-        const delegateCutUsd=Number(n.cutUsd||0)+Number(n.directUsd||0);
-        if(delegateCutSyp>0 || delegateCutUsd>0){
-          const parts=[];
-          if(num(n.cutSyp)>0)parts.push(`قص سوري ${fmt(n.cutSyp,"SYP")}`);
-          if(Number(n.cutUsd||0)>0)parts.push(`دولار من القص ${fmtUsd(n.cutUsd)}`);
-          if(Number(n.directUsd||0)>0)parts.push(`دولار مباشر ${fmtUsd(n.directUsd)}`);
+        if(num(n.cutSyp)>0 || Number(n.cutUsd||0)>0){
+          const detail=`قص سوري ${fmt(n.cutSyp,"SYP")} / دولار من القص ${fmtUsd(n.cutUsd)}`;
           rows.push({
-            id:"delivery_"+(d.id||""),
+            id:"delivery_cut_"+(d.id||""),
             date:d.date||"",
             source:"delegate",
             sourceLabel:"مندوب",
+            operationType:"cut",
+            operationLabel:cutOperationLabel("cut"),
             name:d.delegateName||"-",
             target:d.officeName||"-",
-            cutSyp:delegateCutSyp,
-            usd:delegateCutUsd,
+            cutSyp:num(n.cutSyp),
+            usd:Number(n.cutUsd||0),
             rate:n.rate,
-            note:d.note||parts.join(" / "),
-            detail:parts.join(" / ")
+            note:d.note||detail,
+            detail
+          });
+        }
+        if(Number(n.directUsd||0)>0){
+          const detail=`دولار مباشر ${fmtUsd(n.directUsd)} / يغطي ${fmt(n.deliveredUsdAsSyp,"SYP")} من المتبقي`;
+          rows.push({
+            id:"delivery_direct_"+(d.id||""),
+            date:d.date||"",
+            source:"delegate",
+            sourceLabel:"مندوب",
+            operationType:"directUsd",
+            operationLabel:cutOperationLabel("directUsd"),
+            name:d.delegateName||"-",
+            target:d.officeName||"-",
+            cutSyp:num(n.deliveredUsdAsSyp),
+            usd:Number(n.directUsd||0),
+            rate:n.rate,
+            note:d.note||detail,
+            detail
           });
         }
       }
@@ -3724,12 +3794,14 @@ function collectCutDollarRows(){
         if(m.type!=="office_convert_syp_to_usd")continue;
         const amountSyp=num(m.amountSyp);
         const rate=num(m.exchangeRate);
-        const amountUsd=Number(m.amountUsd||0) || (rate>0?amountSyp/rate:0);
+        const amountUsd=getOfficeMoveDisplayUsd(m);
         rows.push({
           id:"office_"+(m.id||""),
           date:m.date||"",
           source:"office",
           sourceLabel:"مكتب",
+          operationType:"cut",
+          operationLabel:cutOperationLabel("cut"),
           name:targetDisplayName(m.fromOfficeId)||m.fromOfficeName||"-",
           target:targetDisplayName(m.toOfficeId)||m.toOfficeName||"-",
           cutSyp:amountSyp,
@@ -3766,18 +3838,21 @@ function collectCutDollarRows(){
       const rows=getFilteredCutDollarRows();
       const totalSyp=rows.reduce((a,r)=>a+num(r.cutSyp),0);
       const totalUsd=rows.reduce((a,r)=>a+Number(r.usd||0),0);
-      const weightedRows=rows.filter(r=>num(r.rate)>0&&num(r.syp)>0);
-      const avgRate=weightedRows.reduce((a,r)=>a+(num(r.rate)*num(r.syp)),0)/(weightedRows.reduce((a,r)=>a+num(r.syp),0)||1);
+      const weightedRows=rows.filter(r=>r.operationType==="cut"&&num(r.rate)>0&&num(r.cutSyp)>0);
+      const avgRate=weightedRows.reduce((a,r)=>a+(num(r.rate)*num(r.cutSyp)),0)/(weightedRows.reduce((a,r)=>a+num(r.cutSyp),0)||1);
 
-      if($("cutTotalSyp"))$("cutTotalSyp").textContent=fmt(totalSyp,"SYP");
-      if($("cutTotalUsd"))$("cutTotalUsd").textContent=fmtUsd(totalUsd);
+      if($("cutTotalSyp"))$("cutTotalSyp").innerHTML=fmt(totalSyp,"SYP");
+      if($("cutTotalUsd"))$("cutTotalUsd").innerHTML=fmtUsd(totalUsd);
       if($("cutCount"))$("cutCount").textContent=String(rows.length);
-      if($("cutAvgRate"))$("cutAvgRate").textContent=rows.some(r=>num(r.rate)>0)?Math.round(avgRate).toLocaleString("en-US"):"0";
+      if($("cutAvgRate"))$("cutAvgRate").textContent=weightedRows.length?Math.round(avgRate).toLocaleString("en-US"):"0";
 
       const el=$("cutDollarLog");if(!el)return;
       if(!rows.length){el.innerHTML='<div class="empty">لا توجد حركات قص دولار حسب الفلتر الحالي.</div>';return}
-      el.innerHTML=`<div class="table-wrap"><table><thead><tr><th>التاريخ</th><th>المصدر</th><th>المندوب / المكتب</th><th>الاسم / المكتب</th><th>قص السوري</th><th>الدولار الناتج</th><th>سعر الصرف</th><th>ملاحظات</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${r.date||"-"}</td><td>${r.sourceLabel}</td><td>${r.name}</td><td>${r.target}</td><td class="ltr cut-detail">${fmt(r.cutSyp,"SYP")}</td><td class="ltr">${fmtUsd(r.usd)}</td><td class="ltr">${num(r.rate)?num(r.rate).toLocaleString("en-US"):"-"}</td><td>${r.note||r.detail||"-"}</td></tr>`).join("")}</tbody></table></div>`;
+      el.innerHTML=`<div class="table-wrap"><table><thead><tr><th>التاريخ</th><th>المصدر</th><th>نوع العملية</th><th>المندوب / المكتب</th><th>الاسم / المكتب</th><th>قص السوري</th><th>الدولار الناتج</th><th>سعر الصرف</th><th>ملاحظات</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${displayText(r.date||"-")}</td><td>${displayText(r.sourceLabel)}</td><td>${displayText(r.operationLabel)}</td><td>${displayText(r.name)}</td><td>${displayText(r.target)}</td><td class="ltr cut-detail">${fmt(r.cutSyp,"SYP")}</td><td class="ltr">${fmtUsd(r.usd)}</td><td class="ltr">${num(r.rate)?num(r.rate).toLocaleString("en-US"):"-"}</td><td>${displayText(r.note||r.detail||"-")}</td></tr>`).join("")}</tbody></table></div>`;
     };
+
+
+    
 
 
     
@@ -3822,20 +3897,20 @@ function collectCutDollarRows(){
       }
       const openRows=Object.values(open).filter(x=>Math.abs(x.syp)>0.0001||Math.abs(x.usd)>0.0001);
       const totalOpenSyp=openRows.reduce((a,x)=>a+x.syp,0),totalOpenUsd=openRows.reduce((a,x)=>a+x.usd,0);
-      if($("loansOpenSyp"))$("loansOpenSyp").textContent=fmt(totalOpenSyp,"SYP");
-      if($("loansOpenUsd"))$("loansOpenUsd").textContent=fmtUsd(totalOpenUsd);
+      if($("loansOpenSyp"))$("loansOpenSyp").innerHTML=fmt(totalOpenSyp,"SYP");
+      if($("loansOpenUsd"))$("loansOpenUsd").innerHTML=fmtUsd(totalOpenUsd);
       if($("loansPartyCount"))$("loansPartyCount").textContent=String(openRows.length);
       if($("loansMoveCount"))$("loansMoveCount").textContent=String(rows.length);
 
       const log=$("loanLog");
       if(log){
         if(!rows.length)log.innerHTML='<div class="empty">لا توجد سجلات سلف حسب الفلتر.</div>';
-        else log.innerHTML=`<div class="table-wrap"><table><thead><tr><th>التاريخ</th><th>العملية</th><th>الشخص / الاسم</th><th>SYP</th><th>USD</th><th>ملاحظات</th><th>إجراء</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${r.date||"-"}</td><td>${r.typeLabel}</td><td>${r.party}</td><td class="ltr">${fmt(r.syp,"SYP")}</td><td class="ltr">${fmtUsd(r.usd)}</td><td>${r.note||"-"}</td><td class="loan-actions"><button class="secondary small" onclick="editCashMove('${r.id}')">تعديل</button><button class="danger small" onclick="deleteCashMove('${r.id}')">حذف</button></td></tr>`).join("")}</tbody></table></div>`;
+        else log.innerHTML=`<div class="table-wrap"><table><thead><tr><th>التاريخ</th><th>العملية</th><th>الشخص / الاسم</th><th>SYP</th><th>USD</th><th>ملاحظات</th><th>إجراء</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${displayText(r.date||"-")}</td><td>${displayText(r.typeLabel)}</td><td>${displayText(r.party)}</td><td class="ltr">${fmt(r.syp,"SYP")}</td><td class="ltr">${fmtUsd(r.usd)}</td><td>${displayText(r.note||"-")}</td><td class="loan-actions"><button class="secondary small" onclick="editCashMove('${inlineArg(r.id)}')">تعديل</button><button class="danger small" onclick="deleteCashMove('${inlineArg(r.id)}')">حذف</button></td></tr>`).join("")}</tbody></table></div>`;
       }
       const openEl=$("loanOpenSummary");
       if(openEl){
         if(!openRows.length)openEl.innerHTML='<div class="empty">لا توجد سلف مفتوحة حالياً.</div>';
-        else openEl.innerHTML=`<div class="table-wrap"><table><thead><tr><th>الشخص / الاسم</th><th>سلفة مفتوحة SYP</th><th>سلفة مفتوحة USD</th><th>آخر حركة</th><th>الحالة</th></tr></thead><tbody>${openRows.map(x=>`<tr><td>${x.party}</td><td class="ltr">${fmt(x.syp,"SYP")}</td><td class="ltr">${fmtUsd(x.usd)}</td><td>${x.last||"-"}</td><td>${x.syp<0||x.usd<0?"زيادة إرجاع":"مفتوحة"}</td></tr>`).join("")}</tbody></table></div>`;
+        else openEl.innerHTML=`<div class="table-wrap"><table><thead><tr><th>الشخص / الاسم</th><th>سلفة مفتوحة SYP</th><th>سلفة مفتوحة USD</th><th>آخر حركة</th><th>الحالة</th></tr></thead><tbody>${openRows.map(x=>`<tr><td>${displayText(x.party)}</td><td class="ltr">${fmt(x.syp,"SYP")}</td><td class="ltr">${fmtUsd(x.usd)}</td><td>${displayText(x.last||"-")}</td><td>${x.syp<0||x.usd<0?"زيادة إرجاع":"مفتوحة"}</td></tr>`).join("")}</tbody></table></div>`;
       }
     };
 
@@ -3915,15 +3990,15 @@ function collectCutDollarRows(){
       const totalRevenue=rows.reduce((a,x)=>a+x.revenue,0);
       const totalDelivered=rows.reduce((a,x)=>a+x.delivered,0);
       const totalRemaining=rows.reduce((a,x)=>a+x.remaining,0);
-      if($("matchTotalRevenue"))$("matchTotalRevenue").textContent=fmt(totalRevenue,"SYP");
-      if($("matchTotalDelivered"))$("matchTotalDelivered").textContent=fmt(totalDelivered,"SYP");
-      if($("matchTotalRemaining"))$("matchTotalRemaining").textContent=fmt(totalRemaining,"SYP");
+      if($("matchTotalRevenue"))$("matchTotalRevenue").innerHTML=fmt(totalRevenue,"SYP");
+      if($("matchTotalDelivered"))$("matchTotalDelivered").innerHTML=fmt(totalDelivered,"SYP");
+      if($("matchTotalRemaining"))$("matchTotalRemaining").innerHTML=fmt(totalRemaining,"SYP");
       if($("matchDelegateCount"))$("matchDelegateCount").textContent=String(rows.length);
 
       const el=$("delegateMatchTable");
       if(el){
         if(!rows.length)el.innerHTML='<div class="empty">لا توجد بيانات مطابقة حسب الفلتر.</div>';
-        else el.innerHTML=`<div class="table-wrap"><table><thead><tr><th>المندوب</th><th>الريجين</th><th>مصاري</th><th>CCBS</th><th>إجمالي الإيراد حسب الفلتر</th><th>إجمالي التسليم</th><th>تسليم دولار</th><th>إجمالي المتبقي</th></tr></thead><tbody>${rows.map(x=>`<tr><td><b>${x.name}</b><div class="delegate-type-mini">مصاري: ${fmt(x.masary,"SYP")} / CCBS: ${fmt(x.ccbs,"SYP")}</div></td><td>${x.region}</td><td class="ltr type-masary-cell">${fmt(x.masary,"SYP")}</td><td class="ltr type-ccbs-cell">${fmt(x.ccbs,"SYP")}</td><td class="ltr">${fmt(x.revenue,"SYP")}</td><td class="ltr">${fmt(x.delivered,"SYP")}</td><td class="ltr">${fmtUsd(x.deliveredUsd)}</td><td class="ltr">${fmt(x.remaining,"SYP")}</td></tr>`).join("")}</tbody></table></div>`;
+        else el.innerHTML=`<div class="table-wrap"><table><thead><tr><th>المندوب</th><th>الريجين</th><th>مصاري</th><th>CCBS</th><th>إجمالي الإيراد حسب الفلتر</th><th>إجمالي التسليم</th><th>تسليم دولار</th><th>إجمالي المتبقي</th></tr></thead><tbody>${rows.map(x=>`<tr><td><b>${displayText(x.name)}</b><div class="delegate-type-mini">مصاري: ${fmt(x.masary,"SYP")} / CCBS: ${fmt(x.ccbs,"SYP")}</div></td><td>${displayText(x.region)}</td><td class="ltr type-masary-cell">${fmt(x.masary,"SYP")}</td><td class="ltr type-ccbs-cell">${fmt(x.ccbs,"SYP")}</td><td class="ltr">${fmt(x.revenue,"SYP")}</td><td class="ltr">${fmt(x.delivered,"SYP")}</td><td class="ltr">${fmtUsd(x.deliveredUsd)}</td><td class="ltr">${fmt(x.remaining,"SYP")}</td></tr>`).join("")}</tbody></table></div>`;
       }
 
       const regionMap={};
@@ -3939,7 +4014,7 @@ function collectCutDollarRows(){
       const regEl=$("regionMatchTable");
       if(regEl){
         if(!regRows.length)regEl.innerHTML='<div class="empty">لا يوجد ملخص ريجينات حسب الفلتر.</div>';
-        else regEl.innerHTML=`<div class="table-wrap"><table><thead><tr><th>الريجين</th><th>مصاري</th><th>CCBS</th><th>إجمالي الإيراد</th><th>إجمالي التسليم</th><th>إجمالي المتبقي</th></tr></thead><tbody>${regRows.map(x=>`<tr><td>${x.region}</td><td class="ltr">${fmt(x.masary,"SYP")}</td><td class="ltr">${fmt(x.ccbs,"SYP")}</td><td class="ltr">${fmt(x.revenue,"SYP")}</td><td class="ltr">${fmt(x.delivered,"SYP")}</td><td class="ltr">${fmt(x.remaining,"SYP")}</td></tr>`).join("")}</tbody></table></div>`;
+        else regEl.innerHTML=`<div class="table-wrap"><table><thead><tr><th>الريجين</th><th>مصاري</th><th>CCBS</th><th>إجمالي الإيراد</th><th>إجمالي التسليم</th><th>إجمالي المتبقي</th></tr></thead><tbody>${regRows.map(x=>`<tr><td>${displayText(x.region)}</td><td class="ltr">${fmt(x.masary,"SYP")}</td><td class="ltr">${fmt(x.ccbs,"SYP")}</td><td class="ltr">${fmt(x.revenue,"SYP")}</td><td class="ltr">${fmt(x.delivered,"SYP")}</td><td class="ltr">${fmt(x.remaining,"SYP")}</td></tr>`).join("")}</tbody></table></div>`;
       }
       markNegativeAmounts(document);
     };
@@ -3977,8 +4052,8 @@ window.addCustomOffice=async function(){
       if($("settingsCustomOfficeCount"))$("settingsCustomOfficeCount").textContent=String(customOffices.length);
       if($("settingsCustomDelegateCount"))$("settingsCustomDelegateCount").textContent=String(customDelegates.length);
       const el=$("settingsLists");if(!el)return;
-      const officeRows=customOffices.map(o=>`<tr><td>${o.name}</td><td>${o.region||"-"}</td><td>مكتب</td></tr>`).join("");
-      const delegateRows=customDelegates.map(d=>`<tr><td>${d.name}</td><td>${d.region||"-"}</td><td>مندوب</td></tr>`).join("");
+      const officeRows=customOffices.map(o=>`<tr><td>${displayText(o.name)}</td><td>${displayText(o.region||"-")}</td><td>مكتب</td></tr>`).join("");
+      const delegateRows=customDelegates.map(d=>`<tr><td>${displayText(d.name)}</td><td>${displayText(d.region||"-")}</td><td>مندوب</td></tr>`).join("");
       if(!officeRows&&!delegateRows){el.innerHTML='<div class="empty">لم تضف مكاتب أو مندوبين بعد.</div>';return}
       el.innerHTML=`<div class="table-wrap"><table><thead><tr><th>الاسم</th><th>الريجين</th><th>النوع</th></tr></thead><tbody>${officeRows}${delegateRows}</tbody></table></div>`;
     };
@@ -3986,8 +4061,8 @@ window.addCustomOffice=async function(){
 
     
     window.exportCutDollarExcel=function(){
-      const rows=getFilteredCutDollarRows().map(r=>[r.date||"",r.sourceLabel||"",r.name||"",r.target||"",num(r.cutSyp),Number(r.usd||0).toFixed(2),num(r.rate)||"",r.note||r.detail||""]);
-      downloadExcelTable("cut_dollar_log","سجل قص الدولار",["التاريخ","المصدر","المندوب / المكتب","الاسم / المكتب","قص السوري","الدولار الناتج","سعر الصرف","ملاحظات"],rows,excelDateRangeMeta("cutFromDate","cutToDate"));
+      const rows=getFilteredCutDollarRows().map(r=>[r.date||"",r.sourceLabel||"",r.operationLabel||"",r.name||"",r.target||"",num(r.cutSyp),Number(r.usd||0).toFixed(2),num(r.rate)||"",r.note||r.detail||""]);
+      downloadExcelTable("cut_dollar_log","سجل قص الدولار",["التاريخ","المصدر","نوع العملية","المندوب / المكتب","الاسم / المكتب","قص السوري","الدولار الناتج","سعر الصرف","ملاحظات"],rows,excelDateRangeMeta("cutFromDate","cutToDate"));
     };
 
     window.exportLoansExcel=function(){
@@ -4006,6 +4081,7 @@ window.addCustomOffice=async function(){
 
 
 function markNegativeAmounts(root=document){
+      if(!root||!root.querySelectorAll)return;
       const negRe=/-\s*\d[\d,]*(?:\.\d+)?\s*(?:SYP|USD)?/i;
 
       root.querySelectorAll(".negative-amount").forEach(el=>el.classList.remove("negative-amount"));
@@ -4027,6 +4103,7 @@ function markNegativeAmounts(root=document){
         }
       });
     }
+    window.markNegativeAmounts=markNegativeAmounts;
 
 
     function renderAll(){
