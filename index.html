@@ -1988,44 +1988,28 @@ td{
           <div class="section">
             <div class="section-head">
               <div>
-                <h2>الإغلاق والمحاسبة</h2>
-                <small>إغلاق شهري/سنوي مع تدوير آمن للأرصدة وصافي ربح/خسارة تشغيلي بدون خلط قص الدولار.</small>
+                <h2>الربح والخسارة</h2>
+                <small>تقرير قراءة فقط: يعطيك صافي الربح/الخسارة وفرق سعر الصرف بدون إغلاق أو تدوير.</small>
               </div>
               <div class="head-actions">
-                <button class="secondary" onclick="calculateClosingPreview()">حساب الفترة</button>
-                <button class="good" onclick="saveAccountingClosing()">حفظ الإغلاق</button>
+                <button class="secondary" onclick="calculateProfitLossPreview()">حساب التقرير</button>
               </div>
             </div>
             <div class="warning-note">
-              التدوير هنا آمن: رصيد نهاية الفترة يُحفظ كرصيد افتتاحي للفترة التالية داخل تقرير الإغلاق، بدون إنشاء حركة صندوق جديدة حتى لا تتضاعف الأرصدة.
-              قص السوري إلى دولار لا يدخل في الربح التشغيلي؛ يظهر ضمن حركة الصندوق فقط.
+              هذا القسم لا يحفظ إغلاق ولا يدوّر رصيد ولا ينشئ حركة صندوق. قص السوري إلى دولار لا يدخل بالربح التشغيلي؛ يظهر فرق سعر الصرف كتقييم تقديري مستقل حسب السعر الذي تكتبه.
             </div>
             <div class="form-grid">
-              <div class="field"><label>نوع الإغلاق</label><select id="closingType" onchange="updateClosingPeriodFields();calculateClosingPreview()"><option value="month">إغلاق شهر</option><option value="year">إغلاق سنة</option></select></div>
-              <div class="field"><label>السنة</label><input id="closingYear" type="number" min="2020" max="2100" onchange="calculateClosingPreview()"></div>
-              <div class="field" id="closingMonthField"><label>الشهر</label><select id="closingMonth" onchange="calculateClosingPreview()"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option></select></div>
-              <div class="field"><label>سعر تقييم الدولار وقت الإغلاق</label><input id="closingRate" type="text" inputmode="numeric" placeholder="مثلاً 15000" oninput="calculateClosingPreview()"><div class="field-hint">للتقييم المحاسبي فقط: يحوّل USD إلى SYP في الربح/الخسارة وفرق الجرد، ولا يغيّر الرصيد إلا عند حفظ تسوية الجرد.</div></div>
-              <div class="field"><label>الجرد الفعلي SYP</label><input id="closingActualSyp" type="text" inputmode="numeric" placeholder="اكتب ما عدّيته فعلياً أو اتركه فارغ" oninput="calculateClosingPreview()"><div class="field-hint">هذا الرقم من العد اليدوي للصندوق السوري. إذا تركته فارغاً يعتمد الرصيد المحاسبي.</div></div>
-              <div class="field"><label>الجرد الفعلي USD</label><input id="closingActualUsd" type="text" inputmode="decimal" placeholder="اكتب الدولار الموجود فعلياً أو اتركه فارغ" oninput="calculateClosingPreview()"><div class="field-hint">هذا الرقم من العد اليدوي لصندوق الدولار. إذا تركته فارغاً يعتمد الرصيد المحاسبي.</div></div>
-              <div class="field" style="grid-column:1/-1"><label>ملاحظة الإغلاق</label><textarea id="closingNote" placeholder="اختياري: ملاحظات المدير على الإغلاق"></textarea></div>
+              <div class="field"><label>من تاريخ</label><input id="plFromDate" type="date" onchange="calculateProfitLossPreview()"><div class="field-hint">اتركه فارغاً إذا تريد من أول البيانات.</div></div>
+              <div class="field"><label>إلى تاريخ</label><input id="plToDate" type="date" onchange="calculateProfitLossPreview()"><div class="field-hint">اتركه فارغاً إذا تريد حتى آخر البيانات.</div></div>
+              <div class="field"><label>سعر تقييم الدولار</label><input id="plRate" type="text" inputmode="numeric" placeholder="مثلاً 15000" oninput="calculateProfitLossPreview()"><div class="field-hint">يستخدم فقط لتحويل USD إلى SYP في الربح/الخسارة وفرق سعر الصرف.</div></div>
             </div>
-            <div id="closingSummaryGrid" class="kpi-grid" style="margin-top:12px"></div>
+            <div id="profitLossSummaryGrid" class="kpi-grid" style="margin-top:12px"></div>
             <div class="form-actions">
-              <button class="secondary" onclick="copyClosingReport()">نسخ تقرير الإغلاق</button>
-              <button class="secondary" onclick="exportClosingExcel()">تصدير Excel</button>
-              <button class="secondary" onclick="resetClosingActuals()">مسح الجرد</button>
+              <button class="secondary" onclick="copyProfitLossReport()">نسخ تقرير الربح والخسارة</button>
+              <button class="secondary" onclick="exportProfitLossExcel()">تصدير Excel</button>
+              <button class="secondary" onclick="resetProfitLossFilters()">مسح الفلاتر</button>
             </div>
-            <div id="closingReportBox" style="margin-top:12px"></div>
-          </div>
-
-          <div class="section">
-            <div class="section-head">
-              <div>
-                <h2>سجل الإغلاقات</h2>
-                <small>الإغلاقات المحفوظة تبقى كنسخة رسمية حتى لو تغيرت السجلات لاحقاً.</small>
-              </div>
-            </div>
-            <div id="closingHistoryBox"></div>
+            <div id="profitLossReportBox" style="margin-top:12px"></div>
           </div>
         </section>
 
@@ -2694,7 +2678,7 @@ td{
 
     function getCashMoveEffect(m){
       if(m.officeLinked)return{syp:num(m.effectSyp),usd:Number(m.effectUsd||0)};
-      if((m.type||"")==="closing_adjustment")return{syp:num(m.effectSyp),usd:Number(m.effectUsd||0)};
+      if((m.type||"")==="closing_adjustment")return{syp:0,usd:0};
       const type=m.type||"opening_syp";
       const def=cashMoveDefs[type];
       if(!def)return getLegacyCashEffect(m);
@@ -2890,7 +2874,7 @@ td{
       }).filter(Boolean);
     }
 
-    function allCashLedgerRows(){return [...cashMoves,...officeCashLedgerRows()]}
+    function allCashLedgerRows(){return [...cashMoves.filter(m=>m.type!=="closing_adjustment"),...officeCashLedgerRows()]}
 
     function getFilteredCashRows(){
       const q=String($("cashSearch")?.value||"").trim().toLowerCase();
@@ -3040,36 +3024,33 @@ td{
 
 
 
-    function closingDefaultRate(){
+
+    function profitLossDefaultRate(){
       const s=calculateSummary();
       return s.avgRate?Math.round(s.avgRate):0;
     }
 
-    function initClosingDefaults(){
+    function monthStartISO(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-01`}
+
+    function initProfitLossDefaults(){
       const now=new Date();
-      if($("closingYear")&&!$("closingYear").value)$("closingYear").value=String(now.getFullYear());
-      if($("closingMonth")&&!$("closingMonth").value)$("closingMonth").value=String(now.getMonth()+1);
-      if($("closingRate")&&!$("closingRate").value){
-        const r=closingDefaultRate();
-        if(r>0)$("closingRate").value=String(r);
+      if($("plFromDate")&&!$("plFromDate").value)$("plFromDate").value=monthStartISO(now);
+      if($("plToDate")&&!$("plToDate").value)$("plToDate").value=todayString();
+      if($("plRate")&&!$("plRate").value){
+        const r=profitLossDefaultRate();
+        if(r>0)$("plRate").value=String(r);
       }
-      updateClosingPeriodFields();
     }
 
-    window.updateClosingPeriodFields=function(){
-      const type=$("closingType")?.value||"month";
-      if($("closingMonthField"))$("closingMonthField").style.display=type==="month"?"flex":"none";
-    };
-
-    function lastDayOfMonth(year,month){return new Date(Number(year),Number(month),0).getDate()}
-    function closingPeriodFromForm(){
-      const type=$("closingType")?.value||"month";
-      const year=Number($("closingYear")?.value)||new Date().getFullYear();
-      const month=Number($("closingMonth")?.value)||1;
-      if(type==="year")return{type,year,month:0,start:`${year}-01-01`,end:`${year}-12-31`,label:`إغلاق سنة ${year}`,key:`year_${year}`};
-      const mm=String(month).padStart(2,"0");
-      const endDay=String(lastDayOfMonth(year,month)).padStart(2,"0");
-      return{type,year,month,start:`${year}-${mm}-01`,end:`${year}-${mm}-${endDay}`,label:`إغلاق شهر ${mm}/${year}`,key:`month_${year}_${mm}`};
+    function profitLossPeriodFromForm(){
+      const start=$("plFromDate")?.value||"";
+      const end=$("plToDate")?.value||"";
+      let label="كل المدة";
+      if(start&&end&&start===end)label=`تاريخ ${start}`;
+      else if(start&&end)label=`من ${start} إلى ${end}`;
+      else if(start)label=`من ${start} إلى آخر البيانات`;
+      else if(end)label=`حتى ${end}`;
+      return{start,end,label,key:[start||"all",end||"all"].join("_")};
     }
 
     function rowDateKey(row){return isoDateValue(row?.date||row?.createdDate||row?.day||"")}
@@ -3159,180 +3140,127 @@ td{
       return{count:vals.filter(x=>Math.abs(x.syp)>0.0001||Math.abs(x.usd)>0.0001).length,syp:vals.reduce((a,x)=>a+x.syp,0),usd:vals.reduce((a,x)=>a+x.usd,0)};
     }
 
-    function calculateClosingData(){
-      initClosingDefaults();
-      const p=closingPeriodFromForm();
-      const rate=num($("closingRate")?.value);
-      const currentAdjustmentId="closing_adjust_"+p.key;
-      const opening=cashBalanceBefore(p.start,currentAdjustmentId);
-      const ending=cashBalanceAt(p.end,currentAdjustmentId);
-      const cash=calcPeriodCashBreakdown(p.start,p.end,currentAdjustmentId);
+    function calcFxRevaluation(start,end,rate){
+      const rows=collectCutDollarRows().filter(r=>{
+        const d=isoDateValue(r.date||"");
+        return d&&inDateRange(d,start,end)&&num(r.rate)>0&&num(r.weightSyp)>0;
+      });
+      let costSyp=0,usdFromCut=0;
+      for(const r of rows){
+        const weight=num(r.weightSyp),rr=num(r.rate);
+        costSyp+=weight;
+        usdFromCut+=rr>0?weight/rr:0;
+      }
+      const currentValueSyp=rate>0?usdFromCut*rate:0;
+      const diffSyp=rate>0?currentValueSyp-costSyp:0;
+      const avgCostRate=usdFromCut>0?costSyp/usdFromCut:0;
+      return{costSyp,usdFromCut,currentValueSyp,diffSyp,avgCostRate,count:rows.length};
+    }
+
+    function calculateProfitLossData(){
+      initProfitLossDefaults();
+      const p=profitLossPeriodFromForm();
+      const rate=num($("plRate")?.value);
+      const opening=cashBalanceBefore(p.start,"");
+      const ending=cashBalanceAt(p.end,"");
+      const cash=calcPeriodCashBreakdown(p.start,p.end,"");
       const rev=calcPeriodRevenue(p.start,p.end);
       const fees=calcPeriodOfficeFees(p.start,p.end);
       const loans=calcOpenLoansAt(p.end);
-      const actualSypRaw=String($("closingActualSyp")?.value||"").trim();
-      const actualUsdRaw=String($("closingActualUsd")?.value||"").trim();
-      const actualSyp=actualSypRaw?num(actualSypRaw):ending.syp;
-      const actualUsd=actualUsdRaw?Number(clean(actualUsdRaw)||0):ending.usd;
-      const diffSyp=actualSyp-ending.syp;
-      const diffUsd=actualUsd-ending.usd;
+      const fx=calcFxRevaluation(p.start,p.end,rate);
       const operatingProfitSyp=rev.revenueSyp+fees.feeSyp+(rate>0?fees.feeUsd*rate:0)-cash.expenseSyp-(rate>0?cash.expenseUsd*rate:0);
-      const useActual=(!!actualSypRaw||!!actualUsdRaw);
-      const rollover={syp:useActual?actualSyp:ending.syp,usd:useActual?actualUsd:ending.usd,mode:useActual?"actual_inventory_with_adjustment":"book_balance_snapshot"};
-      return{period:p,rate,currentAdjustmentId,opening,ending,cash,rev,fees,loans,actual:{syp:actualSyp,usd:actualUsd,hasSyp:!!actualSypRaw,hasUsd:!!actualUsdRaw},diff:{syp:diffSyp,usd:diffUsd},rollover,operatingProfitSyp,note:$("closingNote")?.value.trim()||""};
+      const totalWithFxSyp=operatingProfitSyp+fx.diffSyp;
+      return{period:p,rate,opening,ending,cash,rev,fees,loans,fx,operatingProfitSyp,totalWithFxSyp};
     }
 
-    function closingCards(data){
-      const c=data.cash,r=data.rev,f=data.fees;
+    function profitLossCards(data){
+      const c=data.cash,r=data.rev,f=data.fees,fx=data.fx;
       return[
-        ["الفترة",`${displayText(data.period.start)} → ${displayText(data.period.end)}`,data.period.label],
-        ["رصيد بداية الفترة",`${fmt(data.opening.syp,"SYP")} / ${fmtUsd(data.opening.usd)}`,"قبل أول يوم بالفترة"],
+        ["الفترة",displayText(data.period.label),"حسب التاريخ المحدد"],
         ["إجمالي الإيرادات",fmt(r.revenueSyp,"SYP"),`${r.count} سجل إيراد`],
         ["إجمالي العمولات",`${fmt(f.feeSyp,"SYP")} / ${fmtUsd(f.feeUsd)}`,"تدخل ضمن الربح التشغيلي"],
         ["إجمالي المصروفات",`${fmt(c.expenseSyp,"SYP")} / ${fmtUsd(c.expenseUsd)}`,"تنقص الربح التشغيلي"],
-        ["صافي الربح / الخسارة",fmt(data.operatingProfitSyp,"SYP"),data.rate>0?`بسعر تقييم ${data.rate.toLocaleString("en-US")}`:"USD غير مقيم لأن السعر فارغ"],
-        ["رصيد نهاية الفترة",`${fmt(data.ending.syp,"SYP")} / ${fmtUsd(data.ending.usd)}`,"محاسبي قبل تسوية الجرد"],
-        ["فرق الجرد",`${fmt(data.diff.syp,"SYP")} / ${fmtUsd(data.diff.usd)}`,data.actual.hasSyp||data.actual.hasUsd?"تُحفظ كتسوية إذا حفظت الإغلاق":"لم يتم إدخال جرد فعلي"],
+        ["صافي الربح / الخسارة التشغيلي",fmt(data.operatingProfitSyp,"SYP"),data.rate>0?`بسعر تقييم ${data.rate.toLocaleString("en-US")}`:"USD غير مقيم لأن السعر فارغ"],
+        ["فرق سعر الصرف",fmt(fx.diffSyp,"SYP"),fx.count?"تقديري من قص السوري الفعلي فقط":"لا توجد عمليات قص فعلية ضمن الفترة"],
+        ["الربح / الخسارة مع فرق الصرف",fmt(data.totalWithFxSyp,"SYP"),"تشغيلي + فرق سعر الصرف التقديري"],
+        ["رصيد الصندوق الحالي",`${fmt(data.ending.syp,"SYP")} / ${fmtUsd(data.ending.usd)}`,"حسب السجلات فقط"],
         ["السلف المفتوحة",`${fmt(data.loans.syp,"SYP")} / ${fmtUsd(data.loans.usd)}`,`${data.loans.count} جهة`],
-        ["رصيد التدوير",`${fmt(data.rollover.syp,"SYP")} / ${fmtUsd(data.rollover.usd)}`,data.rollover.mode==="actual_inventory_with_adjustment"?"حسب الجرد الفعلي":"حسب الرصيد المحاسبي"],
         ["عدد حركات الصندوق",String(c.count),"ضمن الفترة"]
       ];
     }
 
-    window.calculateClosingPreview=function(){
-      if(!$("closingSummaryGrid"))return;
-      const data=calculateClosingData();
-      $("closingSummaryGrid").innerHTML=closingCards(data).map(x=>`<div class="card"><div class="label">${x[0]}</div><div class="value">${x[1]}</div><div class="sub">${x[2]}</div></div>`).join("");
-      const c=data.cash,r=data.rev,f=data.fees;
-      $("closingReportBox").innerHTML=`<div class="table-wrap"><table><thead><tr><th>البند</th><th>SYP</th><th>USD</th><th>ملاحظة</th></tr></thead><tbody>
-        <tr><td>رصيد البداية</td><td class="ltr">${fmt(data.opening.syp,"SYP")}</td><td class="ltr">${fmtUsd(data.opening.usd)}</td><td>قبل ${displayText(data.period.start)}</td></tr>
-        <tr><td>حركة قبض داخل الفترة</td><td class="ltr">${fmt(c.cashInSyp,"SYP")}</td><td class="ltr">${fmtUsd(c.cashInUsd)}</td><td>كل الداخل للصندوق</td></tr>
-        <tr><td>حركة صرف داخل الفترة</td><td class="ltr">${fmt(c.cashOutSyp,"SYP")}</td><td class="ltr">${fmtUsd(c.cashOutUsd)}</td><td>كل الخارج من الصندوق</td></tr>
-        <tr><td>الإيرادات التشغيلية</td><td class="ltr">${fmt(r.revenueSyp,"SYP")}</td><td class="ltr">-</td><td>مصاري/CCBS/مخصوص</td></tr>
+    window.calculateProfitLossPreview=function(){
+      if(!$("profitLossSummaryGrid"))return;
+      const data=calculateProfitLossData();
+      $("profitLossSummaryGrid").innerHTML=profitLossCards(data).map(x=>`<div class="card"><div class="label">${x[0]}</div><div class="value">${x[1]}</div><div class="sub">${x[2]}</div></div>`).join("");
+      const c=data.cash,r=data.rev,f=data.fees,fx=data.fx;
+      $("profitLossReportBox").innerHTML=`<div class="table-wrap"><table><thead><tr><th>البند</th><th>SYP</th><th>USD</th><th>ملاحظة</th></tr></thead><tbody>
+        <tr><td>إيرادات تشغيلية</td><td class="ltr">${fmt(r.revenueSyp,"SYP")}</td><td class="ltr">-</td><td>مصاري / CCBS / مخصوص</td></tr>
         <tr><td>عمولات المكاتب</td><td class="ltr">${fmt(f.feeSyp,"SYP")}</td><td class="ltr">${fmtUsd(f.feeUsd)}</td><td>تدخل بالربح</td></tr>
-        <tr><td>المصروفات التشغيلية</td><td class="ltr">${fmt(c.expenseSyp,"SYP")}</td><td class="ltr">${fmtUsd(c.expenseUsd)}</td><td>تنقص الربح</td></tr>
-        <tr><td>صرف غير مصنف كمصروف</td><td class="ltr">${fmt(c.paySyp,"SYP")}</td><td class="ltr">${fmtUsd(c.payUsd)}</td><td>لا يدخل بالربح حتى تصنفه كمصروف</td></tr>
+        <tr><td>مصروفات تشغيلية</td><td class="ltr">${fmt(c.expenseSyp,"SYP")}</td><td class="ltr">${fmtUsd(c.expenseUsd)}</td><td>تنقص الربح</td></tr>
+        <tr><td>صافي ربح/خسارة تشغيلي</td><td class="ltr">${fmt(data.operatingProfitSyp,"SYP")}</td><td class="ltr">-</td><td>الإيرادات + العمولات - المصروفات</td></tr>
+        <tr><td>تكلفة الدولار المقصوص</td><td class="ltr">${fmt(fx.costSyp,"SYP")}</td><td class="ltr">${fmtUsd(fx.usdFromCut)}</td><td>قص فعلي فقط، لا يشمل الدولار المباشر</td></tr>
+        <tr><td>قيمة الدولار بسعر التقييم</td><td class="ltr">${fmt(fx.currentValueSyp,"SYP")}</td><td class="ltr">${fmtUsd(fx.usdFromCut)}</td><td>${data.rate>0?"سعر التقييم: "+data.rate.toLocaleString("en-US"):"اكتب سعر التقييم"}</td></tr>
+        <tr><td>فرق سعر الصرف</td><td class="ltr">${fmt(fx.diffSyp,"SYP")}</td><td class="ltr">-</td><td>تقديري وغير محقق حتى يتم بيع الدولار</td></tr>
+        <tr><td>الربح/الخسارة مع فرق الصرف</td><td class="ltr">${fmt(data.totalWithFxSyp,"SYP")}</td><td class="ltr">-</td><td>للمتابعة فقط، بدون تدوير أو حفظ إغلاق</td></tr>
         <tr><td>السلف المعطاة</td><td class="ltr">${fmt(c.loanOutSyp,"SYP")}</td><td class="ltr">${fmtUsd(c.loanOutUsd)}</td><td>ذمة لا تعتبر خسارة</td></tr>
         <tr><td>السلف الراجعة</td><td class="ltr">${fmt(c.loanReturnSyp,"SYP")}</td><td class="ltr">${fmtUsd(c.loanReturnUsd)}</td><td>رجوع ذمة لا يعتبر ربح</td></tr>
-        <tr><td>رصيد النهاية المحسوب</td><td class="ltr">${fmt(data.ending.syp,"SYP")}</td><td class="ltr">${fmtUsd(data.ending.usd)}</td><td>محاسبي قبل التسوية</td></tr>
-        <tr><td>الجرد الفعلي</td><td class="ltr">${fmt(data.actual.syp,"SYP")}</td><td class="ltr">${fmtUsd(data.actual.usd)}</td><td>${data.actual.hasSyp||data.actual.hasUsd?"مدخل يدوياً":"مساوي للمحاسبي"}</td></tr>
-        <tr><td>فرق الصندوق</td><td class="ltr">${fmt(data.diff.syp,"SYP")}</td><td class="ltr">${fmtUsd(data.diff.usd)}</td><td>فعلي - محسوب، ويُسجل كتسوية عند الحفظ</td></tr>
-        <tr><td>رصيد التدوير</td><td class="ltr">${fmt(data.rollover.syp,"SYP")}</td><td class="ltr">${fmtUsd(data.rollover.usd)}</td><td>${data.rollover.mode==="actual_inventory_with_adjustment"?"حسب الجرد الفعلي":"حسب الرصيد المحاسبي"}</td></tr>
+        <tr><td>رصيد الصندوق حسب السجلات</td><td class="ltr">${fmt(data.ending.syp,"SYP")}</td><td class="ltr">${fmtUsd(data.ending.usd)}</td><td>بدون إغلاق أو تدوير</td></tr>
       </tbody></table></div>`;
-      renderClosingHistory();
     };
 
-    window.resetClosingActuals=function(){
-      if($("closingActualSyp"))$("closingActualSyp").value="";
-      if($("closingActualUsd"))$("closingActualUsd").value="";
-      calculateClosingPreview();
+    window.resetProfitLossFilters=function(){
+      if($("plFromDate"))$("plFromDate").value="";
+      if($("plToDate"))$("plToDate").value="";
+      if($("plRate"))$("plRate").value="";
+      calculateProfitLossPreview();
     };
 
-    window.saveAccountingClosing=async function(){
-      try{
-        if(!auth.currentUser)return;
-        const data=calculateClosingData();
-        const existing=accountingClosings.find(x=>x.id===data.period.key);
-        if(existing&&!confirm("يوجد إغلاق محفوظ لهذه الفترة. هل تريد تحديثه؟"))return;
-        await setDoc(doc(db,"accountingClosings",data.period.key),{
-          id:data.period.key,
-          periodKey:data.period.key,
-          periodType:data.period.type,
-          periodLabel:data.period.label,
-          year:data.period.year,
-          month:data.period.month,
-          startDate:data.period.start,
-          endDate:data.period.end,
-          closeRate:data.rate,
-          opening:data.opening,
-          ending:data.ending,
-          cash:data.cash,
-          revenue:data.rev,
-          fees:data.fees,
-          loans:data.loans,
-          actual:data.actual,
-          difference:data.diff,
-          operatingProfitSyp:data.operatingProfitSyp,
-          rollover:{nextOpeningSyp:data.rollover.syp,nextOpeningUsd:data.rollover.usd,mode:data.rollover.mode},
-          note:data.note,
-          createdBy:auth.currentUser.uid,
-          updatedAt:serverTimestamp(),
-          ...(existing?{}:{createdAt:serverTimestamp()})
-        },{merge:true});
-
-        const needsAdjustment=(data.actual.hasSyp||data.actual.hasUsd)&&(Math.abs(data.diff.syp)>0.0001||Math.abs(data.diff.usd)>0.0001);
-        const adjustmentRef=doc(db,"cashboxMovements",data.currentAdjustmentId);
-        if(needsAdjustment){
-          await setDoc(adjustmentRef,{
-            id:data.currentAdjustmentId,
-            type:"closing_adjustment",
-            label:"تسوية فرق جرد الإغلاق",
-            group:"closing",
-            category:"adjustment",
-            categoryLabel:"تسوية جرد",
-            date:data.period.end,
-            party:data.period.label,
-            amountSyp:Math.abs(data.diff.syp),
-            amountUsd:Math.abs(data.diff.usd),
-            effectSyp:data.diff.syp,
-            effectUsd:data.diff.usd,
-            exchangeRate:data.rate,
-            refNo:data.period.key,
-            note:"تسوية تلقائية من الإغلاق: فعلي - محاسبي",
-            closingPeriodKey:data.period.key,
-            officeLinked:false,
-            createdBy:auth.currentUser.uid,
-            updatedAt:serverTimestamp(),
-            createdAt:serverTimestamp()
-          },{merge:true});
-        }else{
-          try{await deleteDoc(adjustmentRef)}catch(_){/* لا توجد تسوية سابقة */}
-        }
-        toast("تم حفظ الإغلاق والتدوير مع تسوية الجرد عند الحاجة.","success");
-        await reloadAll();
-      }catch(e){setStatus("فشل حفظ الإغلاق: "+e.message)}
-    };
-
-    function closingReportText(data){
-      return `${data.period.label}\nمن ${data.period.start} إلى ${data.period.end}\nرصيد بداية: ${fmt(data.opening.syp,"SYP")} / ${fmtUsd(data.opening.usd)}\nإيرادات: ${fmt(data.rev.revenueSyp,"SYP")}\nعمولات: ${fmt(data.fees.feeSyp,"SYP")} / ${fmtUsd(data.fees.feeUsd)}\nمصروفات: ${fmt(data.cash.expenseSyp,"SYP")} / ${fmtUsd(data.cash.expenseUsd)}\nصافي ربح/خسارة تشغيلي: ${fmt(data.operatingProfitSyp,"SYP")}\nرصيد نهاية: ${fmt(data.ending.syp,"SYP")} / ${fmtUsd(data.ending.usd)}\nفرق الجرد: ${fmt(data.diff.syp,"SYP")} / ${fmtUsd(data.diff.usd)}\nالتدوير: رصيد النهاية هو افتتاح الفترة التالية بدون حركة مضاعفة.`.replace(/<[^>]*>/g,"");
+    function profitLossReportText(data){
+      return `${data.period.label}
+إيرادات: ${fmt(data.rev.revenueSyp,"SYP")}
+عمولات: ${fmt(data.fees.feeSyp,"SYP")} / ${fmtUsd(data.fees.feeUsd)}
+مصروفات: ${fmt(data.cash.expenseSyp,"SYP")} / ${fmtUsd(data.cash.expenseUsd)}
+صافي ربح/خسارة تشغيلي: ${fmt(data.operatingProfitSyp,"SYP")}
+فرق سعر الصرف: ${fmt(data.fx.diffSyp,"SYP")}
+النتيجة مع فرق الصرف: ${fmt(data.totalWithFxSyp,"SYP")}
+رصيد الصندوق: ${fmt(data.ending.syp,"SYP")} / ${fmtUsd(data.ending.usd)}
+ملاحظة: هذا تقرير متابعة فقط، بدون إغلاق أو تدوير.`.replace(/<[^>]*>/g,"");
     }
 
-    window.copyClosingReport=async function(){
-      const data=calculateClosingData();
-      try{await navigator.clipboard.writeText(closingReportText(data));toast("تم نسخ تقرير الإغلاق.","success")}catch(e){setStatus("لم أقدر أنسخ تقرير الإغلاق.")}
+    window.copyProfitLossReport=async function(){
+      const data=calculateProfitLossData();
+      try{await navigator.clipboard.writeText(profitLossReportText(data));toast("تم نسخ تقرير الربح والخسارة.","success")}catch(e){setStatus("لم أقدر أنسخ تقرير الربح والخسارة.")}
     };
 
-    window.exportClosingExcel=function(){
-      const data=calculateClosingData();
+    window.exportProfitLossExcel=function(){
+      const data=calculateProfitLossData();
       const rows=[
-        ["نوع الإغلاق",data.period.label,"",""],
-        ["من",data.period.start,"إلى",data.period.end],
+        ["الفترة",data.period.label,"",""],
         ["سعر التقييم",data.rate,"",""],
-        ["رصيد البداية",Math.round(data.opening.syp),Number(data.opening.usd||0).toFixed(2),"قبل الفترة"],
         ["إيرادات",Math.round(data.rev.revenueSyp),"","تشغيلي"],
         ["عمولات",Math.round(data.fees.feeSyp),Number(data.fees.feeUsd||0).toFixed(2),"تشغيلي"],
         ["مصروفات",Math.round(data.cash.expenseSyp),Number(data.cash.expenseUsd||0).toFixed(2),"تشغيلي"],
-        ["صافي ربح/خسارة",Math.round(data.operatingProfitSyp),"","SYP"],
-        ["رصيد النهاية",Math.round(data.ending.syp),Number(data.ending.usd||0).toFixed(2),"محاسبي"],
-        ["الجرد الفعلي",Math.round(data.actual.syp),Number(data.actual.usd||0).toFixed(2),"فعلي"],
-        ["فرق الجرد",Math.round(data.diff.syp),Number(data.diff.usd||0).toFixed(2),"فعلي - محاسبي"],
-        ["رصيد التدوير",Math.round(data.rollover.syp),Number(data.rollover.usd||0).toFixed(2),data.rollover.mode]
+        ["صافي ربح/خسارة تشغيلي",Math.round(data.operatingProfitSyp),"","SYP"],
+        ["تكلفة الدولار المقصوص",Math.round(data.fx.costSyp),Number(data.fx.usdFromCut||0).toFixed(2),"قص فعلي فقط"],
+        ["فرق سعر الصرف",Math.round(data.fx.diffSyp),"","تقديري"],
+        ["الربح/الخسارة مع فرق الصرف",Math.round(data.totalWithFxSyp),"","تشغيلي + فرق صرف"],
+        ["رصيد الصندوق",Math.round(data.ending.syp),Number(data.ending.usd||0).toFixed(2),"حسب السجلات"]
       ];
-      downloadExcelTable("accounting_closing_"+data.period.key,"الإغلاق والمحاسبة",["البند","SYP","USD","ملاحظة"],rows);
+      downloadExcelTable("profit_loss_report","الربح والخسارة",["البند","SYP","USD","ملاحظة"],rows);
     };
 
-    function renderClosingHistory(){
-      const el=$("closingHistoryBox");if(!el)return;
-      const rows=[...accountingClosings].sort((a,b)=>String(b.endDate||"").localeCompare(String(a.endDate||"")));
-      if(!rows.length){el.innerHTML='<div class="empty">لا توجد إغلاقات محفوظة حتى الآن.</div>';return}
-      el.innerHTML=`<div class="table-wrap"><table><thead><tr><th>الفترة</th><th>من</th><th>إلى</th><th>ربح/خسارة</th><th>رصيد نهاية SYP</th><th>رصيد نهاية USD</th><th>فرق الجرد</th><th>ملاحظة</th></tr></thead><tbody>${rows.map(x=>`<tr><td>${displayText(x.periodLabel||x.id)}</td><td>${displayText(x.startDate)}</td><td>${displayText(x.endDate)}</td><td class="ltr">${fmt(x.operatingProfitSyp,"SYP")}</td><td class="ltr">${fmt(x.ending?.syp,"SYP")}</td><td class="ltr">${fmtUsd(x.ending?.usd)}</td><td class="ltr">${fmt(x.difference?.syp,"SYP")} / ${fmtUsd(x.difference?.usd)}</td><td>${displayText(x.note||"-")}</td></tr>`).join("")}</tbody></table></div>`;
+    function renderProfitLossSection(){
+      if(!$("profitLossSummaryGrid"))return;
+      initProfitLossDefaults();
+      calculateProfitLossPreview();
     }
 
-    function renderClosingSection(){
-      if(!$("closingSummaryGrid"))return;
-      initClosingDefaults();
-      calculateClosingPreview();
-    }
+    // Backward-safe aliases: old closing buttons are removed from the UI.
+    window.calculateClosingPreview=window.calculateProfitLossPreview;
+    window.copyClosingReport=window.copyProfitLossReport;
+    window.exportClosingExcel=window.exportProfitLossExcel;
+    function renderClosingSection(){renderProfitLossSection()}
 
     function calculateSummary(){
       const s={totalRevenueSyp:0,masarySyp:0,ccbsSyp:0,cutSyp:0,cutUsd:0,officeCutSyp:0,officeCutUsd:0,rateWeightedSum:0,rateWeight:0,sypFarhad:0,usdFarhad:0};
@@ -4580,7 +4508,7 @@ function markNegativeAmounts(root=document){
         renderCashLog();
         renderLoanSummary();
         renderCashReports();
-        renderClosingSection();
+        renderProfitLossSection();
         if($("cashDate")){updateCashboxFormMode();updateCashPreview()}
       }else if(currentView==="office"){
         fillOfficeMoveSelects();
