@@ -2394,15 +2394,72 @@ td{
       if(!name)return null;
       return getDelegate(name,region) || allDelegates.find(d=>normalizeNameKey(d.name)===normalizeNameKey(name)&&(!region||d.region===region)) || null;
     }
+    function delegateRowRegion(row){
+      return String(row?.region||row?.delegateRegion||"").trim();
+    }
+
+    function resolveDelegateFromRecord(row){
+      const rowId=String(row?.delegateId||"").trim();
+      const rowName=String(row?.delegateName||row?.name||"").trim();
+      const rowRegion=delegateRowRegion(row);
+      if(rowId){
+        const byId=allDelegates.find(d=>String(d.id)===rowId);
+        if(byId)return byId;
+      }
+      if(rowName){
+        const exact=getDelegate(rowName,rowRegion);
+        if(exact)return exact;
+        return allDelegates.find(d=>normalizeNameKey(d.name)===normalizeNameKey(rowName)&&(!rowRegion||d.region===rowRegion))||null;
+      }
+      return null;
+    }
+
     function sameDelegateRecord(row,delegate){
       if(!row||!delegate)return false;
-      const rowName=String(row.delegateName||"").trim();
+      const resolved=resolveDelegateFromRecord(row);
+      if(resolved?.id&&delegate.id&&String(resolved.id)===String(delegate.id))return true;
+      const rowName=String(row.delegateName||row.name||"").trim();
       const rowId=String(row.delegateId||"").trim();
-      const rowRegion=String(row.region||row.delegateRegion||"").trim();
+      const rowRegion=delegateRowRegion(row);
       const idOk=rowId&&delegate.id&&rowId===String(delegate.id);
       const nameOk=normalizeNameKey(rowName)===normalizeNameKey(delegate.name);
       const regionOk=!rowRegion||!delegate.region||rowRegion===delegate.region;
       return (idOk&&regionOk) || (nameOk&&regionOk);
+    }
+
+    function delegateRecordKey(row){
+      const resolved=resolveDelegateFromRecord(row);
+      if(resolved?.id)return "id:"+String(resolved.id);
+      const rowId=String(row?.delegateId||"").trim();
+      const rowName=String(row?.delegateName||row?.name||"").trim();
+      const rowRegion=delegateRowRegion(row);
+      if(rowId)return "id:"+rowId;
+      return "legacy:"+normalizeNameKey(rowRegion)+"|"+normalizeNameKey(rowName);
+    }
+
+    function delegateInfoFromRecord(row){
+      const resolved=resolveDelegateFromRecord(row);
+      const key=delegateRecordKey(row);
+      return {
+        key,
+        id:resolved?.id||String(row?.delegateId||"").trim()||"",
+        name:resolved?.name||String(row?.delegateName||row?.name||"").trim()||"-",
+        region:resolved?.region||delegateRowRegion(row)||"-"
+      };
+    }
+
+    function delegateInfoFromKey(key,dayRevs=[],dayDels=[]){
+      const rows=[...(dayRevs||[]),...(dayDels||[])];
+      const found=rows.find(x=>delegateRecordKey(x)===key);
+      if(found)return delegateInfoFromRecord(found);
+      if(String(key||"").startsWith("id:")){
+        const id=String(key).slice(3);
+        const d=allDelegates.find(x=>String(x.id)===id);
+        if(d)return {key,name:d.name,region:d.region||"-"};
+      }
+      const legacy=String(key||"").replace(/^legacy:/,"");
+      const parts=legacy.split("|");
+      return {key,name:parts[1]||"-",region:parts[0]||"-"};
     }
     function delegateRegionList(){
       return [...new Set(allDelegates.map(d=>d.region).filter(Boolean))]
@@ -4311,19 +4368,22 @@ function collectCutDollarRows(){
       const region=$("matchRegionFilter")?.value||"";
       const type=$("matchTypeFilter")?.value||"";
 
-      const baseRevs=revenues.filter(r=>
-        (!from||r.date>=from)&&(!to||r.date<=to)&&
-        (!name||String(r.delegateName).includes(name))&&
-        (!region||r.region===region)
-      );
+      const wantedName=normalizeNameKey(name);
+      const rowMatchesFilters=row=>{
+        const d=rowDateKey(row);
+        const info=delegateInfoFromRecord(row);
+        if(from&&d&&d<from)return false;
+        if(to&&d&&d>to)return false;
+        if(wantedName&&!normalizeNameKey(info.name).includes(wantedName))return false;
+        if(region&&info.region!==region)return false;
+        return true;
+      };
+
+      const baseRevs=revenues.filter(rowMatchesFilters);
       const revs=baseRevs.filter(r=>!type||r.revenueType===type);
 
       // التسليم غير مربوط بنوع الإيراد، لذلك يبقى حسب التاريخ/المندوب/الريجين فقط
-      const dels=deliveries.filter(d=>
-        (!from||d.date>=from)&&(!to||d.date<=to)&&
-        (!name||String(d.delegateName).includes(name))&&
-        (!region||d.region===region)
-      );
+      const dels=deliveries.filter(rowMatchesFilters);
       return{revs,dels,baseRevs,type};
     }
 
@@ -4377,6 +4437,7 @@ function collectCutDollarRows(){
     }
 
     window.renderDelegateMatch=function(){
+      try{
       const rows=buildDelegateMatchRows();
       const totalRevenue=rows.reduce((a,x)=>a+x.revenue,0);
       const totalDelivered=rows.reduce((a,x)=>a+x.delivered,0);
@@ -4389,7 +4450,7 @@ function collectCutDollarRows(){
       const el=$("delegateMatchTable");
       if(el){
         if(!rows.length)el.innerHTML='<div class="empty">لا توجد بيانات مطابقة حسب الفلتر.</div>';
-        else el.innerHTML=`<div class="table-wrap"><table><thead><tr><th>المندوب</th><th>الريجين</th><th>مصاري</th><th>CCBS</th><th>إجمالي الإيراد حسب الفلتر</th><th>إجمالي التسليم</th><th>تسليم دولار</th><th>إجمالي المتبقي</th></tr></thead><tbody>${rows.map(x=>`<tr><td><b>${x.name}</b><div class="delegate-type-mini">مصاري: ${fmt(x.masary,"SYP")} / CCBS: ${fmt(x.ccbs,"SYP")}</div></td><td>${x.region}</td><td class="ltr type-masary-cell">${fmt(x.masary,"SYP")}</td><td class="ltr type-ccbs-cell">${fmt(x.ccbs,"SYP")}</td><td class="ltr">${fmt(x.revenue,"SYP")}</td><td class="ltr">${fmt(x.delivered,"SYP")}</td><td class="ltr">${fmtUsd(x.deliveredUsd)}</td><td class="ltr">${fmt(x.remaining,"SYP")}</td></tr>`).join("")}</tbody></table></div>`;
+        else el.innerHTML=`<div class="table-wrap"><table><thead><tr><th>المندوب</th><th>الريجين</th><th>مصاري</th><th>CCBS</th><th>إجمالي الإيراد حسب الفلتر</th><th>إجمالي التسليم</th><th>تسليم دولار</th><th>إجمالي المتبقي</th></tr></thead><tbody>${rows.map(x=>`<tr><td><b>${displayText(x.name)}</b><div class="delegate-type-mini">مصاري: ${fmt(x.masary,"SYP")} / CCBS: ${fmt(x.ccbs,"SYP")}</div></td><td>${displayText(x.region)}</td><td class="ltr type-masary-cell">${fmt(x.masary,"SYP")}</td><td class="ltr type-ccbs-cell">${fmt(x.ccbs,"SYP")}</td><td class="ltr">${fmt(x.revenue,"SYP")}</td><td class="ltr">${fmt(x.delivered,"SYP")}</td><td class="ltr">${fmtUsd(x.deliveredUsd)}</td><td class="ltr">${fmt(x.remaining,"SYP")}</td></tr>`).join("")}</tbody></table></div>`;
       }
 
       const regionMap={};
@@ -4405,9 +4466,19 @@ function collectCutDollarRows(){
       const regEl=$("regionMatchTable");
       if(regEl){
         if(!regRows.length)regEl.innerHTML='<div class="empty">لا يوجد ملخص ريجينات حسب الفلتر.</div>';
-        else regEl.innerHTML=`<div class="table-wrap"><table><thead><tr><th>الريجين</th><th>مصاري</th><th>CCBS</th><th>إجمالي الإيراد</th><th>إجمالي التسليم</th><th>إجمالي المتبقي</th></tr></thead><tbody>${regRows.map(x=>`<tr><td>${x.region}</td><td class="ltr">${fmt(x.masary,"SYP")}</td><td class="ltr">${fmt(x.ccbs,"SYP")}</td><td class="ltr">${fmt(x.revenue,"SYP")}</td><td class="ltr">${fmt(x.delivered,"SYP")}</td><td class="ltr">${fmt(x.remaining,"SYP")}</td></tr>`).join("")}</tbody></table></div>`;
+        else regEl.innerHTML=`<div class="table-wrap"><table><thead><tr><th>الريجين</th><th>مصاري</th><th>CCBS</th><th>إجمالي الإيراد</th><th>إجمالي التسليم</th><th>إجمالي المتبقي</th></tr></thead><tbody>${regRows.map(x=>`<tr><td>${displayText(x.region)}</td><td class="ltr">${fmt(x.masary,"SYP")}</td><td class="ltr">${fmt(x.ccbs,"SYP")}</td><td class="ltr">${fmt(x.revenue,"SYP")}</td><td class="ltr">${fmt(x.delivered,"SYP")}</td><td class="ltr">${fmt(x.remaining,"SYP")}</td></tr>`).join("")}</tbody></table></div>`;
       }
       markNegativeAmounts(document);
+      }catch(e){
+        console.error("renderDelegateMatch failed",e);
+        const msg=escapeHTML(e?.message||String(e));
+        if($("delegateMatchTable"))$("delegateMatchTable").innerHTML='<div class="empty">تعذر عرض مطابقة المندوبين: '+msg+'</div>';
+        if($("regionMatchTable"))$("regionMatchTable").innerHTML='';
+        if($("matchTotalRevenue"))$("matchTotalRevenue").innerHTML=fmt(0,"SYP");
+        if($("matchTotalDelivered"))$("matchTotalDelivered").innerHTML=fmt(0,"SYP");
+        if($("matchTotalRemaining"))$("matchTotalRemaining").innerHTML=fmt(0,"SYP");
+        if($("matchDelegateCount"))$("matchDelegateCount").textContent="0";
+      }
     };
 
 
