@@ -2706,6 +2706,7 @@ td{
     const backupCollections=[
       {name:"dailyRevenues",label:"الإيرادات اليومية",data:()=>revenues},
       {name:"officeDeliveries",label:"تسليمات المندوبين",data:()=>deliveries},
+      {name:"cashboxes",label:"الصناديق",data:()=>cashboxes},
       {name:"cashboxMovements",label:"حركات الصندوق",data:()=>cashMoves},
       {name:"officeMovements",label:"حركات المكاتب",data:()=>officeMoves},
       {name:"customOffices",label:"المكاتب المضافة",data:()=>customOffices},
@@ -2760,13 +2761,24 @@ td{
         const collections=payload.collections||{};
         const names=backupCollections.map(c=>c.name).filter(name=>Array.isArray(collections[name]));
         if(!names.length){setStatus("ملف النسخة غير صالح أو لا يحتوي Collections معروفة.");return}
+        const missingIds=[];
+        for(const name of names){
+          collections[name].forEach((raw,idx)=>{
+            if(!raw||typeof raw!=="object")return;
+            if(!String(raw.id||raw.originalId||"").trim())missingIds.push(`${collectionLabels[name]||name} #${idx+1}`);
+          });
+        }
+        if(missingIds.length){
+          setStatus(`تم إيقاف الاستعادة: ملف JSON يحتوي ${missingIds.length} سجل بدون ID، وهذا قد يسبب تكراراً. استخدم نسخة JSON حديثة تحتوي IDs.`);
+          return;
+        }
         const typed=prompt("الاستعادة ستضيف/تحدّث السجلات حسب IDs الموجودة في النسخة، ولن تمسح السجلات الحالية غير الموجودة في الملف. اكتب RESTORE للتأكيد:");
         if(typed!=="RESTORE"){toast("تم إلغاء الاستعادة.","info");return}
         let total=0;
         for(const name of names){
           for(const raw of collections[name]){
             if(!raw||typeof raw!=="object")continue;
-            const id=String(raw.id||raw.originalId||"").trim() || doc(collection(db,name)).id;
+            const id=String(raw.id||raw.originalId||"").trim();
             const data={...raw,id,restoredFromBackupAt:serverTimestamp(),restoredFromBackupBy:auth.currentUser.uid};
             await setDoc(doc(db,name,id),data,{merge:true});
             total++;
@@ -2780,38 +2792,51 @@ td{
     async function moveDocToTrash(collectionName,id,label=""){
       if(!auth.currentUser)throw new Error("سجّل الدخول أولاً.");
       const sourceRef=doc(db,collectionName,id);
-      const snap=await getDoc(sourceRef);
-      if(!snap.exists())throw new Error("السجل غير موجود أو محذوف مسبقاً.");
-      const originalData={id:snap.id,...snap.data()};
       const trashRef=doc(collection(db,"trashBin"));
-      await setDoc(trashRef,{
-        id:trashRef.id,
-        originalCollection:collectionName,
-        originalCollectionLabel:collectionLabels[collectionName]||collectionName,
-        originalId:id,
-        label:label||originalData.label||originalData.delegateName||originalData.officeName||originalData.party||id,
-        originalData,
-        deletedBy:auth.currentUser.uid,
-        deletedAt:serverTimestamp(),
-        deletedAtLocal:new Date().toISOString()
+      let originalData=null,auditLabel=label||id;
+      await runTransaction(db,async tx=>{
+        const snap=await tx.get(sourceRef);
+        if(!snap.exists())throw new Error("السجل غير موجود أو محذوف مسبقاً.");
+        originalData={id:snap.id,...snap.data()};
+        auditLabel=label||originalData.label||originalData.delegateName||originalData.officeName||originalData.party||id;
+        tx.set(trashRef,{
+          id:trashRef.id,
+          originalCollection:collectionName,
+          originalCollectionLabel:collectionLabels[collectionName]||collectionName,
+          originalId:id,
+          label:auditLabel,
+          originalData,
+          deletedBy:auth.currentUser.uid,
+          deletedAt:serverTimestamp(),
+          deletedAtLocal:new Date().toISOString()
+        });
+        tx.delete(sourceRef);
       });
-      await deleteDoc(sourceRef);
-      await writeAuditLog("حذف إلى سلة المحذوفات",collectionName,id,label||originalData.label||originalData.delegateName||originalData.officeName||originalData.party||id,originalData,null);
+      await writeAuditLog("حذف إلى سلة المحذوفات",collectionName,id,auditLabel,originalData,null);
     }
 
     window.restoreTrashItem=async function(trashId){
       if(!auth.currentUser)return;
       try{
-        const t=trashItems.find(x=>x.id===trashId) || (await getDoc(doc(db,"trashBin",trashId))).data();
-        if(!t)throw new Error("السجل غير موجود في المحذوفات.");
+        const trashRef=doc(db,"trashBin",trashId);
+        const cached=trashItems.find(x=>x.id===trashId);
+        const initial=cached || (await getDoc(trashRef));
+        const initialData=cached || (initial.exists()?{id:initial.id,...initial.data()}:null);
+        if(!initialData)throw new Error("السجل غير موجود في المحذوفات.");
         if(!confirm("استعادة هذا السجل إلى مكانه الأصلي؟"))return;
-        const col=t.originalCollection;
-        const id=t.originalId;
-        if(!col||!id||!t.originalData)throw new Error("بيانات المحذوف غير مكتملة.");
-        const restored={...t.originalData,id,restoredAt:serverTimestamp(),restoredBy:auth.currentUser.uid};
-        delete restored.deletedAtLocal;
-        await setDoc(doc(db,col,id),restored,{merge:true});
-        await deleteDoc(doc(db,"trashBin",trashId));
+        let t=null,restored=null,col="",id="";
+        await runTransaction(db,async tx=>{
+          const trashSnap=await tx.get(trashRef);
+          if(!trashSnap.exists())throw new Error("السجل غير موجود في المحذوفات.");
+          t={id:trashSnap.id,...trashSnap.data()};
+          col=t.originalCollection;
+          id=t.originalId;
+          if(!col||!id||!t.originalData)throw new Error("بيانات المحذوف غير مكتملة.");
+          restored={...t.originalData,id,restoredAt:serverTimestamp(),restoredBy:auth.currentUser.uid};
+          delete restored.deletedAtLocal;
+          tx.set(doc(db,col,id),restored,{merge:true});
+          tx.delete(trashRef);
+        });
         await writeAuditLog("استعادة من سلة المحذوفات",col,id,t.label||id,t.originalData,restored);
         toast("تمت استعادة السجل ✅","success");
         await reloadAll();
@@ -2823,8 +2848,13 @@ td{
       try{
         const typed=prompt("الحذف النهائي لا يمكن التراجع عنه. اكتب DELETE للتأكيد:");
         if(typed!=="DELETE")return;
-        const t=trashItems.find(x=>x.id===trashId) || {};
-        await deleteDoc(doc(db,"trashBin",trashId));
+        const trashRef=doc(db,"trashBin",trashId);
+        let t=trashItems.find(x=>x.id===trashId) || {};
+        await runTransaction(db,async tx=>{
+          const snap=await tx.get(trashRef);
+          if(snap.exists())t={id:snap.id,...snap.data()};
+          tx.delete(trashRef);
+        });
         await writeAuditLog("حذف نهائي",t.originalCollection||"trashBin",t.originalId||trashId,t.label||trashId,t.originalData||t,null);
         toast("تم الحذف النهائي من سلة المحذوفات.","warn");
         await reloadAll();
@@ -3944,6 +3974,7 @@ td{
         const payload={...m,id:ref.id,label:officeMoveLabels[m.type]||m.type,fromOfficeName:from,toOfficeName:to,fromCashboxName:"",toCashboxName:"",createdBy:auth.currentUser.uid,updatedAt:serverTimestamp(),...(m.id?{}:{createdAt:serverTimestamp()})};
         if(m.type==="office_convert_syp_to_usd"&&m.amountUsd<=0&&m.exchangeRate>0)payload.amountUsd=m.amountSyp/m.exchangeRate;
         await setDoc(ref,payload,{merge:true});
+        await writeAuditLog(m.id?"تعديل حركة مكتب":"إضافة حركة مكتب","officeMovements",ref.id,officeMoveLabels[m.type]||m.type,null,payload);
         resetOfficeMoveForm();renderOfficeHub();renderOfficeLog();renderOfficeReports();renderCashboxes();
       }catch(e){setStatus("فشل حفظ حركة المكتب: "+e.message)}
     }
@@ -4126,7 +4157,7 @@ td{
       updateDeliveryModeUi();
       updateDeliveryCalculation();
     };
-    window.editRevenue=function(id){const r=revenues.find(x=>x.id===id);if(!r)return;$("editingRevenueId").value=r.id;if($("revRegion")){$("revRegion").value=r.region||"";fillDelegateSelect("rev",r.delegateName)}else{$("revDelegate").value=r.delegateName}$("revDate").value=r.date||todayString();$("revType").value=r.revenueType||"masary";$("revAmount").value=num(r.revenueSyp)||"";$("revNote").value=r.note||"";showView("entry");onRevFormChange();toast("وضع التعديل: "+r.delegateName,"info")};window.deleteRevenue=async function(id){if(!confirm("حذف الإيراد؟ التسليمات لا تنحذف لأنها عمليات مستقلة."))return;await moveDocToTrash("dailyRevenues",id,"إيراد يومي");toast("تم نقل الإيراد إلى سلة المحذوفات ✅","success");renderSecuritySection()};
+    window.editRevenue=function(id){const r=revenues.find(x=>x.id===id);if(!r)return;$("editingRevenueId").value=r.id;if($("revRegion")){$("revRegion").value=r.region||"";fillDelegateSelect("rev",r.delegateName)}else{$("revDelegate").value=r.delegateName}$("revDate").value=r.date||todayString();$("revType").value=r.revenueType||"masary";$("revAmount").value=num(r.revenueSyp)||"";$("revNote").value=r.note||"";showView("entry");onRevFormChange();toast("وضع التعديل: "+r.delegateName,"info")};window.deleteRevenue=async function(id){try{if(!confirm("حذف الإيراد؟ التسليمات لا تنحذف لأنها عمليات مستقلة."))return;await moveDocToTrash("dailyRevenues",id,"إيراد يومي");toast("تم نقل الإيراد إلى سلة المحذوفات ✅","success");renderSecuritySection()}catch(e){setStatus("فشل حذف الإيراد: "+e.message)}};
 
     /* ====== saveRevenue + resetRevenueForm (كانوا ناقصين — هذا سبب عدم الحفظ) ====== */
     window.saveRevenue=async function(){
@@ -4155,7 +4186,7 @@ td{
           updatedAt:serverTimestamp(),
           ...(id?{}:{createdAt:serverTimestamp()})
         },{merge:true});
-        await writeAuditLog(id?"تعديل إيراد":"إضافة إيراد","dailyRevenues",ref.id,delegateName,{delegateName,delegateId:delegate?.id||"",revenueSyp:amount,date});
+        await writeAuditLog(id?"تعديل إيراد":"إضافة إيراد","dailyRevenues",ref.id,delegateName,{delegateName,delegateId:delegate?.id||"",revenueSyp,date});
         resetRevenueForm();
         toast(id?"تم تعديل الإيراد ✅":"تم حفظ الإيراد ✅ - "+delegate.name+" / "+fmt(revenueSyp,"SYP"),"success");
         renderDailyLog();renderKpis();
@@ -4825,7 +4856,7 @@ function collectCutDollarRows(){
     function targetEffectForStatement(m,targetId){
       const e=getOfficeMoveEffect(m);
       if(transferTargetById(targetId)?.isCashbox){
-        if(targetId==="box_farhad")return {syp:num(e.cashboxEffects?.syp_farhad?.syp),usd:Number(e.cashboxEffects?.usd_farhad?.usd||0)};
+        if(targetId==="box_basic")return {syp:num(e.cashboxEffects?.syp_farhad?.syp),usd:Number(e.cashboxEffects?.usd_farhad?.usd||0)};
         return e.cashboxEffects?.[targetId]||{syp:0,usd:0};
       }
       return e.officeEffects?.[targetId]||{syp:0,usd:0};
