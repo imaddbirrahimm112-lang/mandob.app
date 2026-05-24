@@ -1731,7 +1731,7 @@ td{
 
         <div class="nav">
           <button id="navDashboard" class="active" onclick="showView('dashboard')"><span>لوحة الإيرادات</span><small>KPIs + مكاتب</small></button>
-          <button id="navEntry" onclick="showView('entry')"><span>إدخال الإيراد اليومي</span><small>إيراد + تسليم + سجل</small></button><button id="navCashbox" onclick="showView('cashbox')"><span>الصندوق</span><small>صناديق + حركة</small></button><button id="navOffice" onclick="showView('office')"><span>رصيد المكاتب والحوالات</span><small>مكاتب + تحويلات</small></button><button id="navCutDollar" onclick="showView('cutDollar')"><span>قص دولار</span><small>قسط/قص السوري إلى دولار</small></button><button id="navLoans" onclick="showView('loans')"><span>سلف</span><small>سجل السلف والذمم</small></button><button id="navDelegateMatch" onclick="showView('delegateMatch')"><span>مطابقة المندوبين</span><small>إيراد + تسليم + متبقي</small></button><button id="navSettings" onclick="showView('settings')"><span>الإعدادات</span><small>إضافة مكتب / مندوب</small></button>
+          <button id="navEntry" onclick="showView('entry')"><span>إدخال الإيراد اليومي</span><small>إيراد + تسليم + سجل</small></button><button id="navCashbox" onclick="showView('cashbox')"><span>الصندوق</span><small>صناديق + حركة</small></button><button id="navOffice" onclick="showView('office')"><span>رصيد المكاتب والحوالات</span><small>مكاتب + تحويلات</small></button><button id="navCutDollar" onclick="showView('cutDollar')"><span>قص دولار</span><small>قسط/قص السوري إلى دولار</small></button><button id="navLoans" onclick="showView('loans')"><span>سلف</span><small>سجل السلف والذمم</small></button><button id="navDelegateMatch" onclick="showView('delegateMatch')"><span>مطابقة المندوبين</span><small>إيراد + تسليم + متبقي</small></button><button id="navDataCheck" onclick="showView('dataCheck')"><span>فحص البيانات</span><small>أخطاء + تنبيهات</small></button><button id="navSettings" onclick="showView('settings')"><span>الإعدادات</span><small>إضافة مكتب / مندوب</small></button>
         </div>
 
         <div class="side-footer">
@@ -2060,6 +2060,22 @@ td{
             <div class="form-actions"><button class="good" onclick="saveOfficeMove()">حفظ الحركة</button><button class="secondary" onclick="resetOfficeMoveForm()">تفريغ</button></div>
           </div>
 
+
+          <div class="section">
+            <div class="section-head">
+              <div><h2>كشف حساب مكتب</h2><small>كشف مختصر لحركات المكتب: الداخل، الخارج، الرصيد، وآخر العمليات.</small></div>
+              <button class="secondary" onclick="renderOfficeStatement()">تحديث الكشف</button>
+            </div>
+            <div class="filters">
+              <select id="officeStatementTarget" onchange="renderOfficeStatement()"><option value="">اختر المكتب / الصندوق</option></select>
+              <input id="officeStatementFromDate" type="date" onchange="renderOfficeStatement()">
+              <input id="officeStatementToDate" type="date" onchange="renderOfficeStatement()">
+              <button class="secondary" onclick="clearOfficeStatement()">مسح</button>
+            </div>
+            <div id="officeStatementSummary" class="kpi-grid" style="margin-top:12px"></div>
+            <div id="officeStatementBox" style="margin-top:12px"></div>
+          </div>
+
           <div class="section">
             <div class="section-head"><div><h2>سجل حوالات وحركات المكاتب</h2><small>سجل مستقل مع تعديل وحذف وإظهار/إخفاء.</small></div><button class="secondary" onclick="toggleOfficeLog()">إظهار / إخفاء</button></div>
             <div id="officeLogBox">
@@ -2200,6 +2216,22 @@ td{
             </div>
           </div>
 
+
+          <div class="section">
+            <div class="section-head">
+              <div><h2>كشف حساب مندوب</h2><small>اختار مندوب وشوف الإيراد، التسليم، القص، الدولار المباشر، والمتبقي ضمن الفترة.</small></div>
+              <button class="secondary" onclick="renderDelegateStatement()">تحديث الكشف</button>
+            </div>
+            <div class="filters">
+              <select id="statementDelegate" onchange="renderDelegateStatement()"><option value="">اختر المندوب</option></select>
+              <input id="statementFromDate" type="date" onchange="renderDelegateStatement()">
+              <input id="statementToDate" type="date" onchange="renderDelegateStatement()">
+              <button class="secondary" onclick="clearDelegateStatement()">مسح</button>
+            </div>
+            <div id="delegateStatementSummary" class="kpi-grid" style="margin-top:12px"></div>
+            <div id="delegateStatementBox" style="margin-top:12px"></div>
+          </div>
+
           <div class="section">
             <div class="section-head"><div><h2>جدول مطابقة المندوبين</h2><small>كل مندوب وإجمالياته.</small></div></div>
             <div id="delegateMatchTable"></div>
@@ -2208,6 +2240,34 @@ td{
           <div class="section">
             <div class="section-head"><div><h2>ملخص حسب الريجين</h2><small>إجمالي كل ريجين حسب الفلتر.</small></div></div>
             <div id="regionMatchTable"></div>
+          </div>
+        </section>
+
+
+        <section id="viewDataCheck" class="view">
+          <div class="section">
+            <div class="section-head">
+              <div>
+                <h2>فحص البيانات</h2>
+                <small>يفحص الأخطاء المحتملة بدون ما يغيّر أي رقم أو سجل.</small>
+              </div>
+              <div class="head-actions">
+                <button class="good" onclick="renderDataCheck()">تشغيل الفحص</button>
+              </div>
+            </div>
+            <div class="filters">
+              <input id="dataCheckFromDate" type="date" onchange="renderDataCheck()">
+              <input id="dataCheckToDate" type="date" onchange="renderDataCheck()">
+              <select id="dataCheckLevel" onchange="renderDataCheck()">
+                <option value="">كل المستويات</option>
+                <option value="critical">خطير</option>
+                <option value="warning">تنبيه</option>
+                <option value="info">معلومة</option>
+              </select>
+              <button class="secondary" onclick="clearDataCheckFilters()">مسح</button>
+            </div>
+            <div id="dataCheckSummary" class="kpi-grid" style="margin-top:12px"></div>
+            <div id="dataCheckResults" style="margin-top:12px"></div>
           </div>
         </section>
 
@@ -2273,13 +2333,22 @@ td{
             </div>
             <div id="trashBinBox"></div>
           </div>
+
+
+          <div class="section">
+            <div class="section-head">
+              <div><h2>سجل التدقيق الخفيف</h2><small>آخر عمليات الإضافة والتعديل والحذف والاستعادة. لا يظهر في لوحة الإيرادات.</small></div>
+              <button class="secondary" onclick="renderAuditLog()">تحديث السجل</button>
+            </div>
+            <div id="auditLogBox"></div>
+          </div>
         </section>
 
       </main>
     </div>
   </div>
 
-  <div class="mobile-nav"><button id="mNavDashboard" class="active" onclick="showView('dashboard')">لوحة الإيرادات</button><button id="mNavEntry" onclick="showView('entry')">إدخال يومي</button><button id="mNavCashbox" onclick="showView('cashbox')">الصندوق</button><button id="mNavOffice" onclick="showView('office')">المكاتب</button><button id="mNavCutDollar" onclick="showView('cutDollar')">قص دولار</button><button id="mNavLoans" onclick="showView('loans')">سلف</button><button id="mNavDelegateMatch" onclick="showView('delegateMatch')">مطابقة</button><button id="mNavSettings" onclick="showView('settings')">إعدادات</button></div>
+  <div class="mobile-nav"><button id="mNavDashboard" class="active" onclick="showView('dashboard')">لوحة الإيرادات</button><button id="mNavEntry" onclick="showView('entry')">إدخال يومي</button><button id="mNavCashbox" onclick="showView('cashbox')">الصندوق</button><button id="mNavOffice" onclick="showView('office')">المكاتب</button><button id="mNavCutDollar" onclick="showView('cutDollar')">قص دولار</button><button id="mNavLoans" onclick="showView('loans')">سلف</button><button id="mNavDelegateMatch" onclick="showView('delegateMatch')">مطابقة</button><button id="mNavDataCheck" onclick="showView('dataCheck')">فحص</button><button id="mNavSettings" onclick="showView('settings')">إعدادات</button></div>
 
   <div id="officeModal" class="modal" onclick="closeOfficeModal(event)"><div class="modal-box" onclick="event.stopPropagation()"><div class="section-head"><div><h2 id="modalTitle">تفاصيل المكتب</h2><small id="modalSub"></small></div><button class="secondary" onclick="hideOfficeModal()">إغلاق</button></div><div id="modalContent"></div></div></div>
 
@@ -2331,7 +2400,7 @@ td{
 
     const delegatesByRegion={"Region 1":["جفان","علي","كاوا","دلخواز","بشار","صالة قامشلو 1","صالة قامشلو 2","صالة عامودا","صالة درباسية","صالة معبدة","صالة ديريك"],"Region 2":["شريف","يوسف","كمال","صالة حسكة 1","صالة حسكة 2","صالة تل تمر","صالة الشدادي"],"Region 3":["جاسم حسو","فرهاد خليل","احمد اومري","صالة الرقة 1","صالة الرقة 2","احمد هنيدي","صالة الطبقة","صالة دير الزور"],"Region 4":["شاهر ابو احمد","عبدو جاسم","صالة منبج","عادل عبدالعزيز","صالة كوباني"]};
     const officesByRegion={"R1":["هوكر تمي ديريك","تبارك رميلان","اسماعيل عبدي","محمد عامودا","شيخاني","عماد تمو","سوار قامشلو","ميداس عامودا","دعدوش درباسية","روهين تربه سبيه","روهين تل تمر","الحديدي تل كوجر","فهد"],"R2":["زين حسكة","سوار حسكة","يارا حسكة","زين 2 حسكة","نورجان حسكة","جاد شداده"],"R3":["العويد للحوالات رقة","الصفا جزرة بوحميد","خريس طبقة","انس العويد","رامي العويد"],"R4":["القصاب منبج","مسرو كوباني","ابو امير منبج"]};
-    let revenues=[],deliveries=[],officeDocs=[],cashboxes=[],cashMoves=[],officeMoves=[],accountingClosings=[],trashItems=[],officeCurrencyMode="SYP",officeHubCurrencyMode="ALL",unsubscribers=[];const collapsedDays=new Set();const expandedDetailsDays=new Set();
+    let revenues=[],deliveries=[],officeDocs=[],cashboxes=[],cashMoves=[],officeMoves=[],accountingClosings=[],trashItems=[],auditLogs=[],officeCurrencyMode="SYP",officeHubCurrencyMode="ALL",unsubscribers=[];const collapsedDays=new Set();const expandedDetailsDays=new Set();
     function safeId(text){return String(text).trim().replace(/[^\p{L}\p{N}]+/gu,"_").replace(/^_+|_+$/g,"")}
     const baseDelegates=Object.entries(delegatesByRegion).flatMap(([region,names])=>names.map(name=>({id:safeId(region+"_"+name),name,region,custom:false})));
     const baseOffices=Object.entries(officesByRegion).flatMap(([region,names])=>names.map(name=>({id:safeId(region+"_"+name),name,region,custom:false})));
@@ -2533,6 +2602,7 @@ td{
       const officeEl=$("delOffice");if(!officeEl)return;
       const keepOffice=officeEl.value;officeEl.innerHTML=os;
       if([...officeEl.options].some(o=>o.value===keepOffice))officeEl.value=keepOffice;
+      fillStatementSelects();
     }
     window.login=async function(){
       const email=String($("loginEmail")?.value||"").trim();
@@ -2566,7 +2636,7 @@ td{
     function showApp(user){if($("loginScreen"))$("loginScreen").style.display=user?"none":"grid";if($("app"))$("app").style.display=user?"block":"none";const nav=document.querySelector(".mobile-nav");if(nav)nav.style.display=user?"":"none";if($("backToAppBtn"))$("backToAppBtn").style.display=user?"block":"none"}
     window.openLoginScreen=function(){if($("loginScreen"))$("loginScreen").style.display="grid";if($("backToAppBtn"))$("backToAppBtn").style.display=auth.currentUser?"block":"none"}
     window.closeLoginScreen=function(){if(auth.currentUser&&$("loginScreen"))$("loginScreen").style.display="none"}
-    const titles={dashboard:["لوحة الإيرادات","الرصيد محسوب من السجلات فقط."],entry:["إدخال الإيراد اليومي","الإيراد لحاله، والتسليم لحاله، والسجل تحته."],cashbox:["الصندوق","قسم محاسبي مستقل للصندوق."],office:["رصيد المكاتب والحوالات","قسم مستقل لحركة المكاتب والتحويلات."],cutDollar:["قص دولار","سجل خاص بقص السوري إلى دولار من المندوبين والمكاتب."],loans:["سلف","سجل السلف والذمم."],delegateMatch:["مطابقة المندوبين","مطابقة الإيراد والتسليم والمتبقي."],settings:["الإعدادات","إضافة مكتب أو مندوب جديد."]};
+    const titles={dashboard:["لوحة الإيرادات","الرصيد محسوب من السجلات فقط."],entry:["إدخال الإيراد اليومي","الإيراد لحاله، والتسليم لحاله، والسجل تحته."],cashbox:["الصندوق","قسم محاسبي مستقل للصندوق."],office:["رصيد المكاتب والحوالات","قسم مستقل لحركة المكاتب والتحويلات."],cutDollar:["قص دولار","سجل خاص بقص السوري إلى دولار من المندوبين والمكاتب."],loans:["سلف","سجل السلف والذمم."],delegateMatch:["مطابقة المندوبين","مطابقة الإيراد والتسليم والمتبقي."],dataCheck:["فحص البيانات","كشف الأخطاء والتنبيهات بدون تعديل البيانات."],settings:["الإعدادات","إضافة مكتب أو مندوب جديد."]};
     let currentView="dashboard";
     let renderAllTimer=null;
     let fillSelectsTimer=null;
@@ -2590,7 +2660,7 @@ td{
 
     window.showView=function(view){
       currentView=view;
-      ["dashboard","entry","cashbox","office","cutDollar","loans","delegateMatch","settings"].forEach(v=>{
+      ["dashboard","entry","cashbox","office","cutDollar","loans","delegateMatch","dataCheck","settings"].forEach(v=>{
         const viewEl=$("view"+cap(v));
         const navEl=$("nav"+cap(v));
         const mobileEl=$("mNav"+cap(v));
@@ -2623,6 +2693,7 @@ td{
       watch("officeMovements",data=>{officeMoves=data},"تنبيه قراءة حركات المكاتب: ");
       watch("accountingClosings",data=>{accountingClosings=data},"تنبيه قراءة الإغلاقات: ");
       watch("trashBin",data=>{trashItems=data},"تنبيه قراءة المحذوفات: ");
+      watch("auditLogs",data=>{auditLogs=data},"تنبيه قراءة سجل التدقيق: ");
       unsubscribers.push(onSnapshot(collection(db,"customOffices"),s=>{customOffices=s.docs.map(d=>({id:d.id,...d.data()}));scheduleMasterRefresh()},e=>setStatus("تنبيه قراءة المكاتب المضافة: "+e.message)));
       unsubscribers.push(onSnapshot(collection(db,"customDelegates"),s=>{customDelegates=s.docs.map(d=>({id:d.id,...d.data()}));scheduleMasterRefresh()},e=>setStatus("تنبيه قراءة المندوبين المضافين: "+e.message)));
     }
@@ -2639,7 +2710,8 @@ td{
       {name:"officeMovements",label:"حركات المكاتب",data:()=>officeMoves},
       {name:"customOffices",label:"المكاتب المضافة",data:()=>customOffices},
       {name:"customDelegates",label:"المندوبين المضافين",data:()=>customDelegates},
-      {name:"trashBin",label:"سلة المحذوفات",data:()=>trashItems}
+      {name:"trashBin",label:"سلة المحذوفات",data:()=>trashItems},
+      {name:"auditLogs",label:"سجل التدقيق",data:()=>auditLogs}
     ];
     const collectionLabels=Object.fromEntries(backupCollections.map(c=>[c.name,c.label]));
 
@@ -2724,6 +2796,7 @@ td{
         deletedAtLocal:new Date().toISOString()
       });
       await deleteDoc(sourceRef);
+      await writeAuditLog("حذف إلى سلة المحذوفات",collectionName,id,label||originalData.label||originalData.delegateName||originalData.officeName||originalData.party||id,originalData,null);
     }
 
     window.restoreTrashItem=async function(trashId){
@@ -2739,6 +2812,7 @@ td{
         delete restored.deletedAtLocal;
         await setDoc(doc(db,col,id),restored,{merge:true});
         await deleteDoc(doc(db,"trashBin",trashId));
+        await writeAuditLog("استعادة من سلة المحذوفات",col,id,t.label||id,t.originalData,restored);
         toast("تمت استعادة السجل ✅","success");
         await reloadAll();
       }catch(e){setStatus("فشل استعادة السجل: "+e.message)}
@@ -2749,7 +2823,9 @@ td{
       try{
         const typed=prompt("الحذف النهائي لا يمكن التراجع عنه. اكتب DELETE للتأكيد:");
         if(typed!=="DELETE")return;
+        const t=trashItems.find(x=>x.id===trashId) || {};
         await deleteDoc(doc(db,"trashBin",trashId));
+        await writeAuditLog("حذف نهائي",t.originalCollection||"trashBin",t.originalId||trashId,t.label||trashId,t.originalData||t,null);
         toast("تم الحذف النهائي من سلة المحذوفات.","warn");
         await reloadAll();
       }catch(e){setStatus("فشل الحذف النهائي: "+e.message)}
@@ -2782,7 +2858,7 @@ td{
     window.reloadAll=async function(){
       if(!auth.currentUser)return;
       setStatus("");
-      const [r,d,cb,cm,om,ac,tb,co,cd]=await Promise.all([
+      const [r,d,cb,cm,om,ac,tb,al,co,cd]=await Promise.all([
         readCol("dailyRevenues"),
         readCol("officeDeliveries"),
         readCol("cashboxes"),
@@ -2790,10 +2866,11 @@ td{
         readCol("officeMovements"),
         readCol("accountingClosings"),
         readCol("trashBin"),
+        readCol("auditLogs"),
         readCol("customOffices"),
         readCol("customDelegates")
       ]);
-      revenues=r;deliveries=d;cashboxes=cb;cashMoves=cm;officeMoves=om;accountingClosings=ac;trashItems=tb;customOffices=co;customDelegates=cd;
+      revenues=r;deliveries=d;cashboxes=cb;cashMoves=cm;officeMoves=om;accountingClosings=ac;trashItems=tb;auditLogs=al;customOffices=co;customDelegates=cd;
       rebuildMasterData();
       fillSelects();
       renderAll();
@@ -2968,6 +3045,7 @@ td{
           updatedAt:serverTimestamp(),
           ...(id?{}:{createdAt:serverTimestamp()})
         },{merge:true});
+        await writeAuditLog(id?"تعديل حركة صندوق":"إضافة حركة صندوق","cashboxMovements",ref.id,$("cashParty").value.trim()||cashMoveLabel(type),null,{type,amountSyp,amountUsd});
         resetCashMoveForm();
         renderCashboxes();renderCashLog();renderLoanSummary();renderCashReports();
       }catch(e){setStatus("فشل حفظ حركة الصندوق: "+e.message)}
@@ -4031,6 +4109,7 @@ td{
         const totalAsSyp=deliveredSyp+cutSyp+(directUsd*rate);
         const id=$("editingDeliveryId").value,ref=id?doc(db,"officeDeliveries",id):doc(collection(db,"officeDeliveries"));
         await setDoc(ref,{id:ref.id,date:$("delDate").value||todayString(),delegateName:delegate.name,delegateId:delegate.id,region:delegate.region,officeId:office.id,officeName:office.name,officeRegion:office.region,mode:cut?"cut":"direct",deliveredSyp,cutSyp,cutUsd,directUsd,deliveredUsd,exchangeRate:rate,totalDeliveredAsSyp:totalAsSyp,note:$("delNote").value.trim(),createdBy:auth.currentUser.uid,updatedAt:serverTimestamp(),...(id?{}:{createdAt:serverTimestamp()})},{merge:true});
+        await writeAuditLog(id?"تعديل تسليم":"إضافة تسليم","officeDeliveries",ref.id,delegate.name,{delegateName:delegate.name,officeName:office.name,totalAsSyp});
         resetDeliveryForm();
         renderDailyLog();
         toast("تم حفظ التسليم ✅","success");
@@ -4076,6 +4155,7 @@ td{
           updatedAt:serverTimestamp(),
           ...(id?{}:{createdAt:serverTimestamp()})
         },{merge:true});
+        await writeAuditLog(id?"تعديل إيراد":"إضافة إيراد","dailyRevenues",ref.id,delegateName,{delegateName,delegateId:delegate?.id||"",revenueSyp:amount,date});
         resetRevenueForm();
         toast(id?"تم تعديل الإيراد ✅":"تم حفظ الإيراد ✅ - "+delegate.name+" / "+fmt(revenueSyp,"SYP"),"success");
         renderDailyLog();renderKpis();
@@ -4584,6 +4664,219 @@ function collectCutDollarRows(){
     };
 
 
+    /* ===== IMAD Pro clean update: data check + statements + light audit ===== */
+    function dateInRange(date,from,to){
+      const d=String(date||"").slice(0,10);
+      if(from&&d&&d<from)return false;
+      if(to&&d&&d>to)return false;
+      return true;
+    }
+
+    function fillStatementSelects(){
+      const sd=$("statementDelegate");
+      if(sd){
+        const keep=sd.value;
+        sd.innerHTML='<option value="">اختر المندوب</option>'+allDelegates.map(d=>optionHTML(d.id,`${d.region} - ${d.name}`)).join("");
+        if([...sd.options].some(o=>o.value===keep))sd.value=keep;
+      }
+      const os=$("officeStatementTarget");
+      if(os){
+        const keep=os.value;
+        os.innerHTML='<option value="">اختر المكتب / الصندوق</option>'+officeTransferTargets().map(o=>optionHTML(o.id,`${o.region} - ${o.name}`)).join("");
+        if([...os.options].some(o=>o.value===keep))os.value=keep;
+      }
+    }
+
+    function dataIssue(level,section,date,name,details,amount=""){
+      return {level,section,date:String(date||""),name:String(name||"-"),details:String(details||""),amount};
+    }
+    function issueLevelLabel(level){return level==="critical"?"خطير":level==="warning"?"تنبيه":"معلومة"}
+    function issueLevelClass(level){return level==="critical"?"danger":level==="warning"?"warn":"info"}
+
+    function buildDataIssues(){
+      const from=$("dataCheckFromDate")?.value||"";
+      const to=$("dataCheckToDate")?.value||"";
+      const issues=[];
+      const revs=revenues.filter(r=>dateInRange(r.date,from,to));
+      const dels=deliveries.filter(d=>dateInRange(d.date,from,to));
+      const cms=cashMoves.filter(m=>dateInRange(m.date,from,to));
+      const oms=officeMoves.filter(m=>dateInRange(m.date,from,to));
+
+      for(const r of revs){
+        if(!String(r.date||"").trim())issues.push(dataIssue("critical","الإيرادات",r.date,r.delegateName,"سجل إيراد بدون تاريخ."));
+        if(!String(r.delegateName||"").trim())issues.push(dataIssue("critical","الإيرادات",r.date,"-","سجل إيراد بدون اسم مندوب."));
+        if(num(r.revenueSyp)<=0)issues.push(dataIssue("warning","الإيرادات",r.date,r.delegateName,"مبلغ الإيراد صفر أو غير صحيح.",fmt(r.revenueSyp,"SYP")));
+      }
+      for(const d of dels){
+        const n=deliveryNumbers(d);
+        if(!String(d.date||"").trim())issues.push(dataIssue("critical","التسليمات",d.date,d.delegateName,"سجل تسليم بدون تاريخ."));
+        if(!String(d.delegateName||"").trim())issues.push(dataIssue("critical","التسليمات",d.date,"-","سجل تسليم بدون اسم مندوب."));
+        if((n.cutSyp>0||n.directUsd>0)&&n.rate<=0)issues.push(dataIssue("critical","التسليمات",d.date,d.delegateName,"يوجد قص/دولار مباشر بدون سعر صرف صحيح.",fmt(n.totalAsSyp,"SYP")));
+        if(n.totalAsSyp<=0&&n.deliveredUsd<=0)issues.push(dataIssue("warning","التسليمات",d.date,d.delegateName,"تسليم بدون مبلغ مؤثر."));
+      }
+      for(const m of cms){
+        const type=String(m.type||"");
+        if(!String(m.date||"").trim())issues.push(dataIssue("critical","الصندوق",m.date,m.party,"حركة صندوق بدون تاريخ."));
+        if((type==="convert_syp_to_usd"||type==="convert_usd_to_syp")&&num(m.exchangeRate)<=0)issues.push(dataIssue("critical","الصندوق",m.date,m.party,"تحويل بين العملات بدون سعر صرف صحيح."));
+      }
+      for(const m of oms){
+        if(!String(m.date||"").trim())issues.push(dataIssue("critical","المكاتب",m.date,m.party||m.fromOfficeName,"حركة مكتب بدون تاريخ."));
+        if(m.type==="office_convert_syp_to_usd"&&num(m.exchangeRate)<=0)issues.push(dataIssue("critical","المكاتب",m.date,m.fromOfficeName,"قص رصيد مكتب بدون سعر صرف صحيح."));
+        if(["office_to_office","office_to_cashbox"].includes(m.type)&&String(m.fromOfficeId||"")&&String(m.fromOfficeId||"")===String(m.toOfficeId||""))issues.push(dataIssue("critical","المكاتب",m.date,m.fromOfficeName,"المصدر والوجهة نفس المكتب/الصندوق."));
+      }
+
+      const avg=revs.length?revs.reduce((a,r)=>a+num(r.revenueSyp),0)/revs.length:0;
+      for(const r of revs){
+        const amount=num(r.revenueSyp);
+        if(avg>0&&amount>Math.max(avg*3,50000000))issues.push(dataIssue("warning","الإيرادات",r.date,r.delegateName,`مبلغ كبير مقارنة بمتوسط الفترة. المتوسط تقريباً ${fmt(avg,"SYP")}.`,fmt(amount,"SYP")));
+      }
+
+      const revDup=new Map();
+      for(const r of revs){
+        const key=[r.date,delegateRecordKey(r),r.revenueType,num(r.revenueSyp)].join("|");
+        revDup.set(key,(revDup.get(key)||0)+1);
+      }
+      for(const [key,count] of revDup.entries()){
+        if(count>1){const [date,,type,amount]=key.split("|");issues.push(dataIssue("warning","الإيرادات",date,type,`تكرار محتمل: ${count} سجلات بنفس التاريخ/النوع/المبلغ.`,fmt(amount,"SYP")));}
+      }
+      const delDup=new Map();
+      for(const d of dels){
+        const n=deliveryNumbers(d);
+        const key=[d.date,delegateRecordKey(d),String(d.officeName||d.officeId||""),Math.round(n.totalAsSyp)].join("|");
+        delDup.set(key,(delDup.get(key)||0)+1);
+      }
+      for(const [key,count] of delDup.entries()){
+        if(count>1){const [date,,office,amount]=key.split("|");issues.push(dataIssue("warning","التسليمات",date,office||"-",`تكرار محتمل: ${count} تسليمات بنفس التاريخ/المكتب/المبلغ.`,fmt(amount,"SYP")));}
+      }
+
+      const cb=calcCashboxBalances();
+      if(cb.syp_farhad<0)issues.push(dataIssue("critical","الصندوق","","صندوق سوري الأساسي","رصيد الصندوق السوري سالب.",fmt(cb.syp_farhad,"SYP")));
+      if(cb.usd_farhad<0)issues.push(dataIssue("critical","الصندوق","","صندوق دولار الأساسي","رصيد الصندوق الدولار سالب.",fmtUsd(cb.usd_farhad)));
+
+      for(const o of allOffices){
+        const b=getOfficeBalance(o.id);
+        if(b.syp<0)issues.push(dataIssue("warning","المكاتب","",o.name,"رصيد المكتب السوري سالب.",fmt(b.syp,"SYP")));
+        if(b.usd<0)issues.push(dataIssue("warning","المكاتب","",o.name,"رصيد المكتب الدولار سالب.",fmtUsd(b.usd)));
+      }
+
+      const delegatesSeen=new Map();
+      [...revs,...dels].forEach(x=>{const info=delegateInfoFromRecord(x); if(info.key&&!delegatesSeen.has(info.key))delegatesSeen.set(info.key,info)});
+      for(const info of delegatesSeen.values()){
+        const revenue=revenues.filter(r=>delegateRecordKey(r)===info.key&&dateInRange(r.date,from,to)).reduce((a,r)=>a+num(r.revenueSyp),0);
+        const delivered=deliveries.filter(d=>delegateRecordKey(d)===info.key&&dateInRange(d.date,from,to)).reduce((a,d)=>a+deliveryNumbers(d).totalAsSyp,0);
+        const remaining=revenue-delivered;
+        if(remaining<0)issues.push(dataIssue("warning","المندوبين","",info.name,`المتبقي سالب ضمن الفترة. الإيراد ${fmt(revenue,"SYP")} / التسليم ${fmt(delivered,"SYP")}.`,fmt(remaining,"SYP")));
+      }
+      return issues;
+    }
+
+    window.clearDataCheckFilters=function(){["dataCheckFromDate","dataCheckToDate","dataCheckLevel"].forEach(id=>{if($(id))$(id).value=""});renderDataCheck()};
+    window.renderDataCheck=function(){
+      const level=$("dataCheckLevel")?.value||"";
+      let issues=buildDataIssues();
+      if(level)issues=issues.filter(x=>x.level===level);
+      const counts={critical:issues.filter(x=>x.level==="critical").length,warning:issues.filter(x=>x.level==="warning").length,info:issues.filter(x=>x.level==="info").length,total:issues.length};
+      if($("dataCheckSummary"))$("dataCheckSummary").innerHTML=[
+        ["إجمالي الملاحظات",String(counts.total),"حسب الفلتر"],
+        ["أخطاء خطيرة",String(counts.critical),"تحتاج مراجعة أولاً"],
+        ["تنبيهات",String(counts.warning),"تحتاج تدقيق"],
+        ["معلومات",String(counts.info),"ملاحظات خفيفة"]
+      ].map(c=>`<div class="card"><div class="label">${c[0]}</div><div class="value">${c[1]}</div><div class="sub">${c[2]}</div></div>`).join("");
+      const el=$("dataCheckResults");if(!el)return;
+      if(!issues.length){el.innerHTML='<div class="empty">لا توجد مشاكل حسب الفلتر الحالي.</div>';return}
+      el.innerHTML=`<div class="table-wrap"><table><thead><tr><th>المستوى</th><th>القسم</th><th>التاريخ</th><th>الاسم</th><th>القيمة</th><th>التفاصيل</th></tr></thead><tbody>${issues.map(x=>`<tr><td>${issueLevelLabel(x.level)}</td><td>${displayText(x.section)}</td><td>${displayText(x.date||"-")}</td><td>${displayText(x.name)}</td><td class="ltr">${x.amount||"-"}</td><td>${displayText(x.details)}</td></tr>`).join("")}</tbody></table></div>`;
+      markNegativeAmounts(el);
+    };
+
+    function selectedStatementDelegate(){
+      const id=$("statementDelegate")?.value||"";
+      if(id)return allDelegates.find(d=>String(d.id)===String(id))||null;
+      return null;
+    }
+    window.clearDelegateStatement=function(){["statementDelegate","statementFromDate","statementToDate"].forEach(id=>{if($(id))$(id).value=""});renderDelegateStatement()};
+    window.renderDelegateStatement=function(){
+      fillStatementSelects();
+      const delegate=selectedStatementDelegate();
+      const sumEl=$("delegateStatementSummary"),box=$("delegateStatementBox");
+      if(!sumEl||!box)return;
+      if(!delegate){sumEl.innerHTML="";box.innerHTML='<div class="empty">اختار مندوب حتى يظهر كشف الحساب.</div>';return}
+      const from=$("statementFromDate")?.value||"",to=$("statementToDate")?.value||"";
+      const revs=revenues.filter(r=>sameDelegateRecord(r,delegate)&&dateInRange(r.date,from,to));
+      const dels=deliveries.filter(d=>sameDelegateRecord(d,delegate)&&dateInRange(d.date,from,to));
+      let revenue=0,delivered=0,cutSyp=0,cutUsd=0,directUsd=0;
+      const rows=[];
+      revs.forEach(r=>{const amount=num(r.revenueSyp);revenue+=amount;rows.push({date:r.date,type:"إيراد "+getTypeLabel(r.revenueType),syp:amount,usd:0,rate:0,note:r.note||""})});
+      dels.forEach(d=>{const n=deliveryNumbers(d);delivered+=n.totalAsSyp;cutSyp+=n.cutSyp;cutUsd+=n.cutUsd;directUsd+=n.directUsd;rows.push({date:d.date,type:n.mode==="cut"?"تسليم/قص":"تسليم مباشر",syp:-n.totalAsSyp,usd:n.deliveredUsd,rate:n.rate,note:[d.officeName,d.note].filter(Boolean).join(" - ")})});
+      rows.sort((a,b)=>String(a.date||"").localeCompare(String(b.date||""))||String(a.type).localeCompare(String(b.type)));
+      const remaining=revenue-delivered;
+      sumEl.innerHTML=[
+        ["إجمالي الإيراد",fmt(revenue,"SYP"),delegate.name],
+        ["إجمالي التسليم",fmt(delivered,"SYP"),"محسوب كسوري"],
+        ["قص السوري",`${fmt(cutSyp,"SYP")} / ${fmtUsd(cutUsd)}`,"قص فعلي"],
+        ["الدولار المباشر",fmtUsd(directUsd),"لا يدخل بمتوسط القص"],
+        ["المتبقي",fmt(remaining,"SYP"),"إيراد - تسليم"]
+      ].map(c=>`<div class="card"><div class="label">${c[0]}</div><div class="value">${c[1]}</div><div class="sub">${displayText(c[2])}</div></div>`).join("");
+      if(!rows.length){box.innerHTML='<div class="empty">لا توجد حركة لهذا المندوب ضمن الفترة.</div>';return}
+      let running=0;
+      box.innerHTML=`<div class="table-wrap"><table><thead><tr><th>التاريخ</th><th>العملية</th><th>SYP</th><th>USD</th><th>السعر</th><th>الرصيد التراكمي</th><th>ملاحظة</th></tr></thead><tbody>${rows.map(r=>{running+=num(r.syp);return`<tr><td>${displayText(r.date||"-")}</td><td>${displayText(r.type)}</td><td class="ltr">${fmt(r.syp,"SYP")}</td><td class="ltr">${r.usd?fmtUsd(r.usd):"-"}</td><td class="ltr">${r.rate?num(r.rate).toLocaleString("en-US"):"-"}</td><td class="ltr">${fmt(running,"SYP")}</td><td>${displayText(r.note||"-")}</td></tr>`}).join("")}</tbody></table></div>`;
+      markNegativeAmounts(box);
+    };
+
+    function targetEffectForStatement(m,targetId){
+      const e=getOfficeMoveEffect(m);
+      if(transferTargetById(targetId)?.isCashbox){
+        if(targetId==="box_farhad")return {syp:num(e.cashboxEffects?.syp_farhad?.syp),usd:Number(e.cashboxEffects?.usd_farhad?.usd||0)};
+        return e.cashboxEffects?.[targetId]||{syp:0,usd:0};
+      }
+      return e.officeEffects?.[targetId]||{syp:0,usd:0};
+    }
+    window.clearOfficeStatement=function(){["officeStatementTarget","officeStatementFromDate","officeStatementToDate"].forEach(id=>{if($(id))$(id).value=""});renderOfficeStatement()};
+    window.renderOfficeStatement=function(){
+      fillStatementSelects();
+      const targetId=$("officeStatementTarget")?.value||"";
+      const sumEl=$("officeStatementSummary"),box=$("officeStatementBox");
+      if(!sumEl||!box)return;
+      if(!targetId){sumEl.innerHTML="";box.innerHTML='<div class="empty">اختار مكتب أو صندوق حتى يظهر كشف الحساب.</div>';return}
+      const target=transferTargetById(targetId)||officeByIdOrName(targetId);
+      const from=$("officeStatementFromDate")?.value||"",to=$("officeStatementToDate")?.value||"";
+      const rows=[];
+      if(!target?.isCashbox){
+        deliveries.filter(d=>officeMatchesDelivery(d,targetId)&&dateInRange(d.date,from,to)).forEach(d=>{const n=deliveryNumbers(d);rows.push({date:d.date,type:"تسليم مندوب",name:d.delegateName||"-",syp:n.deliveredSyp,usd:n.deliveredUsd,note:d.note||""})});
+      }
+      officeMoves.filter(m=>dateInRange(m.date,from,to)).forEach(m=>{const e=targetEffectForStatement(m,targetId);if(Math.abs(num(e.syp))>0.0001||Math.abs(Number(e.usd||0))>0.0001)rows.push({date:m.date,type:officeMoveLabels[m.type]||m.type||"حركة مكتب",name:[m.fromOfficeName||m.fromCashboxName,m.toOfficeName||m.toCashboxName].filter(Boolean).join(" ← ")||m.party||"-",syp:num(e.syp),usd:Number(e.usd||0),note:m.note||""})});
+      rows.sort((a,b)=>String(a.date||"").localeCompare(String(b.date||""))||String(a.type).localeCompare(String(b.type)));
+      const inSyp=rows.filter(r=>r.syp>0).reduce((a,r)=>a+r.syp,0),outSyp=rows.filter(r=>r.syp<0).reduce((a,r)=>a+Math.abs(r.syp),0);
+      const inUsd=rows.filter(r=>r.usd>0).reduce((a,r)=>a+r.usd,0),outUsd=rows.filter(r=>r.usd<0).reduce((a,r)=>a+Math.abs(r.usd),0);
+      const netSyp=inSyp-outSyp,netUsd=inUsd-outUsd;
+      const current=target?.isCashbox?(getOfficeTransferCashboxBalances()[targetId]||{syp:0,usd:0}):getOfficeBalance(targetId);
+      sumEl.innerHTML=[
+        ["الداخل",`${fmt(inSyp,"SYP")} / ${fmtUsd(inUsd)}`,target?.name||"-"],
+        ["الخارج",`${fmt(outSyp,"SYP")} / ${fmtUsd(outUsd)}`,"حسب الفترة"],
+        ["صافي الفترة",`${fmt(netSyp,"SYP")} / ${fmtUsd(netUsd)}`,"داخل - خارج"],
+        ["الرصيد الحالي",`${fmt(current.syp,"SYP")} / ${fmtUsd(current.usd)}`,"من كل السجلات"]
+      ].map(c=>`<div class="card"><div class="label">${c[0]}</div><div class="value">${c[1]}</div><div class="sub">${displayText(c[2])}</div></div>`).join("");
+      if(!rows.length){box.innerHTML='<div class="empty">لا توجد حركة لهذا المكتب/الصندوق ضمن الفترة.</div>';return}
+      let rs=0,ru=0;
+      box.innerHTML=`<div class="table-wrap"><table><thead><tr><th>التاريخ</th><th>العملية</th><th>الطرف</th><th>SYP</th><th>USD</th><th>الرصيد التراكمي</th><th>ملاحظة</th></tr></thead><tbody>${rows.map(r=>{rs+=num(r.syp);ru+=Number(r.usd||0);return`<tr><td>${displayText(r.date||"-")}</td><td>${displayText(r.type)}</td><td>${displayText(r.name)}</td><td class="ltr">${fmt(r.syp,"SYP")}</td><td class="ltr">${r.usd?fmtUsd(r.usd):"-"}</td><td class="ltr">${fmt(rs,"SYP")} / ${fmtUsd(ru)}</td><td>${displayText(r.note||"-")}</td></tr>`}).join("")}</tbody></table></div>`;
+      markNegativeAmounts(box);
+    };
+
+    async function writeAuditLog(action,collectionName,recordId,label,beforeData=null,afterData=null){
+      try{
+        if(!auth.currentUser)return;
+        const ref=doc(collection(db,"auditLogs"));
+        await setDoc(ref,{id:ref.id,action,collectionName,collectionLabel:collectionLabels[collectionName]||collectionName||"-",recordId:recordId||"",label:label||"",beforeData:sanitizeForBackup(beforeData),afterData:sanitizeForBackup(afterData),userId:auth.currentUser.uid,createdAt:serverTimestamp(),createdAtLocal:new Date().toISOString()});
+      }catch(e){console.warn("audit log skipped",e)}
+    }
+
+    window.renderAuditLog=function(){
+      const el=$("auditLogBox");if(!el)return;
+      const rows=[...auditLogs].sort((a,b)=>String(b.createdAtLocal||"").localeCompare(String(a.createdAtLocal||""))).slice(0,80);
+      if(!rows.length){el.innerHTML='<div class="empty">لا يوجد سجل تدقيق بعد.</div>';return}
+      el.innerHTML=`<div class="table-wrap"><table><thead><tr><th>الوقت</th><th>العملية</th><th>القسم</th><th>السجل</th><th>ملاحظات</th></tr></thead><tbody>${rows.map(x=>`<tr><td class="ltr">${displayText(x.createdAtLocal||"-")}</td><td>${displayText(x.action)}</td><td>${displayText(x.collectionLabel||x.collectionName||"-")}</td><td>${displayText(x.label||x.recordId||"-")}</td><td>${displayText(x.recordId||"-")}</td></tr>`).join("")}</tbody></table></div>`;
+    };
+
+
 window.addCustomOffice=async function(){
       try{
         if(!auth.currentUser)return;
@@ -4623,6 +4916,7 @@ window.addCustomOffice=async function(){
         else el.innerHTML=`<div class="table-wrap"><table><thead><tr><th>الاسم</th><th>الريجين</th><th>النوع</th></tr></thead><tbody>${officeRows}${delegateRows}</tbody></table></div>`;
       }
       renderSecuritySection();
+      renderAuditLog();
     };
 
 
@@ -4693,12 +4987,16 @@ function markNegativeAmounts(root=document){
         renderOfficeLog();
         renderOfficeReports();
         if($("officeMoveDate"))updateOfficeMovePreview();
+        renderOfficeStatement();
       }else if(currentView==="cutDollar"){
         renderCutDollarSection();
       }else if(currentView==="loans"){
         renderLoansSection();
       }else if(currentView==="delegateMatch"){
         renderDelegateMatch();
+        renderDelegateStatement();
+      }else if(currentView==="dataCheck"){
+        renderDataCheck();
       }else if(currentView==="settings"){
         renderSettingsSection();
       }
