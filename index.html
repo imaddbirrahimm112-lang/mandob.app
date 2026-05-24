@@ -2249,6 +2249,30 @@ td{
             <div class="section-head"><div><h2>القوائم المضافة</h2><small>عرض المكاتب والمندوبين الذين أضفتهم.</small></div></div>
             <div id="settingsLists"></div>
           </div>
+
+          <div class="section">
+            <div class="section-head">
+              <div>
+                <h2>النسخ الاحتياطي والأمان</h2>
+                <small>تصدير نسخة كاملة، استعادة نسخة، وسلة محذوفات فيها استعادة أو حذف نهائي.</small>
+              </div>
+            </div>
+            <div class="head-actions" style="justify-content:flex-start;margin-bottom:12px">
+              <button class="good" onclick="exportFullBackupJson()">تصدير نسخة JSON كاملة</button>
+              <button class="secondary" onclick="document.getElementById('backupImportFile').click()">استعادة من JSON</button>
+              <input id="backupImportFile" type="file" accept="application/json,.json" style="display:none" onchange="restoreFullBackupFromFile(event)">
+            </div>
+            <div class="status" style="margin-bottom:12px">الحذف داخل التطبيق صار ينتقل أولاً إلى سلة المحذوفات. من هنا تقدر تستعيد السجل أو تحذفه نهائياً.</div>
+            <div id="backupSecuritySummary" class="cash-summary-grid"></div>
+          </div>
+
+          <div class="section">
+            <div class="section-head">
+              <div><h2>سلة المحذوفات</h2><small>السجلات المحذوفة مؤقتاً. الاستعادة ترجعها إلى مكانها الأصلي، والحذف النهائي لا يمكن التراجع عنه.</small></div>
+              <button class="secondary" onclick="renderTrashBin()">تحديث المحذوفات</button>
+            </div>
+            <div id="trashBinBox"></div>
+          </div>
         </section>
 
       </main>
@@ -2292,7 +2316,7 @@ td{
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, setPersistence, indexedDBLocalPersistence, browserLocalPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { getFirestore, collection, doc, setDoc, getDocs, onSnapshot, serverTimestamp, runTransaction, increment, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { getFirestore, collection, doc, setDoc, getDoc, getDocs, onSnapshot, serverTimestamp, runTransaction, increment, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
     const firebaseConfig = {apiKey:"AIzaSyA9wiCS89YeXlE3eRO5fNThwsJulxnfrgY",authDomain:"frhad11-fb086.firebaseapp.com",projectId:"frhad11-fb086",storageBucket:"frhad11-fb086.firebasestorage.app",messagingSenderId:"12163224746",appId:"1:12163224746:web:32449165eb2e867c4c6cd3",measurementId:"G-VP7L29R9L9"};
     const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app),$=id=>document.getElementById(id);
@@ -2307,7 +2331,7 @@ td{
 
     const delegatesByRegion={"Region 1":["جفان","علي","كاوا","دلخواز","بشار","صالة قامشلو 1","صالة قامشلو 2","صالة عامودا","صالة درباسية","صالة معبدة","صالة ديريك"],"Region 2":["شريف","يوسف","كمال","صالة حسكة 1","صالة حسكة 2","صالة تل تمر","صالة الشدادي"],"Region 3":["جاسم حسو","فرهاد خليل","احمد اومري","صالة الرقة 1","صالة الرقة 2","احمد هنيدي","صالة الطبقة","صالة دير الزور"],"Region 4":["شاهر ابو احمد","عبدو جاسم","صالة منبج","عادل عبدالعزيز","صالة كوباني"]};
     const officesByRegion={"R1":["هوكر تمي ديريك","تبارك رميلان","اسماعيل عبدي","محمد عامودا","شيخاني","عماد تمو","سوار قامشلو","ميداس عامودا","دعدوش درباسية","روهين تربه سبيه","روهين تل تمر","الحديدي تل كوجر","فهد"],"R2":["زين حسكة","سوار حسكة","يارا حسكة","زين 2 حسكة","نورجان حسكة","جاد شداده"],"R3":["العويد للحوالات رقة","الصفا جزرة بوحميد","خريس طبقة","انس العويد","رامي العويد"],"R4":["القصاب منبج","مسرو كوباني","ابو امير منبج"]};
-    let revenues=[],deliveries=[],officeDocs=[],cashboxes=[],cashMoves=[],officeMoves=[],accountingClosings=[],officeCurrencyMode="SYP",officeHubCurrencyMode="ALL",unsubscribers=[];const collapsedDays=new Set();const expandedDetailsDays=new Set();
+    let revenues=[],deliveries=[],officeDocs=[],cashboxes=[],cashMoves=[],officeMoves=[],accountingClosings=[],trashItems=[],officeCurrencyMode="SYP",officeHubCurrencyMode="ALL",unsubscribers=[];const collapsedDays=new Set();const expandedDetailsDays=new Set();
     function safeId(text){return String(text).trim().replace(/[^\p{L}\p{N}]+/gu,"_").replace(/^_+|_+$/g,"")}
     const baseDelegates=Object.entries(delegatesByRegion).flatMap(([region,names])=>names.map(name=>({id:safeId(region+"_"+name),name,region,custom:false})));
     const baseOffices=Object.entries(officesByRegion).flatMap(([region,names])=>names.map(name=>({id:safeId(region+"_"+name),name,region,custom:false})));
@@ -2598,6 +2622,7 @@ td{
       watch("cashboxMovements",data=>{cashMoves=data},"تنبيه قراءة حركة الصندوق: ");
       watch("officeMovements",data=>{officeMoves=data},"تنبيه قراءة حركات المكاتب: ");
       watch("accountingClosings",data=>{accountingClosings=data},"تنبيه قراءة الإغلاقات: ");
+      watch("trashBin",data=>{trashItems=data},"تنبيه قراءة المحذوفات: ");
       unsubscribers.push(onSnapshot(collection(db,"customOffices"),s=>{customOffices=s.docs.map(d=>({id:d.id,...d.data()}));scheduleMasterRefresh()},e=>setStatus("تنبيه قراءة المكاتب المضافة: "+e.message)));
       unsubscribers.push(onSnapshot(collection(db,"customDelegates"),s=>{customDelegates=s.docs.map(d=>({id:d.id,...d.data()}));scheduleMasterRefresh()},e=>setStatus("تنبيه قراءة المندوبين المضافين: "+e.message)));
     }
@@ -2607,20 +2632,168 @@ td{
       catch(e){setStatus("تم التحديث جزئياً، لم أقرأ "+name+": "+e.message);return[]}
     }
 
+    const backupCollections=[
+      {name:"dailyRevenues",label:"الإيرادات اليومية",data:()=>revenues},
+      {name:"officeDeliveries",label:"تسليمات المندوبين",data:()=>deliveries},
+      {name:"cashboxMovements",label:"حركات الصندوق",data:()=>cashMoves},
+      {name:"officeMovements",label:"حركات المكاتب",data:()=>officeMoves},
+      {name:"customOffices",label:"المكاتب المضافة",data:()=>customOffices},
+      {name:"customDelegates",label:"المندوبين المضافين",data:()=>customDelegates},
+      {name:"trashBin",label:"سلة المحذوفات",data:()=>trashItems}
+    ];
+    const collectionLabels=Object.fromEntries(backupCollections.map(c=>[c.name,c.label]));
+
+    function sanitizeForBackup(value){
+      if(value===undefined)return null;
+      if(value===null||typeof value!=="object")return value;
+      if(typeof value.toDate==="function")return value.toDate().toISOString();
+      if(Array.isArray(value))return value.map(sanitizeForBackup);
+      const out={};
+      Object.entries(value).forEach(([k,v])=>{if(typeof v!=="function")out[k]=sanitizeForBackup(v)});
+      return out;
+    }
+
+    function downloadJsonFile(filename,data){
+      const blob=new Blob([JSON.stringify(sanitizeForBackup(data),null,2)],{type:"application/json;charset=utf-8"});
+      const a=document.createElement("a");
+      a.href=URL.createObjectURL(blob);
+      a.download=filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(a.href);
+    }
+
+    window.exportFullBackupJson=function(){
+      const exportedAt=new Date().toISOString();
+      const payload={
+        app:"IMAD Pro",
+        backupVersion:"security-backup-v1",
+        exportedAt,
+        collections:Object.fromEntries(backupCollections.map(c=>[c.name,c.data().map(x=>sanitizeForBackup(x))])),
+        counts:Object.fromEntries(backupCollections.map(c=>[c.name,c.data().length]))
+      };
+      downloadJsonFile(`IMAD-Pro-Backup-${exportedAt.slice(0,10)}-${exportedAt.slice(11,19).replaceAll(":","-")}.json`,payload);
+      toast("تم تجهيز نسخة JSON كاملة ✅","success");
+    };
+
+    window.restoreFullBackupFromFile=async function(event){
+      const file=event?.target?.files?.[0];
+      if(event?.target)event.target.value="";
+      if(!file)return;
+      if(!auth.currentUser){setStatus("سجّل الدخول أولاً قبل الاستعادة.");return}
+      try{
+        const text=await file.text();
+        const payload=JSON.parse(text);
+        const collections=payload.collections||{};
+        const names=backupCollections.map(c=>c.name).filter(name=>Array.isArray(collections[name]));
+        if(!names.length){setStatus("ملف النسخة غير صالح أو لا يحتوي Collections معروفة.");return}
+        const typed=prompt("الاستعادة ستضيف/تحدّث السجلات حسب IDs الموجودة في النسخة، ولن تمسح السجلات الحالية غير الموجودة في الملف. اكتب RESTORE للتأكيد:");
+        if(typed!=="RESTORE"){toast("تم إلغاء الاستعادة.","info");return}
+        let total=0;
+        for(const name of names){
+          for(const raw of collections[name]){
+            if(!raw||typeof raw!=="object")continue;
+            const id=String(raw.id||raw.originalId||"").trim() || doc(collection(db,name)).id;
+            const data={...raw,id,restoredFromBackupAt:serverTimestamp(),restoredFromBackupBy:auth.currentUser.uid};
+            await setDoc(doc(db,name,id),data,{merge:true});
+            total++;
+          }
+        }
+        toast(`تمت الاستعادة/الدمج: ${total} سجل ✅`,"success");
+        await reloadAll();
+      }catch(e){setStatus("فشل استعادة النسخة: "+e.message)}
+    };
+
+    async function moveDocToTrash(collectionName,id,label=""){
+      if(!auth.currentUser)throw new Error("سجّل الدخول أولاً.");
+      const sourceRef=doc(db,collectionName,id);
+      const snap=await getDoc(sourceRef);
+      if(!snap.exists())throw new Error("السجل غير موجود أو محذوف مسبقاً.");
+      const originalData={id:snap.id,...snap.data()};
+      const trashRef=doc(collection(db,"trashBin"));
+      await setDoc(trashRef,{
+        id:trashRef.id,
+        originalCollection:collectionName,
+        originalCollectionLabel:collectionLabels[collectionName]||collectionName,
+        originalId:id,
+        label:label||originalData.label||originalData.delegateName||originalData.officeName||originalData.party||id,
+        originalData,
+        deletedBy:auth.currentUser.uid,
+        deletedAt:serverTimestamp(),
+        deletedAtLocal:new Date().toISOString()
+      });
+      await deleteDoc(sourceRef);
+    }
+
+    window.restoreTrashItem=async function(trashId){
+      if(!auth.currentUser)return;
+      try{
+        const t=trashItems.find(x=>x.id===trashId) || (await getDoc(doc(db,"trashBin",trashId))).data();
+        if(!t)throw new Error("السجل غير موجود في المحذوفات.");
+        if(!confirm("استعادة هذا السجل إلى مكانه الأصلي؟"))return;
+        const col=t.originalCollection;
+        const id=t.originalId;
+        if(!col||!id||!t.originalData)throw new Error("بيانات المحذوف غير مكتملة.");
+        const restored={...t.originalData,id,restoredAt:serverTimestamp(),restoredBy:auth.currentUser.uid};
+        delete restored.deletedAtLocal;
+        await setDoc(doc(db,col,id),restored,{merge:true});
+        await deleteDoc(doc(db,"trashBin",trashId));
+        toast("تمت استعادة السجل ✅","success");
+        await reloadAll();
+      }catch(e){setStatus("فشل استعادة السجل: "+e.message)}
+    };
+
+    window.permanentlyDeleteTrashItem=async function(trashId){
+      if(!auth.currentUser)return;
+      try{
+        const typed=prompt("الحذف النهائي لا يمكن التراجع عنه. اكتب DELETE للتأكيد:");
+        if(typed!=="DELETE")return;
+        await deleteDoc(doc(db,"trashBin",trashId));
+        toast("تم الحذف النهائي من سلة المحذوفات.","warn");
+        await reloadAll();
+      }catch(e){setStatus("فشل الحذف النهائي: "+e.message)}
+    };
+
+    function renderSecuritySection(){
+      if($("backupSecuritySummary")){
+        const totalMain=revenues.length+deliveries.length+cashMoves.length+officeMoves.length+customOffices.length+customDelegates.length;
+        $("backupSecuritySummary").innerHTML=[
+          ["عدد السجلات الأساسية",String(totalMain),"جاهزة للتصدير JSON"],
+          ["المحذوفات المؤقتة",String(trashItems.length),"يمكن استعادة أو حذف نهائي"],
+          ["آخر تحديث",new Date().toLocaleString("en-US"),"حسب الجهاز"]
+        ].map(c=>`<div class="card mini-summary"><div class="label">${c[0]}</div><div class="value">${c[1]}</div><div class="sub">${c[2]}</div></div>`).join("");
+      }
+      renderTrashBin();
+    }
+
+    window.renderTrashBin=function(){
+      const el=$("trashBinBox");if(!el)return;
+      const rows=[...trashItems].sort((a,b)=>String(b.deletedAtLocal||"").localeCompare(String(a.deletedAtLocal||"")));
+      if(!rows.length){el.innerHTML='<div class="empty">سلة المحذوفات فارغة حالياً.</div>';return}
+      el.innerHTML=`<div class="table-wrap"><table><thead><tr><th>وقت الحذف</th><th>القسم الأصلي</th><th>السجل</th><th>الإجراء</th></tr></thead><tbody>${rows.map(t=>{
+        const when=displayText(t.deletedAtLocal||"-");
+        const col=displayText(t.originalCollectionLabel||collectionLabels[t.originalCollection]||t.originalCollection||"-");
+        const label=displayText(t.label||t.originalData?.delegateName||t.originalData?.party||t.originalId||"-");
+        return `<tr><td class="ltr">${when}</td><td>${col}</td><td>${label}</td><td><button class="good small" onclick="restoreTrashItem('${inlineArg(t.id)}')">استعادة</button> <button class="danger small" onclick="permanentlyDeleteTrashItem('${inlineArg(t.id)}')">حذف نهائي</button></td></tr>`;
+      }).join("")}</tbody></table></div>`;
+    };
+
     window.reloadAll=async function(){
       if(!auth.currentUser)return;
       setStatus("");
-      const [r,d,cb,cm,om,ac,co,cd]=await Promise.all([
+      const [r,d,cb,cm,om,ac,tb,co,cd]=await Promise.all([
         readCol("dailyRevenues"),
         readCol("officeDeliveries"),
         readCol("cashboxes"),
         readCol("cashboxMovements"),
         readCol("officeMovements"),
         readCol("accountingClosings"),
+        readCol("trashBin"),
         readCol("customOffices"),
         readCol("customDelegates")
       ]);
-      revenues=r;deliveries=d;cashboxes=cb;cashMoves=cm;officeMoves=om;accountingClosings=ac;customOffices=co;customDelegates=cd;
+      revenues=r;deliveries=d;cashboxes=cb;cashMoves=cm;officeMoves=om;accountingClosings=ac;trashItems=tb;customOffices=co;customDelegates=cd;
       rebuildMasterData();
       fillSelects();
       renderAll();
@@ -2933,8 +3106,9 @@ td{
     window.deleteCashMove=async function(id){
       try{
         if(!confirm("حذف حركة الصندوق؟ سيتغير الرصيد لأنها محسوبة من السجل."))return;
-        await deleteDoc(doc(db,"cashboxMovements",id));
-        renderCashboxes();renderCashLog();renderLoanSummary();renderCashReports();
+        await moveDocToTrash("cashboxMovements",id,"حركة صندوق");
+        toast("تم نقل حركة الصندوق إلى سلة المحذوفات ✅","success");
+        renderCashboxes();renderCashLog();renderLoanSummary();renderCashReports();renderSecuritySection();
       }catch(e){setStatus("فشل حذف حركة الصندوق: "+e.message)}
     };
 
@@ -3723,7 +3897,7 @@ td{
       updateOfficeMoveMode();
       updateOfficeMovePreview();
     }
-    window.deleteOfficeMove=async function(id){try{if(!confirm("حذف حركة المكتب؟ سيتم إعادة حساب الأرصدة من السجل."))return;await deleteDoc(doc(db,"officeMovements",id));renderOfficeHub();renderOfficeLog();renderOfficeReports();renderDashboardCashboxes();renderCashboxes()}catch(e){setStatus("فشل حذف حركة المكتب: "+e.message)}}
+    window.deleteOfficeMove=async function(id){try{if(!confirm("حذف حركة المكتب؟ سيتم إعادة حساب الأرصدة من السجل."))return;await moveDocToTrash("officeMovements",id,"حركة مكتب");toast("تم نقل حركة المكتب إلى سلة المحذوفات ✅","success");renderOfficeHub();renderOfficeLog();renderOfficeReports();renderDashboardCashboxes();renderCashboxes();renderSecuritySection()}catch(e){setStatus("فشل حذف حركة المكتب: "+e.message)}}
     function getFilteredOfficeMoves(){
       const target=$("officeMoveNameFilter")?.value||"";
       const type=$("officeMoveTypeFilter")?.value||"";
@@ -3873,7 +4047,7 @@ td{
       updateDeliveryModeUi();
       updateDeliveryCalculation();
     };
-    window.editRevenue=function(id){const r=revenues.find(x=>x.id===id);if(!r)return;$("editingRevenueId").value=r.id;if($("revRegion")){$("revRegion").value=r.region||"";fillDelegateSelect("rev",r.delegateName)}else{$("revDelegate").value=r.delegateName}$("revDate").value=r.date||todayString();$("revType").value=r.revenueType||"masary";$("revAmount").value=num(r.revenueSyp)||"";$("revNote").value=r.note||"";showView("entry");onRevFormChange();toast("وضع التعديل: "+r.delegateName,"info")};window.deleteRevenue=async function(id){if(!confirm("حذف الإيراد؟ التسليمات لا تنحذف لأنها عمليات مستقلة."))return;await deleteDoc(doc(db,"dailyRevenues",id));toast("تم حذف الإيراد ✅","success")};
+    window.editRevenue=function(id){const r=revenues.find(x=>x.id===id);if(!r)return;$("editingRevenueId").value=r.id;if($("revRegion")){$("revRegion").value=r.region||"";fillDelegateSelect("rev",r.delegateName)}else{$("revDelegate").value=r.delegateName}$("revDate").value=r.date||todayString();$("revType").value=r.revenueType||"masary";$("revAmount").value=num(r.revenueSyp)||"";$("revNote").value=r.note||"";showView("entry");onRevFormChange();toast("وضع التعديل: "+r.delegateName,"info")};window.deleteRevenue=async function(id){if(!confirm("حذف الإيراد؟ التسليمات لا تنحذف لأنها عمليات مستقلة."))return;await moveDocToTrash("dailyRevenues",id,"إيراد يومي");toast("تم نقل الإيراد إلى سلة المحذوفات ✅","success");renderSecuritySection()};
 
     /* ====== saveRevenue + resetRevenueForm (كانوا ناقصين — هذا سبب عدم الحفظ) ====== */
     window.saveRevenue=async function(){
@@ -3995,7 +4169,7 @@ td{
       updateDeliveryCalculation();
       showView("entry");
     };
-    window.deleteDelivery=async function(id){try{if(!confirm("حذف التسليم؟ سيتم خصمه من الرصيد لأنه محسوب من السجلات."))return;await deleteDoc(doc(db,"officeDeliveries",id));setStatus("تم حذف التسليم ✅")}catch(e){setStatus("فشل حذف التسليم ❌\n"+e.message)}};
+    window.deleteDelivery=async function(id){try{if(!confirm("حذف التسليم؟ سيتم خصمه من الرصيد لأنه محسوب من السجلات."))return;await moveDocToTrash("officeDeliveries",id,"تسليم مندوب");toast("تم نقل التسليم إلى سلة المحذوفات ✅","success");renderSecuritySection()}catch(e){setStatus("فشل حذف التسليم ❌\n"+e.message)}};
     window.showOfficeDetails=function(officeId){
       const office=allOffices.find(o=>o.id===officeId);if(!office)return;
       const b=getOfficeBalance(officeId),related=getOfficeDeliveries(officeId);
@@ -4441,11 +4615,14 @@ window.addCustomOffice=async function(){
       if($("settingsDelegateCount"))$("settingsDelegateCount").textContent=String(allDelegates.length);
       if($("settingsCustomOfficeCount"))$("settingsCustomOfficeCount").textContent=String(customOffices.length);
       if($("settingsCustomDelegateCount"))$("settingsCustomDelegateCount").textContent=String(customDelegates.length);
-      const el=$("settingsLists");if(!el)return;
-      const officeRows=customOffices.map(o=>`<tr><td>${o.name}</td><td>${o.region||"-"}</td><td>مكتب</td></tr>`).join("");
-      const delegateRows=customDelegates.map(d=>`<tr><td>${d.name}</td><td>${d.region||"-"}</td><td>مندوب</td></tr>`).join("");
-      if(!officeRows&&!delegateRows){el.innerHTML='<div class="empty">لم تضف مكاتب أو مندوبين بعد.</div>';return}
-      el.innerHTML=`<div class="table-wrap"><table><thead><tr><th>الاسم</th><th>الريجين</th><th>النوع</th></tr></thead><tbody>${officeRows}${delegateRows}</tbody></table></div>`;
+      const el=$("settingsLists");
+      if(el){
+        const officeRows=customOffices.map(o=>`<tr><td>${displayText(o.name)}</td><td>${displayText(o.region||"-")}</td><td>مكتب</td></tr>`).join("");
+        const delegateRows=customDelegates.map(d=>`<tr><td>${displayText(d.name)}</td><td>${displayText(d.region||"-")}</td><td>مندوب</td></tr>`).join("");
+        if(!officeRows&&!delegateRows)el.innerHTML='<div class="empty">لم تضف مكاتب أو مندوبين بعد.</div>';
+        else el.innerHTML=`<div class="table-wrap"><table><thead><tr><th>الاسم</th><th>الريجين</th><th>النوع</th></tr></thead><tbody>${officeRows}${delegateRows}</tbody></table></div>`;
+      }
+      renderSecuritySection();
     };
 
 
