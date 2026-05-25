@@ -2258,6 +2258,166 @@ button{
   .cash-card-amount,.dash-cash-amount{font-size:29px !important}
 }
 
+
+
+/* ===== v7 Fix: office balances large-number fit without changing calculations ===== */
+#viewOffice .office-hub-card,
+#viewOffice .office-cashbox-card,
+#viewDashboard .office-card{
+  overflow:hidden !important;
+}
+
+#viewOffice .office-hub-dual,
+#viewDashboard .office-dashboard-dual{
+  display:grid !important;
+  gap:7px !important;
+  width:100% !important;
+  min-width:0 !important;
+}
+
+#viewOffice .office-hub-dual div,
+#viewDashboard .office-dashboard-dual div{
+  display:grid !important;
+  grid-template-columns:minmax(0,1fr) auto !important;
+  align-items:center !important;
+  gap:8px !important;
+  width:100% !important;
+  min-width:0 !important;
+  overflow:hidden !important;
+  direction:ltr !important;
+}
+
+#viewOffice .office-hub-dual span,
+#viewDashboard .office-dashboard-dual span{
+  grid-column:2 !important;
+  white-space:nowrap !important;
+  min-width:max-content !important;
+  text-align:right !important;
+  direction:ltr !important;
+  font-size:11px !important;
+  opacity:.86 !important;
+}
+
+#viewOffice .office-hub-dual b,
+#viewDashboard .office-dashboard-dual b{
+  grid-column:1 !important;
+  min-width:0 !important;
+  max-width:100% !important;
+  white-space:nowrap !important;
+  overflow:visible !important;
+  text-overflow:clip !important;
+  direction:ltr !important;
+  unicode-bidi:isolate !important;
+  text-align:left !important;
+  font-variant-numeric:tabular-nums !important;
+  letter-spacing:-.55px !important;
+  font-size:clamp(15px,1.05vw,20px) !important;
+  line-height:1.12 !important;
+}
+
+#viewDashboard .office-dashboard-dual b{
+  font-size:clamp(14px,1vw,18px) !important;
+}
+
+#viewOffice .office-hub-card{
+  min-height:124px !important;
+  padding:14px 14px 13px !important;
+}
+
+#viewOffice .office-hub-name,
+#viewDashboard .office-name-value{
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+  white-space:nowrap !important;
+  max-width:calc(100% - 48px) !important;
+}
+
+#viewOffice .office-cashbox-card .box-balance{
+  white-space:nowrap !important;
+  overflow:visible !important;
+  direction:ltr !important;
+  unicode-bidi:isolate !important;
+  text-align:right !important;
+  letter-spacing:-.55px !important;
+  font-size:clamp(15px,1.05vw,19px) !important;
+  line-height:1.2 !important;
+}
+
+#viewOffice .office-hub-amount{
+  white-space:nowrap !important;
+  overflow:visible !important;
+  direction:ltr !important;
+  unicode-bidi:isolate !important;
+  text-align:right !important;
+  letter-spacing:-.55px !important;
+  font-size:clamp(18px,1.25vw,24px) !important;
+}
+
+@media(max-width:760px){
+  #viewOffice .office-hub-dual b,
+  #viewDashboard .office-dashboard-dual b{
+    font-size:18px !important;
+    letter-spacing:-.35px !important;
+  }
+  #viewOffice .office-hub-dual span,
+  #viewDashboard .office-dashboard-dual span{
+    font-size:11px !important;
+  }
+}
+
+
+
+/* ===== v8 Profit/Loss number visibility + office cut FX clarity ===== */
+#profitLossSummaryGrid.kpi-grid{
+  grid-template-columns:repeat(auto-fit,minmax(245px,1fr)) !important;
+  gap:14px !important;
+}
+#profitLossSummaryGrid .pl-card{
+  min-height:158px !important;
+  padding:17px 16px !important;
+  overflow:visible !important;
+}
+#profitLossSummaryGrid .pl-card .value{
+  direction:ltr !important;
+  text-align:right !important;
+  font-size:clamp(19px,1.42vw,28px) !important;
+  line-height:1.22 !important;
+  white-space:normal !important;
+  overflow-wrap:anywhere !important;
+  word-break:normal !important;
+  letter-spacing:.01em !important;
+}
+#profitLossSummaryGrid .pl-period-card .value{
+  direction:rtl !important;
+  text-align:right !important;
+  font-size:clamp(18px,1.25vw,24px) !important;
+  color:#dfeeff !important;
+  -webkit-text-fill-color:#dfeeff !important;
+  text-shadow:none !important;
+}
+#profitLossSummaryGrid .pl-card .sub{
+  white-space:normal !important;
+  line-height:1.55 !important;
+  min-height:0 !important;
+}
+#profitLossReportBox .table-wrap{
+  overflow-x:auto !important;
+}
+#profitLossReportBox table{
+  min-width:920px !important;
+}
+#profitLossReportBox td.ltr,
+#profitLossReportBox th{
+  white-space:nowrap !important;
+}
+#profitLossReportBox td.ltr{
+  font-size:clamp(14px,1.05vw,18px) !important;
+  font-weight:900 !important;
+}
+@media(max-width:720px){
+  #profitLossSummaryGrid .pl-card .value{font-size:22px !important}
+  #profitLossSummaryGrid .pl-period-card .value{font-size:18px !important}
+}
 </style>
 </head>
 
@@ -4150,16 +4310,31 @@ button{
         const d=isoDateValue(r.date||"");
         return d&&inDateRange(d,start,end)&&num(r.rate)>0&&num(r.weightSyp)>0;
       });
+      const makePart=()=>({costSyp:0,usdFromCut:0,currentValueSyp:0,diffSyp:0,avgCostRate:0,count:0});
+      const parts={delegate:makePart(),office:makePart()};
       let costSyp=0,usdFromCut=0;
       for(const r of rows){
         const weight=num(r.weightSyp),rr=num(r.rate);
+        const fxUsd=Number(r.fxUsd||0) || (rr>0?weight/rr:0);
+        const sourceKey=r.source==="office"?"office":"delegate";
         costSyp+=weight;
-        usdFromCut+=rr>0?weight/rr:0;
+        usdFromCut+=fxUsd;
+        parts[sourceKey].costSyp+=weight;
+        parts[sourceKey].usdFromCut+=fxUsd;
+        parts[sourceKey].count++;
       }
+      const finishPart=part=>{
+        part.currentValueSyp=rate>0?part.usdFromCut*rate:0;
+        part.diffSyp=rate>0?part.currentValueSyp-part.costSyp:0;
+        part.avgCostRate=part.usdFromCut>0?part.costSyp/part.usdFromCut:0;
+        return part;
+      };
+      finishPart(parts.delegate);
+      finishPart(parts.office);
       const currentValueSyp=rate>0?usdFromCut*rate:0;
       const diffSyp=rate>0?currentValueSyp-costSyp:0;
       const avgCostRate=usdFromCut>0?costSyp/usdFromCut:0;
-      return{costSyp,usdFromCut,currentValueSyp,diffSyp,avgCostRate,count:rows.length};
+      return{costSyp,usdFromCut,currentValueSyp,diffSyp,avgCostRate,count:rows.length,delegate:parts.delegate,office:parts.office};
     }
 
     function calculateProfitLossData(){
@@ -4186,7 +4361,7 @@ button{
         ["إجمالي العمولات",`${fmt(f.feeSyp,"SYP")} / ${fmtUsd(f.feeUsd)}`,"تدخل ضمن الربح التشغيلي"],
         ["إجمالي المصروفات",`${fmt(c.expenseSyp,"SYP")} / ${fmtUsd(c.expenseUsd)}`,"تنقص الربح التشغيلي"],
         ["صافي الربح / الخسارة التشغيلي",fmt(data.operatingProfitSyp,"SYP"),data.rate>0?`بسعر تقييم ${data.rate.toLocaleString("en-US")}`:"USD غير مقيم لأن السعر فارغ"],
-        ["فرق سعر الصرف",fmt(fx.diffSyp,"SYP"),fx.count?"تقديري من قص السوري الفعلي فقط":"لا توجد عمليات قص فعلية ضمن الفترة"],
+        ["فرق سعر الصرف",fmt(fx.diffSyp,"SYP"),fx.count?`يشمل قص المكاتب (${fx.office?.count||0}) وقص المندوبين (${fx.delegate?.count||0})`:"لا توجد عمليات قص فعلية ضمن الفترة"],
         ["الربح / الخسارة مع فرق الصرف",fmt(data.totalWithFxSyp,"SYP"),"تشغيلي + فرق سعر الصرف التقديري"],
         ["رصيد الصندوق الحالي",`${fmt(data.ending.syp,"SYP")} / ${fmtUsd(data.ending.usd)}`,"حسب السجلات فقط"],
         ["السلف المفتوحة",`${fmt(data.loans.syp,"SYP")} / ${fmtUsd(data.loans.usd)}`,`${data.loans.count} جهة`],
@@ -4197,15 +4372,17 @@ button{
     window.calculateProfitLossPreview=function(){
       if(!$("profitLossSummaryGrid"))return;
       const data=calculateProfitLossData();
-      $("profitLossSummaryGrid").innerHTML=profitLossCards(data).map(x=>`<div class="card"><div class="label">${x[0]}</div><div class="value">${x[1]}</div><div class="sub">${x[2]}</div></div>`).join("");
+      $("profitLossSummaryGrid").innerHTML=profitLossCards(data).map((x,i)=>`<div class="card pl-card ${i===0?"pl-period-card":""}"><div class="label">${x[0]}</div><div class="value">${x[1]}</div><div class="sub">${x[2]}</div></div>`).join("");
       const c=data.cash,r=data.rev,f=data.fees,fx=data.fx;
       $("profitLossReportBox").innerHTML=`<div class="table-wrap"><table><thead><tr><th>البند</th><th>SYP</th><th>USD</th><th>ملاحظة</th></tr></thead><tbody>
         <tr><td>إيرادات تشغيلية</td><td class="ltr">${fmt(r.revenueSyp,"SYP")}</td><td class="ltr">-</td><td>مصاري / CCBS / مخصوص</td></tr>
         <tr><td>عمولات المكاتب</td><td class="ltr">${fmt(f.feeSyp,"SYP")}</td><td class="ltr">${fmtUsd(f.feeUsd)}</td><td>تدخل بالربح</td></tr>
         <tr><td>مصروفات تشغيلية</td><td class="ltr">${fmt(c.expenseSyp,"SYP")}</td><td class="ltr">${fmtUsd(c.expenseUsd)}</td><td>تنقص الربح</td></tr>
         <tr><td>صافي ربح/خسارة تشغيلي</td><td class="ltr">${fmt(data.operatingProfitSyp,"SYP")}</td><td class="ltr">-</td><td>الإيرادات + العمولات - المصروفات</td></tr>
-        <tr><td>تكلفة الدولار المقصوص</td><td class="ltr">${fmt(fx.costSyp,"SYP")}</td><td class="ltr">${fmtUsd(fx.usdFromCut)}</td><td>قص فعلي فقط، لا يشمل الدولار المباشر</td></tr>
+        <tr><td>تكلفة الدولار المقصوص</td><td class="ltr">${fmt(fx.costSyp,"SYP")}</td><td class="ltr">${fmtUsd(fx.usdFromCut)}</td><td>يشمل قص المكاتب وقص المندوبين فقط، لا يشمل الدولار المباشر ولا تحويلات الصندوق الأساسي</td></tr>
         <tr><td>قيمة الدولار بسعر التقييم</td><td class="ltr">${fmt(fx.currentValueSyp,"SYP")}</td><td class="ltr">${fmtUsd(fx.usdFromCut)}</td><td>${data.rate>0?"سعر التقييم: "+data.rate.toLocaleString("en-US"):"اكتب سعر التقييم"}</td></tr>
+        <tr><td>فرق سعر صرف قص المكاتب</td><td class="ltr">${fmt(fx.office?.diffSyp||0,"SYP")}</td><td class="ltr">${fmtUsd(fx.office?.usdFromCut||0)}</td><td>من حركة: قص رصيد مكتب سوري إلى دولار</td></tr>
+        <tr><td>فرق سعر صرف قص المندوبين</td><td class="ltr">${fmt(fx.delegate?.diffSyp||0,"SYP")}</td><td class="ltr">${fmtUsd(fx.delegate?.usdFromCut||0)}</td><td>من تسليمات المندوبين التي فيها قص فعلي فقط</td></tr>
         <tr><td>فرق سعر الصرف</td><td class="ltr">${fmt(fx.diffSyp,"SYP")}</td><td class="ltr">-</td><td>تقديري وغير محقق حتى يتم بيع الدولار</td></tr>
         <tr><td>الربح/الخسارة مع فرق الصرف</td><td class="ltr">${fmt(data.totalWithFxSyp,"SYP")}</td><td class="ltr">-</td><td>للمتابعة فقط، بدون تدوير أو حفظ إغلاق</td></tr>
         <tr><td>السلف المعطاة</td><td class="ltr">${fmt(c.loanOutSyp,"SYP")}</td><td class="ltr">${fmtUsd(c.loanOutUsd)}</td><td>ذمة لا تعتبر خسارة</td></tr>
@@ -4227,6 +4404,8 @@ button{
 عمولات: ${fmt(data.fees.feeSyp,"SYP")} / ${fmtUsd(data.fees.feeUsd)}
 مصروفات: ${fmt(data.cash.expenseSyp,"SYP")} / ${fmtUsd(data.cash.expenseUsd)}
 صافي ربح/خسارة تشغيلي: ${fmt(data.operatingProfitSyp,"SYP")}
+فرق سعر صرف قص المكاتب: ${fmt(data.fx.office?.diffSyp||0,"SYP")}
+فرق سعر صرف قص المندوبين: ${fmt(data.fx.delegate?.diffSyp||0,"SYP")}
 فرق سعر الصرف: ${fmt(data.fx.diffSyp,"SYP")}
 النتيجة مع فرق الصرف: ${fmt(data.totalWithFxSyp,"SYP")}
 رصيد الصندوق: ${fmt(data.ending.syp,"SYP")} / ${fmtUsd(data.ending.usd)}
@@ -4247,7 +4426,9 @@ button{
         ["عمولات",Math.round(data.fees.feeSyp),Number(data.fees.feeUsd||0).toFixed(2),"تشغيلي"],
         ["مصروفات",Math.round(data.cash.expenseSyp),Number(data.cash.expenseUsd||0).toFixed(2),"تشغيلي"],
         ["صافي ربح/خسارة تشغيلي",Math.round(data.operatingProfitSyp),"","SYP"],
-        ["تكلفة الدولار المقصوص",Math.round(data.fx.costSyp),Number(data.fx.usdFromCut||0).toFixed(2),"قص فعلي فقط"],
+        ["تكلفة الدولار المقصوص",Math.round(data.fx.costSyp),Number(data.fx.usdFromCut||0).toFixed(2),"قص المكاتب + قص المندوبين فقط"],
+        ["فرق سعر صرف قص المكاتب",Math.round(data.fx.office?.diffSyp||0),Number(data.fx.office?.usdFromCut||0).toFixed(2),"تقديري"],
+        ["فرق سعر صرف قص المندوبين",Math.round(data.fx.delegate?.diffSyp||0),Number(data.fx.delegate?.usdFromCut||0).toFixed(2),"تقديري"],
         ["فرق سعر الصرف",Math.round(data.fx.diffSyp),"","تقديري"],
         ["الربح/الخسارة مع فرق الصرف",Math.round(data.totalWithFxSyp),"","تشغيلي + فرق صرف"],
         ["رصيد الصندوق",Math.round(data.ending.syp),Number(data.ending.usd||0).toFixed(2),"حسب السجلات"]
@@ -5174,6 +5355,7 @@ function collectCutDollarRows(){
             cutSyp:delegateCutSyp,
             usd:delegateCutUsd,
             weightSyp:actualCutSyp,
+            fxUsd:actualCutUsd,
             rate:n.rate,
             note:d.note||parts.join(" / "),
             detail:parts.join(" / ")
@@ -5195,6 +5377,7 @@ function collectCutDollarRows(){
           cutSyp:amountSyp,
           usd:amountUsd,
           weightSyp:amountSyp,
+          fxUsd:amountUsd,
           rate,
           note:m.note||"",
           detail:`قص ${fmt(amountSyp,"SYP")} إلى ${fmtUsd(amountUsd)}`
@@ -5791,5 +5974,166 @@ function markNegativeAmounts(root=document){
     onAuthStateChanged(auth,user=>{showApp(user);if(user){setStatus("");fillSelects();if($("revDate"))$("revDate").value=todayString();if($("delDate"))$("delDate").value=todayString();if($("cashDate"))$("cashDate").value=todayString();if($("officeMoveDate"))$("officeMoveDate").value=todayString();startLiveSync();scheduleRenderAll(120);setTimeout(onRevFormChange,200)}else{stopLiveSync();setLoginStatus("")}});
     fillSelects();
   </script>
+
+
+
+<style id="imad-safe-big-numbers-fit-v10">
+/* ===== v10: safe big-number fitting — card/summary only, never tables ===== */
+.card .value,
+.cash-card-amount,
+.dash-cash-amount,
+.cash-lock-amount,
+.office-hub-amount,
+.office-cashbox-card .box-balance,
+.office-dashboard-dual b,
+.office-hub-dual b{
+  max-width:100% !important;
+  box-sizing:border-box !important;
+  font-variant-numeric:tabular-nums !important;
+  overflow:visible !important;
+}
+
+.card .value.imad-fit-number,
+.cash-card-amount.imad-fit-number,
+.dash-cash-amount.imad-fit-number,
+.cash-lock-amount.imad-fit-number,
+.office-hub-amount.imad-fit-number,
+.office-cashbox-card .box-balance.imad-fit-number,
+.office-dashboard-dual b.imad-fit-number,
+.office-hub-dual b.imad-fit-number{
+  direction:ltr !important;
+  unicode-bidi:isolate !important;
+  text-align:right !important;
+  white-space:nowrap !important;
+  line-height:1.14 !important;
+  letter-spacing:-.02em !important;
+}
+
+.card .value.imad-fit-long,
+.cash-card-amount.imad-fit-long,
+.dash-cash-amount.imad-fit-long,
+.cash-lock-amount.imad-fit-long,
+.office-hub-amount.imad-fit-long,
+.office-cashbox-card .box-balance.imad-fit-long,
+.office-dashboard-dual b.imad-fit-long,
+.office-hub-dual b.imad-fit-long{
+  font-size:clamp(20px,1.55vw,28px) !important;
+  letter-spacing:-.045em !important;
+}
+
+.card .value.imad-fit-xlong,
+.cash-card-amount.imad-fit-xlong,
+.dash-cash-amount.imad-fit-xlong,
+.cash-lock-amount.imad-fit-xlong,
+.office-hub-amount.imad-fit-xlong,
+.office-cashbox-card .box-balance.imad-fit-xlong,
+.office-dashboard-dual b.imad-fit-xlong,
+.office-hub-dual b.imad-fit-xlong{
+  font-size:clamp(17px,1.2vw,23px) !important;
+  letter-spacing:-.06em !important;
+}
+
+.card .value.imad-fit-xxlong,
+.cash-card-amount.imad-fit-xxlong,
+.dash-cash-amount.imad-fit-xxlong,
+.cash-lock-amount.imad-fit-xxlong,
+.office-hub-amount.imad-fit-xxlong,
+.office-cashbox-card .box-balance.imad-fit-xxlong,
+.office-dashboard-dual b.imad-fit-xxlong,
+.office-hub-dual b.imad-fit-xxlong{
+  font-size:clamp(14px,0.98vw,19px) !important;
+  letter-spacing:-.072em !important;
+}
+
+/* Keep tables/logs normal: do not let number fitting change table layout */
+table .ltr,
+table td,
+table th,
+.daily-summary-table .ltr,
+#dailyGroupedLog .ltr,
+#profitLossReportBox .ltr,
+#cashboxMoves .ltr,
+#officeMovementLog .ltr{
+  display:table-cell !important;
+  white-space:nowrap !important;
+  direction:ltr !important;
+  text-align:right !important;
+  letter-spacing:normal !important;
+  overflow:visible !important;
+  font-size:inherit !important;
+}
+
+#dailyGroupedLog table,
+#cashboxMoves table,
+#officeMovementLog table,
+#profitLossReportBox table{
+  table-layout:auto !important;
+  width:100% !important;
+}
+
+.day-total .pill,
+.daily-buttons button,
+.record-actions button{
+  white-space:nowrap !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+}
+
+@media(max-width:720px){
+  .card .value.imad-fit-long{font-size:23px !important}
+  .card .value.imad-fit-xlong{font-size:20px !important}
+  .card .value.imad-fit-xxlong{font-size:17px !important}
+}
+</style>
+
+<script id="imad-safe-big-numbers-fit-script-v10">
+(function(){
+  const selector=[
+    '.card .value',
+    '.cash-card-amount',
+    '.dash-cash-amount',
+    '.cash-lock-amount',
+    '.office-hub-amount',
+    '.office-cashbox-card .box-balance',
+    '.office-dashboard-dual b',
+    '.office-hub-dual b'
+  ].join(',');
+
+  function textOf(el){return (el && (el.textContent||'')).replace(/\s+/g,' ').trim();}
+  function hasAmountText(text){return /\d[\d,\.]*\s*(SYP|USD)?/i.test(text);}
+
+  function fitOne(el){
+    if(!el || el.closest('table'))return;
+    const text=textOf(el);
+    el.classList.remove('imad-fit-number','imad-fit-long','imad-fit-xlong','imad-fit-xxlong');
+    if(!text || !hasAmountText(text))return;
+    const score=text.replace(/\s+/g,'').length;
+    el.classList.add('imad-fit-number');
+    if(score>=25)el.classList.add('imad-fit-xxlong');
+    else if(score>=19)el.classList.add('imad-fit-xlong');
+    else if(score>=14)el.classList.add('imad-fit-long');
+  }
+
+  function fitLargeNumbers(root){
+    const base=root && root.querySelectorAll ? root : document;
+    base.querySelectorAll(selector).forEach(fitOne);
+  }
+
+  let timer=null;
+  function schedule(root){
+    clearTimeout(timer);
+    timer=setTimeout(()=>fitLargeNumbers(root||document),40);
+  }
+
+  window.__imadFitLargeNumbers=fitLargeNumbers;
+  document.addEventListener('DOMContentLoaded',()=>schedule(document));
+  window.addEventListener('load',()=>schedule(document));
+  const mo=new MutationObserver(()=>schedule(document));
+  mo.observe(document.documentElement,{childList:true,subtree:true,characterData:true});
+  schedule(document);
+})();
+</script>
+
 </body>
 </html>
