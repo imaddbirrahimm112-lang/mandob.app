@@ -1719,6 +1719,27 @@ td{
   animation:none !important;
 }
 
+
+
+/* ===== IMAD patch v3 — restore Rcell logo animation only ===== */
+/* Keep sidebar/page moving shine disabled, but bring back the premium animated Rcell logo. */
+.sidebar::after,
+.sidebar .nav button::after{
+  display:none !important;
+  animation:none !important;
+}
+.logo-box::before{
+  display:block !important;
+  animation:rcellOrbitGold 8s linear infinite !important;
+}
+.logo-box::after{
+  display:block !important;
+  animation:goldSweep 4.8s ease-in-out infinite !important;
+}
+.logo-title{
+  animation:rcellPulseGold 3.2s ease-in-out infinite !important;
+}
+
 </style>
 </head>
 
@@ -4293,7 +4314,7 @@ td{
           updatedAt:serverTimestamp(),
           ...(id?{}:{createdAt:serverTimestamp()})
         },{merge:true});
-        await writeAuditLog(id?"تعديل إيراد":"إضافة إيراد","dailyRevenues",ref.id,delegateName,{delegateName,delegateId:delegate?.id||"",revenueSyp:amount,date});
+        await writeAuditLog(id?"تعديل إيراد":"إضافة إيراد","dailyRevenues",ref.id,delegateName,{delegateName,delegateId:delegate?.id||"",revenueSyp,date});
         resetRevenueForm();
         toast(id?"تم تعديل الإيراد ✅":"تم حفظ الإيراد ✅ - "+delegate.name+" / "+fmt(revenueSyp,"SYP"),"success");
         renderDailyLog();renderKpis();
