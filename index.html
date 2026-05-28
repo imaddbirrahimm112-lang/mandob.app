@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Rcell Revenue System - Gold Glass</title>
+  <title>Rcell Revenue System</title>
   <style>
-    *{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:radial-gradient(circle at 10% 5%,rgba(56,132,255,.28),transparent 31%),radial-gradient(circle at 86% 18%,rgba(255,177,70,.16),transparent 28%),linear-gradient(135deg,#05070d,#0b1020 52%,#05070d);color:#fff;min-height:100vh}button,input,select,textarea{font-family:Arial,sans-serif}
+    *{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:radial-gradient(circle at 10% 5%,rgba(56,132,255,.28),transparent 31%),radial-gradient(circle at 86% 18%,rgba(40,90,220,.14),transparent 28%),linear-gradient(135deg,#05070d,#0b1020 52%,#05070d);color:#fff;min-height:100vh}button,input,select,textarea{font-family:Arial,sans-serif}
     :root{--panel:rgba(255,255,255,.065);--border:rgba(255,255,255,.14);--muted:rgba(255,255,255,.62);--blue:#2f7cff;--violet:#735cff;--green:#28d17c;--danger:#ff5757;--orange:#ff8a3d;--sidebar:285px}
     .login-screen{min-height:100vh;display:grid;place-items:center;padding:18px}.login-card{width:min(430px,94vw);padding:22px;border-radius:30px;background:rgba(255,255,255,.075);border:1px solid var(--border);backdrop-filter:blur(24px);box-shadow:0 26px 95px rgba(0,0,0,.48)}.login-card h1{margin:0 0 8px;font-size:26px}.login-card p{margin:0 0 16px;color:var(--muted);line-height:1.7}.login-card input,.login-card button{width:100%;margin-top:8px}
     .app{display:none}.shell{min-height:100vh;display:grid;grid-template-columns:var(--sidebar) 1fr;gap:16px;width:min(1600px,98vw);margin:0 auto;padding:16px 0 34px}.sidebar{position:sticky;top:16px;height:calc(100vh - 32px);padding:16px;border-radius:30px;background:rgba(255,255,255,.075);border:1px solid var(--border);backdrop-filter:blur(22px);box-shadow:0 22px 80px rgba(0,0,0,.38);display:flex;flex-direction:column;gap:14px;overflow:auto}.logo-box{padding:15px;border-radius:24px;background:linear-gradient(135deg,rgba(255,255,255,.13),rgba(255,255,255,.055));border:1px solid rgba(255,255,255,.13)}.logo-title{font-size:22px;font-weight:900}.logo-sub{margin-top:6px;color:var(--muted);font-size:13px;line-height:1.6}
@@ -1176,1248 +1176,389 @@ html,body{
 
 
 /* =========================================================
-   RCELL DESIGN 04 — Gold Liquid Glass Skin
-   Visual-only override: keeps sidebar buttons, IDs, Firebase, and calculations intact.
+   RCELL — Premium Blue Glass Theme (Clean, Readable, Eye-Friendly)
+   Single unified override. Replaces all previous gold/blue patches.
    ========================================================= */
+
+/* ── Core Palette ── */
 :root{
-  --panel:rgba(22,20,15,.66) !important;
-  --border:rgba(246,189,96,.26) !important;
-  --muted:rgba(255,245,222,.68) !important;
-  --blue:#f6bd60 !important;
-  --violet:#9f6a24 !important;
-  --cyan:#ffd78a !important;
-  --green:#69f0b8 !important;
-  --danger:#ff6464 !important;
-  --orange:#f6bd60 !important;
-  --gold:#f6bd60;
-  --gold2:#ffd78a;
-  --gold3:#a66a1f;
-  --glassBlack:rgba(8,8,7,.68);
-  --glassGold:rgba(246,189,96,.13);
-  --softLine:rgba(255,245,222,.12);
-  --deepShadow:0 26px 85px rgba(0,0,0,.48);
+  --panel:rgba(8,18,46,.74) !important;
+  --border:rgba(72,160,255,.26) !important;
+  --muted:rgba(210,232,255,.72) !important;
+  --blue:#2d96ff !important;
+  --violet:#5b6cff !important;
+  --cyan:#45dcff !important;
+  --green:#38f0a0 !important;
+  --danger:#ff4d63 !important;
+  --orange:#ff8940 !important;
+  --deepShadow:0 24px 80px rgba(0,8,28,.55) !important;
 }
+
+/* ── Background ── */
 html,body{
-  color:#fff8e8 !important;
+  color:#eaf5ff !important;
   background:
-    radial-gradient(circle at 18% 12%, rgba(246,189,96,.22), transparent 25%),
-    radial-gradient(circle at 86% 78%, rgba(255,215,138,.13), transparent 32%),
-    radial-gradient(circle at 50% 110%, rgba(166,106,31,.18), transparent 39%),
-    linear-gradient(135deg,#030404 0%,#0b0c0b 45%,#17130b 100%) !important;
+    radial-gradient(ellipse at 12% 6%,  rgba(30,130,255,.26), transparent 30%),
+    radial-gradient(ellipse at 88% 14%, rgba(60,90,255,.18),  transparent 32%),
+    radial-gradient(ellipse at 52% 108%,rgba(20,70,200,.16),  transparent 44%),
+    linear-gradient(155deg,#010712 0%,#040f26 50%,#010610 100%) !important;
 }
-body::before,
-body::after{
-  content:"";
-  position:fixed;
-  pointer-events:none;
-  z-index:-2;
-}
+body::before,body::after{content:"";position:fixed;pointer-events:none;z-index:-2}
 body::before{
-  inset:-13% -10% auto auto;
-  width:74vw;
-  height:62vh;
+  inset:-15% -12% auto auto;width:72vw;height:60vh;
   border-radius:46% 54% 55% 45%;
   background:
-    radial-gradient(circle at 44% 28%, rgba(255,221,145,.20), transparent 39%),
-    linear-gradient(120deg, transparent 8%, rgba(255,210,126,.10), transparent 68%);
-  filter:blur(28px);
-  transform:rotate(-8deg);
+    radial-gradient(circle at 42% 30%,rgba(60,180,255,.20),transparent 42%),
+    linear-gradient(120deg,transparent 10%,rgba(30,140,255,.10),transparent 66%);
+  filter:blur(36px);transform:rotate(-8deg);opacity:.85;
 }
 body::after{
-  right:-10vw;
-  bottom:-12vh;
-  width:58vw;
-  height:48vh;
-  background:radial-gradient(circle, rgba(246,189,96,.12), transparent 62%);
-  filter:blur(22px);
+  right:-8vw;bottom:-14vh;width:56vw;height:46vh;
+  background:radial-gradient(circle,rgba(20,100,255,.13),transparent 64%);
+  filter:blur(30px);
 }
-@keyframes rcellPulseGold{
-  0%,100%{transform:translateY(0) scale(1);filter:drop-shadow(0 0 12px rgba(246,189,96,.34))}
-  50%{transform:translateY(-2px) scale(1.045);filter:drop-shadow(0 0 28px rgba(255,215,138,.58))}
+
+/* ── Animations ── */
+@keyframes blueOrbit{to{transform:rotate(360deg)}}
+@keyframes bluePulse{
+  0%,100%{filter:drop-shadow(0 0 10px rgba(50,180,255,.42))}
+  50%     {filter:drop-shadow(0 0 26px rgba(100,230,255,.72))}
 }
-@keyframes rcellOrbitGold{to{transform:rotate(360deg)}}
-@keyframes goldSweep{
-  0%{transform:translateX(-140%) rotate(18deg);opacity:0}
-  36%{opacity:.56}
-  100%{transform:translateX(140%) rotate(18deg);opacity:0}
+@keyframes blueShimmer{
+  0%  {transform:translateX(-130%) rotate(18deg);opacity:0}
+  40% {opacity:.40}
+  100%{transform:translateX(130%) rotate(18deg);opacity:0}
 }
-@keyframes liquidGlowGold{
-  0%,100%{transform:translate3d(0,0,0) scale(1);opacity:.64}
-  33%{transform:translate3d(8px,-10px,0) scale(1.05);opacity:.78}
-  66%{transform:translate3d(-8px,8px,0) scale(.96);opacity:.52}
-}
-.login-card,
-.sidebar,
-.topbar,
-.section,
-.card,
-.modal-box,
-.status,
-.table-wrap,
-.day-box,
-.cash-liquid-card,
-.dash-cash-card,
-.office-hub-card,
-.office-cashbox-card{
+
+/* ── Glass Panels (sidebar, topbar, sections, modals) ── */
+.login-card,.sidebar,.topbar,.section,.card,.modal-box,
+.status,.table-wrap,.day-box,
+.cash-liquid-card,.dash-cash-card,.office-hub-card,.office-cashbox-card{
   background:
-    linear-gradient(145deg,rgba(255,255,255,.105),rgba(255,255,255,.045)) !important;
-  border-color:rgba(246,189,96,.24) !important;
+    linear-gradient(148deg,rgba(255,255,255,.10),rgba(255,255,255,.032)) !important;
+  border-color:rgba(72,160,255,.22) !important;
   box-shadow:
-    var(--deepShadow),
-    inset 0 1px 0 rgba(255,255,255,.18),
-    inset 0 -20px 42px rgba(0,0,0,.25) !important;
-  backdrop-filter:blur(28px) saturate(140%) !important;
-  -webkit-backdrop-filter:blur(28px) saturate(140%) !important;
+    0 24px 80px rgba(0,8,28,.55),
+    inset 0 1px 0 rgba(160,215,255,.18),
+    inset 0 -18px 40px rgba(0,20,60,.20) !important;
+  backdrop-filter:blur(28px) saturate(1.5) !important;
+  -webkit-backdrop-filter:blur(28px) saturate(1.5) !important;
 }
-.shell{
-  background:transparent !important;
-}
-.main{
-  scrollbar-color:rgba(246,189,96,.46) rgba(255,255,255,.04);
-}
+.shell{background:transparent !important}
+.main{scrollbar-color:rgba(60,160,255,.52) rgba(255,255,255,.04)}
+
+/* ── Topbar ── */
 .topbar{
-  min-height:86px;
+  min-height:82px;overflow:hidden;
   background:
-    radial-gradient(circle at 78% 24%,rgba(246,189,96,.15),transparent 30%),
-    linear-gradient(145deg,rgba(255,255,255,.105),rgba(255,255,255,.040)) !important;
-  overflow:hidden;
+    radial-gradient(circle at 76% 22%,rgba(80,210,255,.14),transparent 28%),
+    linear-gradient(148deg,rgba(255,255,255,.10),rgba(255,255,255,.034)) !important;
 }
-.topbar::before,
-.section::before,
-.sidebar::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  pointer-events:none;
-  border-radius:inherit;
+.topbar::before,.section::before,.sidebar::before{
+  content:"";position:absolute;inset:0;pointer-events:none;border-radius:inherit;
   background:
-    radial-gradient(circle at 16% 18%,rgba(255,244,207,.10),transparent 24%),
-    linear-gradient(115deg,transparent 22%,rgba(255,244,207,.075),transparent 52%);
-  opacity:.82;
+    radial-gradient(circle at 14% 16%,rgba(180,230,255,.09),transparent 22%),
+    linear-gradient(115deg,transparent 20%,rgba(120,210,255,.06),transparent 52%);
 }
-.topbar::after,
-.section::after,
-.sidebar::after,
-.card::after,
-.office-hub-card::after,
-.cash-liquid-card::after,
-.dash-cash-card::after{
-  content:"";
-  position:absolute;
-  inset:-45% -55%;
-  pointer-events:none;
-  background:linear-gradient(110deg,transparent 34%,rgba(255,255,255,.16),transparent 63%);
-  transform:rotate(18deg);
-  animation:goldSweep 7s ease-in-out infinite;
-  opacity:.44;
+.topbar::after,.section::after,
+.card::after,.office-hub-card::after,.cash-liquid-card::after,.dash-cash-card::after{
+  content:"";position:absolute;inset:-48% -58%;pointer-events:none;
+  background:linear-gradient(112deg,transparent 32%,rgba(160,230,255,.11),transparent 62%);
+  transform:rotate(18deg);animation:blueShimmer 9s ease-in-out infinite;opacity:.55;
 }
-.topbar > *,
-.section > *,
-.sidebar > *,
-.card > *,
-.office-hub-card > *,
-.cash-liquid-card > *,
-.dash-cash-card > *{
-  position:relative;
-  z-index:2;
+.topbar>*,.section>*,.sidebar>*,.card>*,
+.office-hub-card>*,.cash-liquid-card>*,.dash-cash-card>*{position:relative;z-index:2}
+.section{position:relative;overflow:hidden !important;border-radius:30px !important}
+
+/* ── Typography ── */
+.topbar h1,.section-head h2,.logo-title{
+  color:#ddf2ff !important;
+  text-shadow:0 0 18px rgba(60,200,255,.20) !important;
 }
-.section{
-  position:relative;
-  overflow:hidden !important;
-  border-radius:30px !important;
+.topbar p,.section-head small,.logo-sub,.label,.field label,th{
+  color:rgba(200,228,255,.70) !important;
 }
-.topbar h1,
-.section-head h2,
-.logo-title{
-  color:#fff4d8 !important;
-  text-shadow:0 0 18px rgba(246,189,96,.18);
-}
-.topbar p,
-.section-head small,
-.logo-sub,
-.label,
-.field label,
-th{
-  color:rgba(255,245,222,.67) !important;
-}
+td{color:rgba(228,246,255,.92) !important}
+
+/* ── Sidebar ── */
 .sidebar{
-  position:sticky !important;
-  border-radius:32px !important;
+  position:sticky !important;border-radius:32px !important;overflow:auto !important;
   background:
-    radial-gradient(circle at 50% 8%,rgba(246,189,96,.13),transparent 30%),
-    linear-gradient(180deg,rgba(24,21,15,.78),rgba(8,8,7,.86)) !important;
-  overflow:auto !important;
+    radial-gradient(circle at 48% 6%,rgba(30,130,255,.15),transparent 28%),
+    linear-gradient(175deg,rgba(7,18,48,.84),rgba(2,6,20,.92)) !important;
+  border-color:rgba(72,160,255,.22) !important;
 }
+
+/* ── Logo box ── */
 .logo-box{
-  position:relative;
-  overflow:hidden;
-  min-height:122px;
-  display:grid;
-  place-items:center;
-  gap:8px;
-  padding:18px 14px !important;
+  position:relative;overflow:hidden;min-height:118px;
+  display:grid;place-items:center;gap:8px;padding:18px 14px !important;
   border-radius:28px !important;
   background:
-    radial-gradient(circle at 34% 24%,rgba(255,244,207,.40),rgba(246,189,96,.17) 34%,rgba(56,37,10,.28) 68%,rgba(0,0,0,.18)),
-    linear-gradient(145deg,rgba(255,255,255,.12),rgba(246,189,96,.05)) !important;
-  border:1px solid rgba(255,215,138,.32) !important;
+    radial-gradient(circle at 32% 22%,rgba(180,240,255,.50),rgba(30,140,255,.22) 36%,rgba(8,28,70,.30) 70%),
+    linear-gradient(148deg,rgba(255,255,255,.13),rgba(30,130,255,.06)) !important;
+  border:1px solid rgba(100,210,255,.40) !important;
   box-shadow:
-    0 0 38px rgba(246,189,96,.21),
-    inset 0 1px 0 rgba(255,255,255,.30),
-    inset 0 -18px 30px rgba(0,0,0,.28) !important;
+    0 0 40px rgba(30,130,255,.26),
+    inset 0 1px 0 rgba(255,255,255,.28),
+    inset 0 -16px 28px rgba(0,8,26,.28) !important;
 }
 .logo-box::before{
-  content:"";
-  position:absolute;
-  inset:10px;
-  border-radius:24px;
-  border:1px solid rgba(255,245,222,.18);
-  border-top-color:rgba(255,245,222,.62);
-  border-right-color:rgba(246,189,96,.46);
-  animation:rcellOrbitGold 8s linear infinite;
+  content:"";position:absolute;inset:10px;border-radius:22px;
+  border:1px solid rgba(180,230,255,.16);
+  border-top-color:rgba(200,245,255,.58);
+  border-right-color:rgba(60,210,255,.50);
+  animation:blueOrbit 10s linear infinite;
 }
 .logo-box::after{
-  content:"";
-  position:absolute;
-  inset:-45% -65%;
-  background:linear-gradient(110deg,transparent 35%,rgba(255,255,255,.28),transparent 63%);
-  transform:rotate(18deg);
-  animation:goldSweep 4.8s ease-in-out infinite;
+  content:"";position:absolute;inset:-48% -68%;
+  background:linear-gradient(112deg,transparent 34%,rgba(200,248,255,.24),transparent 64%);
+  transform:rotate(18deg);animation:blueShimmer 6s ease-in-out infinite;
 }
 .logo-title{
-  position:relative;
-  z-index:2;
-  font-size:32px !important;
-  font-weight:1000 !important;
-  letter-spacing:-.04em;
-  line-height:1;
-  color:#fff4cf !important;
-  text-shadow:0 0 16px rgba(255,215,138,.76),0 2px 16px rgba(0,0,0,.44) !important;
-  animation:rcellPulseGold 3.2s ease-in-out infinite;
+  position:relative;z-index:2;font-size:32px !important;font-weight:1000 !important;
+  letter-spacing:-.04em;line-height:1;color:#d8f8ff !important;
+  text-shadow:0 0 18px rgba(60,220,255,.90),0 2px 14px rgba(0,0,0,.44) !important;
+  animation:bluePulse 3.6s ease-in-out infinite;
 }
 .logo-sub{
-  position:relative;
-  z-index:2;
-  margin-top:0 !important;
-  text-align:center;
-  color:rgba(255,245,222,.68) !important;
+  position:relative;z-index:2;margin-top:0 !important;
+  text-align:center;color:rgba(195,235,255,.70) !important;
 }
-.nav{
-  gap:10px !important;
+
+/* ── Nav buttons ── */
+.nav{gap:10px !important}
+.nav button,.mobile-nav button,button.secondary,.date-btn{
+  background:linear-gradient(135deg,rgba(255,255,255,.09),rgba(255,255,255,.032)) !important;
+  border:1px solid rgba(100,185,255,.18) !important;
+  color:rgba(220,244,255,.92) !important;
+  box-shadow:inset 0 1px 0 rgba(140,200,255,.08) !important;
 }
-.nav button,
-.mobile-nav button,
-button.secondary,
-.date-btn{
-  background:
-    linear-gradient(135deg,rgba(255,255,255,.085),rgba(255,255,255,.035)) !important;
-  border:1px solid rgba(255,215,138,.17) !important;
-  color:rgba(255,248,232,.92) !important;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.08) !important;
-}
-.nav button{
-  position:relative;
-  overflow:hidden;
-  border-radius:18px !important;
-}
+.nav button{position:relative;overflow:hidden;border-radius:18px !important}
 .nav button::after{
-  content:"";
-  position:absolute;
-  inset:0;
-  background:linear-gradient(110deg,transparent 28%,rgba(255,238,192,.10),transparent 58%);
-  transform:translateX(-120%) rotate(8deg);
-  transition:.35s ease;
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(112deg,transparent 26%,rgba(140,215,255,.10),transparent 58%);
+  transform:translateX(-120%) rotate(8deg);transition:.32s ease;
 }
 .nav button:hover::after{transform:translateX(120%) rotate(8deg)}
-.nav button small{
-  color:rgba(255,245,222,.55) !important;
-}
-.nav button.active,
-.mobile-nav button.active,
-button.active-tab{
+.nav button small{color:rgba(180,220,255,.56) !important}
+.nav button.active,.mobile-nav button.active,button.active-tab{
   background:
-    radial-gradient(circle at 22% 18%,rgba(255,244,207,.22),transparent 26%),
-    linear-gradient(135deg,rgba(246,189,96,.92),rgba(118,74,20,.88)) !important;
-  border-color:rgba(255,215,138,.44) !important;
-  color:#fff9e8 !important;
+    radial-gradient(circle at 20% 16%,rgba(180,240,255,.24),transparent 28%),
+    linear-gradient(135deg,rgba(26,128,255,.98),rgba(16,68,210,.92)) !important;
+  border-color:rgba(80,200,255,.48) !important;
+  color:#d8f4ff !important;
   box-shadow:
-    0 16px 36px rgba(246,189,96,.18),
-    inset 0 1px 0 rgba(255,255,255,.28),
-    inset 0 -16px 30px rgba(0,0,0,.22) !important;
+    0 14px 38px rgba(20,110,255,.30),
+    inset 0 1px 0 rgba(255,255,255,.26),
+    inset 0 -14px 28px rgba(0,8,26,.22) !important;
 }
-.nav button.active small{
-  color:rgba(255,255,255,.76) !important;
-}
+.nav button.active small{color:rgba(200,240,255,.78) !important}
+.sidebar::after,.sidebar .nav button::after{display:none !important;animation:none !important}
+
+/* ── Action Buttons ── */
 button{
-  background:linear-gradient(135deg,#f6bd60,#9f6a24) !important;
-  border-color:rgba(255,215,138,.34) !important;
-  color:#fff8e8 !important;
-  box-shadow:0 12px 30px rgba(246,189,96,.16), inset 0 1px 0 rgba(255,255,255,.15) !important;
+  background:linear-gradient(135deg,#2a96ff,#1a5cdf) !important;
+  border-color:rgba(100,200,255,.36) !important;
+  color:#e8f8ff !important;
+  box-shadow:0 10px 28px rgba(20,110,255,.26),inset 0 1px 0 rgba(255,255,255,.18) !important;
 }
 button.good{
-  background:linear-gradient(135deg,#58d896,#2f8a62) !important;
-  border-color:rgba(105,240,184,.30) !important;
+  background:linear-gradient(135deg,#30e896,#0d8a60) !important;
+  border-color:rgba(60,240,160,.30) !important;
 }
 button.danger{
-  background:linear-gradient(135deg,#8e3a32,#f6bd60) !important;
-  border-color:rgba(255,120,98,.28) !important;
+  background:linear-gradient(135deg,#ff3d55,#c02060) !important;
+  border-color:rgba(255,80,100,.28) !important;
 }
+
+/* ── Inputs ── */
 input,select,textarea{
-  background:rgba(10,10,9,.68) !important;
-  border-color:rgba(255,215,138,.20) !important;
-  color:#fff8e8 !important;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.055) !important;
+  background:rgba(3,10,30,.72) !important;
+  border-color:rgba(80,180,255,.22) !important;
+  color:#dff0ff !important;
+  box-shadow:inset 0 1px 4px rgba(0,0,0,.22) !important;
 }
-input::placeholder,textarea::placeholder{color:rgba(255,245,222,.42) !important}
-option{color:#16110a !important;background:#fff4d8 !important}
-.status{
-  background:rgba(8,8,7,.50) !important;
-  color:rgba(255,245,222,.76) !important;
+input:focus,select:focus,textarea:focus{
+  border-color:rgba(50,170,255,.52) !important;
+  box-shadow:0 0 0 3px rgba(30,130,255,.14),inset 0 1px 4px rgba(0,0,0,.22) !important;
 }
-.card,
-.dashboard-revenue-grid .card,
-.office-card,
-.office-hub-card,
-.office-cashbox-card,
-.cash-liquid-card,
-.dash-cash-card,
-.cash-lock-card,
-.mini-summary{
-  position:relative;
-  overflow:hidden;
+input::placeholder,textarea::placeholder{color:rgba(170,215,255,.44) !important}
+option{color:#061630 !important;background:#d8eeff !important}
+.status{background:rgba(2,8,24,.54) !important;color:rgba(195,228,255,.80) !important}
+
+/* ── Cards (KPI, office, cash, etc.) ── */
+.card,.dashboard-revenue-grid .card,
+.office-card,.office-hub-card,.office-cashbox-card,
+.cash-liquid-card,.dash-cash-card,.cash-lock-card,.mini-summary{
+  position:relative;overflow:hidden;
   background:
-    radial-gradient(circle at 14% 18%,rgba(255,244,207,.18),transparent 18%),
-    radial-gradient(circle at 86% 16%,rgba(246,189,96,.14),transparent 24%),
-    linear-gradient(145deg,rgba(255,255,255,.13),rgba(255,255,255,.050) 52%,rgba(246,189,96,.070)) !important;
-  border:1px solid rgba(255,215,138,.22) !important;
+    radial-gradient(circle at 12% 16%,rgba(60,190,255,.16),transparent 22%),
+    radial-gradient(circle at 88% 14%,rgba(50,80,255,.10),transparent 26%),
+    linear-gradient(148deg,rgba(255,255,255,.12),rgba(255,255,255,.042) 54%,rgba(20,90,220,.06)) !important;
+  border:1px solid rgba(80,175,255,.20) !important;
   box-shadow:
-    0 18px 48px rgba(0,0,0,.34),
-    0 8px 22px rgba(246,189,96,.06),
-    inset 0 1px 0 rgba(255,255,255,.22),
-    inset 0 -18px 38px rgba(0,0,0,.20) !important;
+    0 16px 48px rgba(0,8,28,.42),
+    0 6px 18px rgba(20,100,255,.06),
+    inset 0 1px 0 rgba(160,220,255,.20),
+    inset 0 -16px 36px rgba(0,14,50,.18) !important;
 }
-.card::before,
-.office-card::before,
-.office-hub-card::before,
-.office-cashbox-card::before,
-.cash-liquid-card::before,
-.dash-cash-card::before{
-  content:"" !important;
-  position:absolute !important;
-  top:13px !important;
-  left:13px !important;
-  width:43px !important;
-  height:43px !important;
-  border-radius:17px !important;
-  background:
-    radial-gradient(circle at 35% 28%,rgba(255,244,207,.74),rgba(246,189,96,.30) 48%,rgba(0,0,0,.08)) !important;
-  border:1px solid rgba(255,215,138,.28) !important;
-  box-shadow:
-    0 0 28px rgba(246,189,96,.24),
-    inset 0 1px 0 rgba(255,255,255,.34),
-    inset 0 -10px 20px rgba(0,0,0,.14) !important;
-  filter:none !important;
-  opacity:1 !important;
+.card::before,.office-card::before,.office-hub-card::before,
+.office-cashbox-card::before,.cash-liquid-card::before,.dash-cash-card::before{
+  content:"" !important;position:absolute !important;top:13px !important;left:13px !important;
+  width:42px !important;height:42px !important;border-radius:16px !important;
+  background:radial-gradient(circle at 34% 26%,rgba(200,246,255,.84),rgba(30,155,255,.38) 50%,rgba(0,0,0,.08)) !important;
+  border:1px solid rgba(100,210,255,.32) !important;
+  box-shadow:0 0 26px rgba(30,150,255,.28),inset 0 1px 0 rgba(255,255,255,.36) !important;
+  filter:none !important;opacity:1 !important;
 }
-.card:hover,
-.office-card:hover,
-.office-hub-card:hover,
-.office-cashbox-card:hover{
+.card:hover,.office-card:hover,.office-hub-card:hover,.office-cashbox-card:hover{
   transform:translateY(-2px);
-  border-color:rgba(255,215,138,.40) !important;
+  border-color:rgba(80,190,255,.38) !important;
   box-shadow:
-    0 24px 68px rgba(0,0,0,.40),
-    0 10px 28px rgba(246,189,96,.12),
-    inset 0 1px 0 rgba(255,255,255,.28),
-    inset 0 -18px 38px rgba(0,0,0,.18) !important;
+    0 22px 66px rgba(0,8,28,.48),
+    0 8px 26px rgba(20,110,255,.12),
+    inset 0 1px 0 rgba(160,220,255,.26),
+    inset 0 -16px 36px rgba(0,14,50,.16) !important;
 }
-.value,
-.cash-card-amount,
-.dash-cash-amount,
-.office-hub-amount,
+
+/* ── Numbers & Values (extra clarity) ── */
+.value,.cash-card-amount,.dash-cash-amount,.office-hub-amount,
 .office-card .money-row span:last-child,
-.office-dashboard-dual b,
-.office-hub-dual b,
-.pill,
-.ltr{
-  color:#fff7df !important;
-  text-shadow:0 0 16px rgba(246,189,96,.13) !important;
+.office-dashboard-dual b,.office-hub-dual b,.pill,.ltr{
+  color:#e6f6ff !important;
+  text-shadow:0 0 14px rgba(50,190,255,.14) !important;
+  font-variant-numeric:tabular-nums;
 }
-.sub,
-.cash-card-currency,
-.dash-cash-sub,
-.office-hub-region,
-.delegate-type-mini{
-  color:rgba(255,245,222,.58) !important;
+.sub,.cash-card-currency,.dash-cash-sub,.office-hub-region,.delegate-type-mini{
+  color:rgba(175,218,255,.62) !important;
 }
-.money-row,
-.office-dashboard-dual div,
-.office-hub-dual div,
-.calc-item,
-.cash-form-note,
-.warning-note,
-.day-box,
-.table-wrap,
-.empty{
-  background:rgba(8,8,7,.38) !important;
-  border-color:rgba(255,215,138,.12) !important;
+
+/* ── Tables ── */
+.table-wrap{border-color:rgba(72,160,255,.16) !important;border-radius:24px !important}
+table{background:rgba(2,8,24,.36) !important}
+th{background:rgba(30,120,255,.07) !important;color:rgba(190,228,255,.72) !important}
+td{color:rgba(224,244,255,.92) !important}
+tr:hover td{background:rgba(30,100,255,.06) !important}
+
+/* ── Day boxes, money rows, calc items ── */
+.money-row,.office-dashboard-dual div,.office-hub-dual div,
+.calc-item,.cash-form-note,.warning-note,.day-box,.empty{
+  background:rgba(2,8,22,.40) !important;
+  border-color:rgba(72,160,255,.12) !important;
 }
-.table-wrap{
-  border-radius:24px !important;
+.day-head,.clean-day-head{
+  background:linear-gradient(135deg,rgba(30,120,255,.11),rgba(255,255,255,.04)) !important;
 }
-table{
-  background:rgba(8,8,7,.32) !important;
+
+/* ── Semantic colors (keep functional, just blue-tuned) ── */
+.type-masary-cell,.remain-cell,.remain-pill,
+.office-hub-amount,.office-hub-dual b,
+.office-card .money-row span:last-child,.cut-detail{
+  color:#38f0a0 !important;-webkit-text-fill-color:#38f0a0 !important;
 }
-th{
-  background:rgba(246,189,96,.075) !important;
+.type-ccbs-cell{color:#60d8ff !important;-webkit-text-fill-color:#60d8ff !important}
+.negative-amount,.negative-amount *,.neg-money,.neg-money *{
+  color:#ff4060 !important;-webkit-text-fill-color:#ff4060 !important;
+  text-shadow:0 0 12px rgba(255,60,90,.28) !important;
 }
-td{
-  color:rgba(255,248,232,.88) !important;
+
+/* ── Misc ── */
+.toast{border-color:rgba(80,190,255,.28) !important}
+.mobile-nav{background:rgba(2,8,22,.86) !important;border-color:rgba(72,160,255,.24) !important}
+.mobile-nav button.active{
+  background:linear-gradient(135deg,rgba(26,128,255,.96),rgba(16,68,210,.90)) !important;
 }
-.day-head,
-.clean-day-head{
-  background:linear-gradient(135deg,rgba(246,189,96,.11),rgba(255,255,255,.045)) !important;
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar{width:9px;height:9px}
+::-webkit-scrollbar-track{background:rgba(255,255,255,.03);border-radius:999px}
+::-webkit-scrollbar-thumb{
+  background:linear-gradient(180deg,rgba(50,170,255,.60),rgba(16,80,210,.64));
+  border-radius:999px;border:2px solid rgba(1,4,14,.44);
 }
-.type-masary-cell,
-.remain-cell,
-.remain-pill,
-.office-hub-amount,
-.office-hub-dual b,
-.office-card .money-row span:last-child,
-.cut-detail{
-  color:#69f0b8 !important;
-  -webkit-text-fill-color:#69f0b8 !important;
+
+/* ── Cash Lock Cards ── */
+.cash-lock-card{
+  background:
+    radial-gradient(ellipse at 10% 90%,rgba(30,160,255,.22),transparent 38%),
+    radial-gradient(ellipse at 90% 8%,rgba(20,60,200,.14),transparent 34%),
+    linear-gradient(148deg,rgba(8,22,64,.88),rgba(2,7,22,.94)) !important;
+  border-color:rgba(60,155,255,.26) !important;
+  box-shadow:
+    0 18px 52px rgba(0,8,28,.44),
+    inset 0 1px 0 rgba(160,220,255,.18),
+    inset 0 -16px 40px rgba(0,14,50,.18) !important;
 }
-.type-ccbs-cell{
-  color:#ffd78a !important;
-  -webkit-text-fill-color:#ffd78a !important;
+.cash-lock-card.syp-lock{
+  background:
+    radial-gradient(ellipse at 10% 90%,rgba(110,60,255,.22),transparent 38%),
+    radial-gradient(ellipse at 90% 8%,rgba(30,130,255,.14),transparent 34%),
+    linear-gradient(148deg,rgba(12,8,48,.88),rgba(2,4,22,.94)) !important;
+  border-color:rgba(110,80,255,.28) !important;
 }
-.negative-amount,
-.negative-amount *,
-.neg-money,
-.neg-money *{
-  color:#ff485f !important;
-  -webkit-text-fill-color:#ff485f !important;
-  text-shadow:0 0 13px rgba(255,72,95,.26) !important;
+.cash-lock-card.usd-lock{
+  background:
+    radial-gradient(ellipse at 10% 90%,rgba(30,190,255,.24),transparent 38%),
+    radial-gradient(ellipse at 90% 8%,rgba(20,80,200,.16),transparent 34%),
+    linear-gradient(148deg,rgba(4,20,62,.88),rgba(2,7,22,.94)) !important;
+  border-color:rgba(30,190,255,.30) !important;
 }
-.toast{
-  border-color:rgba(255,215,138,.25) !important;
+
+/* ── Dashboard KPI cards ── */
+#viewDashboard #kpiGrid.kpi-grid{
+  display:grid !important;grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+  gap:16px !important;align-items:stretch !important;
 }
-.mobile-nav{
-  background:rgba(8,8,7,.80) !important;
-  border-color:rgba(255,215,138,.24) !important;
+#viewDashboard #kpiGrid.kpi-grid .card{
+  min-height:164px !important;padding:20px 18px !important;
+  border-radius:30px !important;display:flex !important;
+  flex-direction:column !important;justify-content:center !important;
 }
-#viewDashboard .kpi-grid,
-.dashboard-revenue-grid,
-.office-grid,
-.office-hub-grid,
-.office-cashbox-cards,
-.cashbox-grid,
-.cash-summary-grid,
-.office-reports-grid{
-  gap:14px !important;
+#viewDashboard #kpiGrid.kpi-grid .card .label{font-size:14px !important;line-height:1.55 !important}
+#viewDashboard #kpiGrid.kpi-grid .card .value{
+  font-size:clamp(28px,2.05vw,38px) !important;line-height:1.18 !important;
+  margin-top:14px !important;white-space:normal !important;
 }
-.dashboard-revenue-grid .card{
-  min-height:174px !important;
-  border-radius:30px !important;
+#viewDashboard #kpiGrid.kpi-grid .card .sub{margin-top:10px !important;min-height:22px !important}
+
+/* ── Profit/Loss grid ── */
+#profitLossSummaryGrid.kpi-grid{
+  grid-template-columns:repeat(auto-fit,minmax(245px,1fr)) !important;gap:14px !important;
 }
-.office-card{
-  border-radius:26px !important;
+#profitLossSummaryGrid .pl-card{
+  min-height:158px !important;padding:17px 16px !important;overflow:visible !important;
 }
-.section-head{
-  position:relative;
-  z-index:3;
+#profitLossSummaryGrid .pl-card .value{
+  direction:ltr !important;text-align:right !important;
+  font-size:clamp(19px,1.42vw,28px) !important;line-height:1.22 !important;
+  white-space:normal !important;word-break:break-word !important;
 }
-::-webkit-scrollbar{width:10px;height:10px}
-::-webkit-scrollbar-track{background:rgba(255,255,255,.04);border-radius:999px}
-::-webkit-scrollbar-thumb{background:linear-gradient(180deg,rgba(246,189,96,.58),rgba(166,106,31,.62));border-radius:999px;border:2px solid rgba(5,5,5,.42)}
+
+/* ── Responsive ── */
+@media(max-width:1280px){
+  #viewDashboard #kpiGrid.kpi-grid{grid-template-columns:repeat(2,minmax(0,1fr)) !important}
+}
 @media(max-width:1100px){
   .sidebar{height:auto !important;max-height:none !important}
   .logo-box{min-height:96px}
 }
 @media(max-width:720px){
   .topbar,.section{border-radius:24px !important}
-  .logo-title{font-size:28px !important}
+  .logo-title{font-size:26px !important}
+  #viewDashboard #kpiGrid.kpi-grid{grid-template-columns:1fr !important}
+  #viewDashboard #kpiGrid.kpi-grid .card{min-height:136px !important;padding:17px 15px !important}
+  #viewDashboard #kpiGrid.kpi-grid .card .value{font-size:26px !important}
 }
 
-
-
-/* ===== IMAD patch — expand dashboard KPI cards and remove empty left gap ===== */
-#viewDashboard #kpiGrid.kpi-grid{
-  display:grid !important;
-  grid-template-columns:repeat(4,minmax(0,1fr)) !important;
-  gap:16px !important;
-  align-items:stretch !important;
-}
-#viewDashboard #kpiGrid.kpi-grid .card{
-  min-height:164px !important;
-  padding:20px 18px !important;
-  border-radius:30px !important;
-  display:flex !important;
-  flex-direction:column !important;
-  justify-content:center !important;
-}
-#viewDashboard #kpiGrid.kpi-grid .card .label{
-  font-size:14px !important;
-  line-height:1.55 !important;
-}
-#viewDashboard #kpiGrid.kpi-grid .card .value{
-  font-size:clamp(28px,2.05vw,38px) !important;
-  line-height:1.18 !important;
-  margin-top:14px !important;
-  white-space:normal !important;
-}
-#viewDashboard #kpiGrid.kpi-grid .card .sub{
-  margin-top:10px !important;
-  min-height:22px !important;
-}
-@media(max-width:1280px){
-  #viewDashboard #kpiGrid.kpi-grid{
-    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
-  }
-}
-@media(max-width:720px){
-  #viewDashboard #kpiGrid.kpi-grid{
-    grid-template-columns:1fr !important;
-  }
-  #viewDashboard #kpiGrid.kpi-grid .card{
-    min-height:136px !important;
-    padding:17px 15px !important;
-  }
-  #viewDashboard #kpiGrid.kpi-grid .card .value{
-    font-size:26px !important;
-  }
+/* ── Performance ── */
+.main .section{content-visibility:auto;contain-intrinsic-size:1px 520px}
+.card,.office-hub-card,.office-cashbox-card,.cash-liquid-card,.dash-cash-card{contain:layout paint style}
+.table-wrap{contain:layout paint}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important}
 }
 
-
-
-/* ===== Performance pass: faster scrolling and lighter repaints ===== */
-.main .section{
-  content-visibility:auto;
-  contain-intrinsic-size:1px 520px;
-}
-.card,.office-hub-card,.office-cashbox-card,.cash-liquid-card,.dash-cash-card{
-  contain:layout paint style;
-}
-.table-wrap{
-  contain:layout paint;
-}
-@media (prefers-reduced-motion: reduce){
-  *,*::before,*::after{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important;scroll-behavior:auto !important}
-}
-
-
-
-/* ===== IMAD patch — stop moving shine in sidebar only ===== */
-.sidebar::after,
-.sidebar .nav button::after,
-.logo-box::after{
-  display:none !important;
-  animation:none !important;
-}
-.logo-box::before{
-  animation:none !important;
-}
-
-
-
-/* ===== IMAD patch v3 — restore Rcell logo animation only ===== */
-/* Keep sidebar/page moving shine disabled, but bring back the premium animated Rcell logo. */
-.sidebar::after,
-.sidebar .nav button::after{
-  display:none !important;
-  animation:none !important;
-}
-.logo-box::before{
-  display:block !important;
-  animation:rcellOrbitGold 8s linear infinite !important;
-}
-.logo-box::after{
-  display:block !important;
-  animation:goldSweep 4.8s ease-in-out infinite !important;
-}
-.logo-title{
-  animation:rcellPulseGold 3.2s ease-in-out infinite !important;
-}
-
-
-/* =========================================================
-   IMAD Pro — Blue Liquid Glass Preview Skin
-   Visual-only override: keeps Firebase, calculations, delete/trash, cut, delivery intact.
-   ========================================================= */
-:root{
-  --panel:rgba(10,24,52,.70) !important;
-  --border:rgba(86,178,255,.30) !important;
-  --muted:rgba(218,239,255,.70) !important;
-  --blue:#3aa7ff !important;
-  --violet:#5d7cff !important;
-  --cyan:#5ee7ff !important;
-  --green:#62f6bd !important;
-  --danger:#ff5d70 !important;
-  --orange:#50bfff !important;
-  --gold:#3aa7ff !important;
-  --gold2:#90e6ff !important;
-  --gold3:#2467ff !important;
-  --glassBlack:rgba(3,10,26,.72) !important;
-  --glassGold:rgba(58,167,255,.14) !important;
-  --softLine:rgba(210,238,255,.13) !important;
-  --deepShadow:0 26px 90px rgba(0,10,30,.54) !important;
-}
-html,body{
-  color:#eef9ff !important;
-  background:
-    radial-gradient(circle at 14% 8%, rgba(42,166,255,.30), transparent 28%),
-    radial-gradient(circle at 86% 18%, rgba(94,231,255,.20), transparent 30%),
-    radial-gradient(circle at 58% 105%, rgba(58,92,255,.22), transparent 42%),
-    linear-gradient(135deg,#020713 0%,#061633 45%,#020712 100%) !important;
-}
-body::before{
-  background:
-    radial-gradient(circle at 40% 28%, rgba(125,220,255,.28), transparent 40%),
-    linear-gradient(120deg, transparent 8%, rgba(58,167,255,.14), transparent 68%) !important;
-}
-body::after{
-  background:radial-gradient(circle, rgba(58,167,255,.16), transparent 62%) !important;
-}
-@keyframes rcellPulseGold{
-  0%,100%{transform:translateY(0) scale(1);filter:drop-shadow(0 0 12px rgba(58,167,255,.38))}
-  50%{transform:translateY(-2px) scale(1.045);filter:drop-shadow(0 0 30px rgba(94,231,255,.68))}
-}
-@keyframes rcellOrbitGold{to{transform:rotate(360deg)}}
-@keyframes goldSweep{
-  0%{transform:translateX(-140%) rotate(18deg);opacity:0}
-  36%{opacity:.52}
-  100%{transform:translateX(140%) rotate(18deg);opacity:0}
-}
-@keyframes liquidGlowGold{
-  0%,100%{transform:translate3d(0,0,0) scale(1);opacity:.58}
-  33%{transform:translate3d(8px,-10px,0) scale(1.05);opacity:.74}
-  66%{transform:translate3d(-8px,8px,0) scale(.96);opacity:.50}
-}
-.login-card,
-.sidebar,
-.topbar,
-.section,
-.card,
-.modal-box,
-.status,
-.table-wrap,
-.day-box,
-.cash-liquid-card,
-.dash-cash-card,
-.office-hub-card,
-.office-cashbox-card{
-  background:
-    linear-gradient(145deg,rgba(255,255,255,.115),rgba(255,255,255,.042)) !important;
-  border-color:rgba(86,178,255,.28) !important;
-  box-shadow:
-    0 26px 90px rgba(0,10,30,.54),
-    inset 0 1px 0 rgba(255,255,255,.18),
-    inset 0 -20px 42px rgba(0,12,30,.24) !important;
-  backdrop-filter:blur(30px) saturate(150%) !important;
-  -webkit-backdrop-filter:blur(30px) saturate(150%) !important;
-}
-.main{
-  scrollbar-color:rgba(86,178,255,.55) rgba(255,255,255,.04) !important;
-}
-.topbar{
-  background:
-    radial-gradient(circle at 78% 24%,rgba(94,231,255,.16),transparent 30%),
-    linear-gradient(145deg,rgba(255,255,255,.11),rgba(255,255,255,.04)) !important;
-}
-.topbar::before,
-.section::before,
-.sidebar::before{
-  background:
-    radial-gradient(circle at 16% 18%,rgba(198,241,255,.11),transparent 24%),
-    linear-gradient(115deg,transparent 22%,rgba(120,220,255,.08),transparent 52%) !important;
-}
-.topbar::after,
-.section::after,
-.card::after,
-.office-hub-card::after,
-.cash-liquid-card::after,
-.dash-cash-card::after{
-  background:linear-gradient(110deg,transparent 34%,rgba(175,235,255,.13),transparent 63%) !important;
-}
-.topbar h1,
-.section-head h2,
-.logo-title{
-  color:#ecfbff !important;
-  text-shadow:0 0 20px rgba(94,231,255,.24) !important;
-}
-.topbar p,
-.section-head small,
-.logo-sub,
-.label,
-.field label,
-th{
-  color:rgba(218,239,255,.70) !important;
-}
-.sidebar{
-  background:
-    radial-gradient(circle at 50% 8%,rgba(58,167,255,.16),transparent 30%),
-    linear-gradient(180deg,rgba(9,22,50,.82),rgba(3,8,22,.90)) !important;
-  border-color:rgba(86,178,255,.26) !important;
-}
-.logo-box{
-  background:
-    radial-gradient(circle at 34% 24%,rgba(214,247,255,.44),rgba(58,167,255,.22) 34%,rgba(12,42,92,.34) 68%,rgba(0,0,0,.20)),
-    linear-gradient(145deg,rgba(255,255,255,.13),rgba(58,167,255,.07)) !important;
-  border-color:rgba(125,220,255,.42) !important;
-  box-shadow:
-    0 0 42px rgba(58,167,255,.26),
-    inset 0 1px 0 rgba(255,255,255,.30),
-    inset 0 -18px 30px rgba(0,10,28,.30) !important;
-}
-.logo-box::before{
-  border-color:rgba(218,239,255,.20) !important;
-  border-top-color:rgba(218,249,255,.72) !important;
-  border-right-color:rgba(94,231,255,.56) !important;
-}
-.logo-box::after{
-  background:linear-gradient(110deg,transparent 35%,rgba(215,248,255,.30),transparent 63%) !important;
-}
-.logo-title{
-  color:#f2fdff !important;
-  text-shadow:0 0 18px rgba(94,231,255,.82),0 2px 16px rgba(0,0,0,.46) !important;
-}
-.logo-sub{
-  color:rgba(218,239,255,.72) !important;
-}
-.nav button,
-.mobile-nav button,
-button.secondary,
-.date-btn{
-  background:linear-gradient(135deg,rgba(255,255,255,.09),rgba(255,255,255,.035)) !important;
-  border-color:rgba(125,220,255,.20) !important;
-  color:rgba(238,249,255,.94) !important;
-}
-.nav button small{
-  color:rgba(218,239,255,.58) !important;
-}
-.nav button.active,
-.mobile-nav button.active,
-button.active-tab{
-  background:
-    radial-gradient(circle at 22% 18%,rgba(218,249,255,.25),transparent 26%),
-    linear-gradient(135deg,rgba(58,167,255,.95),rgba(36,94,255,.88)) !important;
-  border-color:rgba(125,220,255,.52) !important;
-  color:#f2fdff !important;
-  box-shadow:
-    0 16px 38px rgba(58,167,255,.24),
-    inset 0 1px 0 rgba(255,255,255,.28),
-    inset 0 -16px 30px rgba(0,10,28,.24) !important;
-}
-button{
-  background:linear-gradient(135deg,#3aa7ff,#2467ff) !important;
-  border-color:rgba(125,220,255,.38) !important;
-  color:#f2fdff !important;
-  box-shadow:0 12px 30px rgba(58,167,255,.18), inset 0 1px 0 rgba(255,255,255,.16) !important;
-}
-button.good{
-  background:linear-gradient(135deg,#62f6bd,#1c9d78) !important;
-  border-color:rgba(98,246,189,.32) !important;
-}
-button.danger{
-  background:linear-gradient(135deg,#ff5d70,#7f2bff) !important;
-  border-color:rgba(255,93,112,.30) !important;
-}
-input,select,textarea{
-  background:rgba(3,12,30,.72) !important;
-  border-color:rgba(125,220,255,.22) !important;
-  color:#eef9ff !important;
-}
-input::placeholder,textarea::placeholder{color:rgba(218,239,255,.43) !important}
-option{color:#061633 !important;background:#e6f8ff !important}
-.status{
-  background:rgba(3,10,26,.54) !important;
-  color:rgba(218,239,255,.78) !important;
-}
-.card,
-.dashboard-revenue-grid .card,
-.office-card,
-.office-hub-card,
-.office-cashbox-card,
-.cash-liquid-card,
-.dash-cash-card,
-.cash-lock-card,
-.mini-summary{
-  background:
-    radial-gradient(circle at 14% 18%,rgba(205,245,255,.18),transparent 18%),
-    radial-gradient(circle at 86% 16%,rgba(58,167,255,.16),transparent 24%),
-    linear-gradient(145deg,rgba(255,255,255,.13),rgba(255,255,255,.048) 52%,rgba(58,167,255,.075)) !important;
-  border-color:rgba(125,220,255,.24) !important;
-  box-shadow:
-    0 18px 50px rgba(0,10,30,.40),
-    0 8px 24px rgba(58,167,255,.07),
-    inset 0 1px 0 rgba(255,255,255,.22),
-    inset 0 -18px 38px rgba(0,12,30,.20) !important;
-}
-.card::before,
-.office-card::before,
-.office-hub-card::before,
-.office-cashbox-card::before,
-.cash-liquid-card::before,
-.dash-cash-card::before{
-  background:radial-gradient(circle at 35% 28%,rgba(225,250,255,.78),rgba(58,167,255,.36) 48%,rgba(0,0,0,.08)) !important;
-  border-color:rgba(125,220,255,.34) !important;
-  box-shadow:
-    0 0 30px rgba(58,167,255,.28),
-    inset 0 1px 0 rgba(255,255,255,.34),
-    inset 0 -10px 20px rgba(0,12,30,.15) !important;
-}
-.card:hover,
-.office-card:hover,
-.office-hub-card:hover,
-.office-cashbox-card:hover{
-  border-color:rgba(125,220,255,.46) !important;
-  box-shadow:
-    0 24px 70px rgba(0,10,30,.45),
-    0 10px 30px rgba(58,167,255,.15),
-    inset 0 1px 0 rgba(255,255,255,.28),
-    inset 0 -18px 38px rgba(0,12,30,.18) !important;
-}
-.value,
-.cash-card-amount,
-.dash-cash-amount,
-.office-hub-amount,
-.office-card .money-row span:last-child,
-.office-dashboard-dual b,
-.office-hub-dual b,
-.pill,
-.ltr{
-  color:#f2fdff !important;
-  text-shadow:0 0 17px rgba(94,231,255,.16) !important;
-}
-.sub,
-.cash-card-currency,
-.dash-cash-sub,
-.office-hub-region,
-.delegate-type-mini{
-  color:rgba(218,239,255,.60) !important;
-}
-.money-row,
-.office-dashboard-dual div,
-.office-hub-dual div,
-.calc-item,
-.cash-form-note,
-.warning-note,
-.day-box,
-.table-wrap,
-.empty{
-  background:rgba(3,10,26,.42) !important;
-  border-color:rgba(125,220,255,.14) !important;
-}
-table{background:rgba(3,10,26,.36) !important}
-th{background:rgba(58,167,255,.085) !important}
-td{color:rgba(238,249,255,.90) !important}
-.day-head,
-.clean-day-head{
-  background:linear-gradient(135deg,rgba(58,167,255,.12),rgba(255,255,255,.045)) !important;
-}
-.type-masary-cell,
-.remain-cell,
-.remain-pill,
-.office-hub-amount,
-.office-hub-dual b,
-.office-card .money-row span:last-child,
-.cut-detail{
-  color:#62f6bd !important;
-  -webkit-text-fill-color:#62f6bd !important;
-}
-.type-ccbs-cell{
-  color:#90e6ff !important;
-  -webkit-text-fill-color:#90e6ff !important;
-}
-.negative-amount,
-.negative-amount *,
-.neg-money,
-.neg-money *{
-  color:#ff4b67 !important;
-  -webkit-text-fill-color:#ff4b67 !important;
-  text-shadow:0 0 13px rgba(255,75,103,.27) !important;
-}
-.toast{border-color:rgba(125,220,255,.28) !important}
-.mobile-nav{
-  background:rgba(3,10,26,.84) !important;
-  border-color:rgba(125,220,255,.26) !important;
-}
-::-webkit-scrollbar-thumb{
-  background:linear-gradient(180deg,rgba(94,231,255,.62),rgba(36,103,255,.66)) !important;
-  border-color:rgba(3,10,26,.50) !important;
-}
-/* Keep sidebar shine disabled exactly like the previous version. Logo animation remains only on Rcell logo. */
-.sidebar::after,
-.sidebar .nav button::after{
-  display:none !important;
-  animation:none !important;
-}
-.logo-box::before{
-  display:block !important;
-  animation:rcellOrbitGold 8s linear infinite !important;
-}
-.logo-box::after{
-  display:block !important;
-  animation:goldSweep 4.8s ease-in-out infinite !important;
-}
-.logo-title{
-  animation:rcellPulseGold 3.2s ease-in-out infinite !important;
-}
-
-
-
-/* =========================================================
-   IMAD Pro — Blue Glass v5 Clear Numbers / Eye Comfort Patch
-   Visual-only: stronger number readability, calmer blue glass.
-   ========================================================= */
-html,body{
-  background:
-    radial-gradient(circle at 14% 8%, rgba(38,145,230,.22), transparent 30%),
-    radial-gradient(circle at 86% 18%, rgba(75,205,235,.13), transparent 32%),
-    radial-gradient(circle at 58% 105%, rgba(48,74,210,.15), transparent 44%),
-    linear-gradient(135deg,#010611 0%,#051329 48%,#010712 100%) !important;
-  color:#f4fbff !important;
-}
-body::before{
-  opacity:.78 !important;
-  filter:blur(34px) !important;
-}
-body::after{
-  opacity:.66 !important;
-  filter:blur(30px) !important;
-}
-.login-card,
-.sidebar,
-.topbar,
-.section,
-.card,
-.modal-box,
-.status,
-.table-wrap,
-.day-box,
-.cash-liquid-card,
-.dash-cash-card,
-.office-hub-card,
-.office-cashbox-card,
-.cash-lock-card,
-.mini-summary{
-  background:
-    linear-gradient(145deg,rgba(16,38,78,.82),rgba(4,13,30,.76)) !important;
-  border-color:rgba(102,196,255,.26) !important;
-  box-shadow:
-    0 22px 72px rgba(0,8,24,.48),
-    inset 0 1px 0 rgba(255,255,255,.13),
-    inset 0 -18px 34px rgba(0,9,24,.22) !important;
-  backdrop-filter:blur(24px) saturate(128%) !important;
-  -webkit-backdrop-filter:blur(24px) saturate(128%) !important;
-}
-.card,
-.dashboard-revenue-grid .card,
-.office-card,
-.office-hub-card,
-.office-cashbox-card,
-.cash-liquid-card,
-.dash-cash-card,
-.cash-lock-card,
-.mini-summary{
-  background:
-    radial-gradient(circle at 13% 17%,rgba(160,230,255,.13),transparent 20%),
-    radial-gradient(circle at 86% 16%,rgba(58,167,255,.12),transparent 26%),
-    linear-gradient(145deg,rgba(18,45,90,.86),rgba(5,14,32,.82)) !important;
-  border-color:rgba(120,212,255,.25) !important;
-}
-.topbar::after,
-.section::after,
-.card::after,
-.office-hub-card::after,
-.cash-liquid-card::after,
-.dash-cash-card::after{
-  opacity:.18 !important;
-}
-.label,
-.field label,
-th,
-.sub,
-.cash-card-currency,
-.dash-cash-sub,
-.office-hub-region,
-.delegate-type-mini,
-.section-head small,
-.topbar p{
-  color:rgba(229,246,255,.76) !important;
-  text-shadow:none !important;
-}
-.value,
-.cash-card-amount,
-.dash-cash-amount,
-.office-hub-amount,
-.office-card .money-row span:last-child,
-.office-dashboard-dual b,
-.office-hub-dual b,
-.pill,
-.ltr,
-.calc-item span{
-  color:#ffffff !important;
-  -webkit-text-fill-color:#ffffff !important;
-  font-weight:1000 !important;
-  letter-spacing:.15px !important;
-  text-shadow:0 1px 0 rgba(0,0,0,.35),0 0 10px rgba(118,220,255,.10) !important;
-  font-variant-numeric:tabular-nums !important;
-}
-.value{
-  font-size:clamp(25px,1.8vw,34px) !important;
-  line-height:1.16 !important;
-}
-#viewDashboard #kpiGrid.kpi-grid .card .value,
-.dashboard-revenue-grid .card .value{
-  font-size:clamp(30px,2.25vw,42px) !important;
-  line-height:1.12 !important;
-}
-.cash-card-amount,
-.dash-cash-amount{
-  font-size:clamp(30px,2.1vw,40px) !important;
-  line-height:1.12 !important;
-}
-.office-hub-amount,
-.office-card .money-row span:last-child,
-.office-dashboard-dual b,
-.office-hub-dual b{
-  font-size:clamp(20px,1.35vw,28px) !important;
-  line-height:1.12 !important;
-}
-.type-masary-cell,
-.remain-cell,
-.remain-pill,
-.office-hub-amount,
-.office-hub-dual b,
-.office-card .money-row span:last-child,
-.cut-detail{
-  color:#86ffd0 !important;
-  -webkit-text-fill-color:#86ffd0 !important;
-  text-shadow:0 1px 0 rgba(0,0,0,.34),0 0 10px rgba(134,255,208,.10) !important;
-}
-.type-ccbs-cell{
-  color:#b7efff !important;
-  -webkit-text-fill-color:#b7efff !important;
-}
-.negative-amount,
-.negative-amount *,
-.neg-money,
-.neg-money *{
-  color:#ff5e76 !important;
-  -webkit-text-fill-color:#ff5e76 !important;
-  text-shadow:0 1px 0 rgba(0,0,0,.38),0 0 10px rgba(255,94,118,.12) !important;
-}
-.money-row,
-.office-dashboard-dual div,
-.office-hub-dual div,
-.calc-item,
-.cash-form-note,
-.warning-note,
-.day-box,
-.table-wrap,
-.empty,
-table{
-  background:rgba(2,9,24,.54) !important;
-  border-color:rgba(125,220,255,.16) !important;
-}
-th{
-  background:rgba(69,174,255,.12) !important;
-  color:rgba(229,246,255,.82) !important;
-}
-td{
-  color:rgba(246,252,255,.94) !important;
-  font-weight:800 !important;
-}
-input,select,textarea{
-  background:rgba(2,10,25,.78) !important;
-  border-color:rgba(125,220,255,.24) !important;
-  color:#f6fcff !important;
-}
-.nav button,
-.mobile-nav button,
-button.secondary,
-.date-btn{
-  background:linear-gradient(135deg,rgba(18,46,86,.78),rgba(5,15,34,.66)) !important;
-  border-color:rgba(125,220,255,.22) !important;
-}
-.nav button.active,
-.mobile-nav button.active,
-button.active-tab,
-button{
-  box-shadow:0 12px 28px rgba(40,145,230,.16), inset 0 1px 0 rgba(255,255,255,.14) !important;
-}
-.logo-title{
-  text-shadow:0 0 16px rgba(94,231,255,.70),0 2px 14px rgba(0,0,0,.48) !important;
-}
-@media(max-width:720px){
-  .value{font-size:26px !important}
-  #viewDashboard #kpiGrid.kpi-grid .card .value,
-  .dashboard-revenue-grid .card .value{font-size:29px !important}
-  .cash-card-amount,.dash-cash-amount{font-size:29px !important}
-}
-
-
-
-/* ===== v7 Fix: office balances large-number fit without changing calculations ===== */
-#viewOffice .office-hub-card,
-#viewOffice .office-cashbox-card,
-#viewDashboard .office-card{
-  overflow:hidden !important;
-}
-
-#viewOffice .office-hub-dual,
-#viewDashboard .office-dashboard-dual{
-  display:grid !important;
-  gap:7px !important;
-  width:100% !important;
-  min-width:0 !important;
-}
-
-#viewOffice .office-hub-dual div,
-#viewDashboard .office-dashboard-dual div{
-  display:grid !important;
-  grid-template-columns:minmax(0,1fr) auto !important;
-  align-items:center !important;
-  gap:8px !important;
-  width:100% !important;
-  min-width:0 !important;
-  overflow:hidden !important;
-  direction:ltr !important;
-}
-
-#viewOffice .office-hub-dual span,
-#viewDashboard .office-dashboard-dual span{
-  grid-column:2 !important;
-  white-space:nowrap !important;
-  min-width:max-content !important;
-  text-align:right !important;
-  direction:ltr !important;
-  font-size:11px !important;
-  opacity:.86 !important;
-}
-
-#viewOffice .office-hub-dual b,
-#viewDashboard .office-dashboard-dual b{
-  grid-column:1 !important;
-  min-width:0 !important;
-  max-width:100% !important;
-  white-space:nowrap !important;
-  overflow:visible !important;
-  text-overflow:clip !important;
-  direction:ltr !important;
-  unicode-bidi:isolate !important;
-  text-align:left !important;
-  font-variant-numeric:tabular-nums !important;
-  letter-spacing:-.55px !important;
-  font-size:clamp(15px,1.05vw,20px) !important;
-  line-height:1.12 !important;
-}
-
-#viewDashboard .office-dashboard-dual b{
-  font-size:clamp(14px,1vw,18px) !important;
-}
-
-#viewOffice .office-hub-card{
-  min-height:124px !important;
-  padding:14px 14px 13px !important;
-}
-
-#viewOffice .office-hub-name,
-#viewDashboard .office-name-value{
-  overflow:hidden !important;
-  text-overflow:ellipsis !important;
-  white-space:nowrap !important;
-  max-width:calc(100% - 48px) !important;
-}
-
-#viewOffice .office-cashbox-card .box-balance{
-  white-space:nowrap !important;
-  overflow:visible !important;
-  direction:ltr !important;
-  unicode-bidi:isolate !important;
-  text-align:right !important;
-  letter-spacing:-.55px !important;
-  font-size:clamp(15px,1.05vw,19px) !important;
-  line-height:1.2 !important;
-}
-
-#viewOffice .office-hub-amount{
-  white-space:nowrap !important;
-  overflow:visible !important;
-  direction:ltr !important;
-  unicode-bidi:isolate !important;
-  text-align:right !important;
-  letter-spacing:-.55px !important;
-  font-size:clamp(18px,1.25vw,24px) !important;
-}
-
-@media(max-width:760px){
-  #viewOffice .office-hub-dual b,
-  #viewDashboard .office-dashboard-dual b{
-    font-size:18px !important;
-    letter-spacing:-.35px !important;
-  }
-  #viewOffice .office-hub-dual span,
-  #viewDashboard .office-dashboard-dual span{
-    font-size:11px !important;
-  }
-}
-
-
-
-/* ===== v8 Profit/Loss number visibility + office cut FX clarity ===== */
-#profitLossSummaryGrid.kpi-grid{
-  grid-template-columns:repeat(auto-fit,minmax(245px,1fr)) !important;
-  gap:14px !important;
-}
-#profitLossSummaryGrid .pl-card{
-  min-height:158px !important;
-  padding:17px 16px !important;
-  overflow:visible !important;
-}
-#profitLossSummaryGrid .pl-card .value{
-  direction:ltr !important;
-  text-align:right !important;
-  font-size:clamp(19px,1.42vw,28px) !important;
-  line-height:1.22 !important;
-  white-space:normal !important;
-  overflow-wrap:anywhere !important;
-  word-break:normal !important;
-  letter-spacing:.01em !important;
-}
-#profitLossSummaryGrid .pl-period-card .value{
-  direction:rtl !important;
-  text-align:right !important;
-  font-size:clamp(18px,1.25vw,24px) !important;
-  color:#dfeeff !important;
-  -webkit-text-fill-color:#dfeeff !important;
-  text-shadow:none !important;
-}
-#profitLossSummaryGrid .pl-card .sub{
-  white-space:normal !important;
-  line-height:1.55 !important;
-  min-height:0 !important;
-}
-#profitLossReportBox .table-wrap{
-  overflow-x:auto !important;
-}
-#profitLossReportBox table{
-  min-width:920px !important;
-}
-#profitLossReportBox td.ltr,
-#profitLossReportBox th{
-  white-space:nowrap !important;
-}
-#profitLossReportBox td.ltr{
-  font-size:clamp(14px,1.05vw,18px) !important;
-  font-weight:900 !important;
-}
-@media(max-width:720px){
-  #profitLossSummaryGrid .pl-card .value{font-size:22px !important}
-  #profitLossSummaryGrid .pl-period-card .value{font-size:18px !important}
-}
 </style>
 </head>
 
@@ -2453,12 +1594,30 @@ button{
       </aside>
 
       <main class="main">
-        <div class="topbar">
-          <div>
+        <div class="topbar" style="overflow:hidden;position:relative;min-height:90px;">
+          <div class="topbar-title-wrap" style="position:relative;z-index:2;">
             <h1 id="pageTitle">لوحة الإيرادات</h1>
             <p id="pageSub">لوحة الإيرادات فيها رصيد المكاتب أيضاً. الإدخال والسجل في القسم الثاني.</p>
           </div>
-          <div class="head-actions">
+
+          <!-- Royal Blue Liquid Glass Horizon -->
+          <div class="topbar-luxury-scene" aria-hidden="true">
+            <span class="topbar-depth-layer"></span>
+            <span class="topbar-royal-horizon"></span>
+            <span class="topbar-liquid-wave wave-main"></span>
+            <span class="topbar-liquid-wave wave-secondary"></span>
+            <span class="topbar-glass-ribbon"></span>
+            <span class="topbar-faceted-glass facet-one"></span>
+            <span class="topbar-faceted-glass facet-two"></span>
+            <span class="topbar-soft-glow glow-one"></span>
+            <span class="topbar-soft-glow glow-two"></span>
+            <span class="topbar-soft-glow glow-three"></span>
+            <span class="topbar-soft-shimmer"></span>
+            <span class="topbar-edge-light"></span>
+            <span class="topbar-dark-veil"></span>
+          </div>
+          <!-- End Royal Blue Liquid Glass Horizon -->
+          <div class="head-actions" style="position:relative;z-index:2;">
             <button class="secondary" onclick="reloadAll()">تحديث</button>
             <button class="danger" onclick="logout()">خروج</button>
           </div>
@@ -6085,6 +5244,301 @@ table th,
   .card .value.imad-fit-xlong{font-size:20px !important}
   .card .value.imad-fit-xxlong{font-size:17px !important}
 }
+
+
+
+/* ===== Royal Blue Liquid Glass Horizon Topbar ===== */
+.topbar{
+  position:relative !important;
+  overflow:hidden !important;
+  height:108px !important;
+  min-height:108px !important;
+  max-height:108px !important;
+  padding:14px 16px !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:flex-end !important;
+  gap:12px !important;
+  isolation:isolate !important;
+  border-radius:30px !important;
+  background:
+    linear-gradient(132deg,rgba(3,16,31,.98),rgba(7,28,58,.94) 42%,rgba(5,30,74,.90) 63%,rgba(3,16,31,.97)) !important;
+  border:1px solid rgba(120,210,255,.30) !important;
+  box-shadow:
+    0 20px 62px rgba(0,8,28,.46),
+    0 0 46px rgba(31,140,255,.10),
+    inset 0 1px 0 rgba(180,235,255,.20),
+    inset 0 -26px 48px rgba(0,8,28,.34) !important;
+  backdrop-filter:blur(19px) saturate(1.24) !important;
+  -webkit-backdrop-filter:blur(19px) saturate(1.24) !important;
+}
+.main{
+  align-content:start !important;
+}
+.topbar::before,
+.topbar::after{
+  display:none !important;
+}
+.topbar-title-wrap,
+.topbar h1,
+.topbar p{
+  display:none !important;
+}
+.topbar-luxury-scene{
+  position:absolute !important;
+  inset:0 !important;
+  width:100% !important;
+  height:100% !important;
+  pointer-events:none !important;
+  z-index:0 !important;
+  overflow:hidden !important;
+  border-radius:inherit !important;
+  background:
+    radial-gradient(ellipse at 18% 10%,rgba(88,217,255,.25),transparent 34%),
+    radial-gradient(ellipse at 82% 18%,rgba(88,101,255,.20),transparent 36%),
+    radial-gradient(ellipse at 52% 112%,rgba(31,140,255,.22),transparent 54%),
+    linear-gradient(180deg,#071c3a 0%,#03101f 100%);
+}
+.topbar-luxury-scene span{
+  position:absolute;
+  display:block;
+  pointer-events:none;
+}
+.topbar-depth-layer{
+  inset:0;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.065),transparent 28%,rgba(0,6,18,.35) 100%),
+    linear-gradient(90deg,rgba(0,8,24,.38),transparent 22%,transparent 76%,rgba(0,8,24,.40)),
+    radial-gradient(ellipse at 50% 106%,rgba(88,217,255,.18),transparent 57%);
+}
+.topbar-royal-horizon{
+  left:5%;
+  right:5%;
+  bottom:-18%;
+  height:78%;
+  border-radius:50%;
+  border-top:1px solid rgba(150,226,255,.30);
+  background:
+    radial-gradient(ellipse at 50% 10%,rgba(88,217,255,.24),rgba(31,140,255,.11) 38%,transparent 70%),
+    linear-gradient(180deg,rgba(255,255,255,.055),transparent 42%);
+  box-shadow:
+    0 -12px 42px rgba(31,140,255,.18),
+    inset 0 1px 0 rgba(255,255,255,.08);
+  opacity:.76;
+  transform:translate3d(0,0,0);
+  animation:topbarHorizonDrift 13.8s ease-in-out infinite;
+}
+.topbar-liquid-wave{
+  left:-14%;
+  right:-14%;
+  height:76%;
+  border-radius:50% 48% 0 0 / 72% 72% 0 0;
+  border-top:1px solid rgba(120,210,255,.30);
+  background:
+    linear-gradient(105deg,rgba(255,255,255,.10),rgba(88,217,255,.15) 36%,rgba(31,140,255,.18) 62%,rgba(88,101,255,.10)),
+    radial-gradient(ellipse at 42% 20%,rgba(88,217,255,.24),transparent 50%),
+    linear-gradient(180deg,rgba(255,255,255,.045),rgba(0,10,28,.06));
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.16),
+    inset 0 22px 34px rgba(255,255,255,.045),
+    0 -12px 34px rgba(31,140,255,.16);
+  transform:translate3d(0,0,0) rotate(-1.8deg);
+  opacity:.74;
+}
+.topbar-liquid-wave.wave-main{
+  bottom:-30%;
+  animation:topbarLuxuryWave 12.8s ease-in-out infinite;
+}
+.topbar-liquid-wave.wave-secondary{
+  top:-36%;
+  height:66%;
+  opacity:.28;
+  transform:translate3d(0,0,0) rotate(2.2deg);
+  animation:topbarLuxuryWaveAlt 14s ease-in-out infinite;
+}
+.topbar-glass-ribbon{
+  left:-16%;
+  right:-16%;
+  top:14%;
+  height:38%;
+  border-radius:999px;
+  background:
+    linear-gradient(100deg,transparent 5%,rgba(255,255,255,.055) 20%,rgba(88,217,255,.11) 44%,rgba(31,140,255,.085) 68%,transparent 92%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.11);
+  opacity:.58;
+  transform:translate3d(0,0,0) rotate(-2.6deg);
+  animation:topbarRibbonFloat 12.6s ease-in-out infinite;
+}
+.topbar-faceted-glass{
+  top:7%;
+  height:88%;
+  width:24%;
+  border:1px solid rgba(160,226,255,.13);
+  background:
+    linear-gradient(118deg,rgba(255,255,255,.075),rgba(88,217,255,.07) 42%,rgba(88,101,255,.045) 100%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.10);
+  clip-path:polygon(12% 0,88% 4%,100% 86%,18% 100%,0 42%);
+  opacity:.25;
+}
+.topbar-faceted-glass.facet-one{
+  right:20%;
+  transform:skewX(-8deg);
+}
+.topbar-faceted-glass.facet-two{
+  left:8%;
+  width:30%;
+  transform:skewX(8deg) scaleY(.92);
+  opacity:.18;
+}
+.topbar-soft-glow{
+  width:36%;
+  height:96%;
+  border-radius:999px;
+  filter:blur(21px);
+  opacity:.46;
+  animation:topbarGlowBreath 8.4s ease-in-out infinite;
+}
+.topbar-soft-glow.glow-one{
+  right:3%;
+  top:-22%;
+  background:rgba(88,217,255,.30);
+}
+.topbar-soft-glow.glow-two{
+  left:16%;
+  bottom:-38%;
+  background:rgba(31,140,255,.28);
+  animation-delay:-2.6s;
+}
+.topbar-soft-glow.glow-three{
+  left:-8%;
+  top:18%;
+  background:rgba(88,101,255,.18);
+  animation-delay:-4.1s;
+}
+.topbar-soft-shimmer{
+  top:-42%;
+  bottom:-42%;
+  left:-24%;
+  width:18%;
+  background:linear-gradient(104deg,transparent 0 18%,rgba(210,246,255,.13) 46%,rgba(88,217,255,.08) 54%,transparent 74%);
+  transform:translate3d(-20%,0,0) skewX(-16deg);
+  opacity:.28;
+  animation:topbarSoftShimmer 13.6s ease-in-out infinite;
+}
+.topbar-edge-light{
+  inset:1px;
+  border-radius:inherit;
+  border:1px solid rgba(120,210,255,.16);
+  background:
+    linear-gradient(90deg,transparent,rgba(88,217,255,.13),transparent) top / 100% 1px no-repeat,
+    linear-gradient(90deg,transparent,rgba(31,140,255,.10),transparent) bottom / 100% 1px no-repeat;
+  opacity:.72;
+}
+.topbar-dark-veil{
+  inset:0;
+  background:
+    linear-gradient(180deg,rgba(0,8,22,.06),rgba(0,6,16,.24)),
+    radial-gradient(ellipse at 50% 50%,transparent 0 60%,rgba(0,8,24,.24) 100%);
+}
+.topbar .head-actions{
+  position:relative !important;
+  z-index:4 !important;
+  margin-inline-start:auto !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:flex-end !important;
+  gap:8px !important;
+}
+.topbar .head-actions button{
+  position:relative !important;
+  z-index:4 !important;
+  border-color:rgba(120,210,255,.24) !important;
+  background:rgba(255,255,255,.08) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.10),0 10px 24px rgba(0,8,24,.22) !important;
+  backdrop-filter:blur(12px) !important;
+  -webkit-backdrop-filter:blur(12px) !important;
+  transition:transform .18s ease,border-color .18s ease,background .18s ease !important;
+}
+.topbar .head-actions button:hover{
+  transform:translateY(-1px);
+  border-color:rgba(120,210,255,.34) !important;
+  background:rgba(255,255,255,.105) !important;
+}
+.topbar .head-actions button.danger{
+  border-color:rgba(255,126,126,.25) !important;
+  background:linear-gradient(135deg,rgba(255,87,87,.50),rgba(255,138,61,.36)) !important;
+}
+@keyframes topbarLuxuryWave{
+  0%,100%{transform:translate3d(-1.8%,0,0) rotate(-1.8deg);opacity:.62}
+  50%{transform:translate3d(1.8%,-4%,0) rotate(-.6deg);opacity:.78}
+}
+@keyframes topbarLuxuryWaveAlt{
+  0%,100%{transform:translate3d(1.4%,0,0) rotate(2.2deg);opacity:.24}
+  50%{transform:translate3d(-1.4%,3%,0) rotate(1deg);opacity:.38}
+}
+@keyframes topbarGlowBreath{
+  0%,100%{transform:translate3d(0,0,0) scale(.98);opacity:.32}
+  50%{transform:translate3d(1.4%,-1%,0) scale(1.04);opacity:.48}
+}
+@keyframes topbarSoftShimmer{
+  0%,18%{transform:translate3d(-24%,0,0) skewX(-16deg);opacity:0}
+  48%{opacity:.25}
+  72%,100%{transform:translate3d(820%,0,0) skewX(-16deg);opacity:0}
+}
+@keyframes topbarHorizonDrift{
+  0%,100%{transform:translate3d(-1.2%,0,0) scaleX(.98);opacity:.68}
+  50%{transform:translate3d(1.2%,-2%,0) scaleX(1.02);opacity:.82}
+}
+@keyframes topbarRibbonFloat{
+  0%,100%{transform:translate3d(-1.6%,0,0) rotate(-2.6deg);opacity:.46}
+  50%{transform:translate3d(1.6%,5%,0) rotate(-1.2deg);opacity:.64}
+}
+@media(max-width:720px){
+  .topbar{
+    height:84px !important;
+    min-height:84px !important;
+    max-height:84px !important;
+    padding:10px 12px !important;
+    border-radius:24px !important;
+    flex-direction:row !important;
+    align-items:center !important;
+    justify-content:flex-end !important;
+  }
+  .topbar-luxury-scene{opacity:.88 !important}
+  .topbar-liquid-wave{left:-18%;right:-18%;height:66%}
+  .topbar-royal-horizon{left:8%;right:8%;height:64%;opacity:.62}
+  .topbar-glass-ribbon{opacity:.36}
+  .topbar-faceted-glass{opacity:.13}
+  .topbar-faceted-glass.facet-two{display:none}
+  .topbar-soft-glow{filter:blur(16px);opacity:.32}
+  .topbar-soft-glow.glow-three{display:none}
+  .topbar-soft-shimmer{opacity:.18}
+  .topbar .head-actions{
+    width:auto !important;
+    flex-wrap:nowrap !important;
+    justify-content:flex-end !important;
+    gap:7px !important;
+  }
+  .topbar .head-actions button{
+    width:auto !important;
+    padding:9px 10px !important;
+    border-radius:13px !important;
+    font-size:12px !important;
+  }
+}
+@media(max-width:420px){
+  .topbar{height:78px !important;min-height:78px !important;max-height:78px !important}
+  .topbar .head-actions button{padding:8px 9px !important}
+}
+@media(prefers-reduced-motion:reduce){
+  .topbar-luxury-scene *,
+  .topbar-luxury-scene::before,
+  .topbar-luxury-scene::after{
+    animation:none !important;
+    transition:none !important;
+  }
+}
+
 </style>
 
 <script id="imad-safe-big-numbers-fit-script-v10">
