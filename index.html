@@ -1246,6 +1246,15 @@
     const dashboardOfficeCard = (name, b) => `<div class="panel dashboard-office-card" onclick="ui.openOffice('${encodeURIComponent(name)}')"><h3>${escapeHtml(name)}</h3><div class="flex-between"><span class="card-title">SYP</span><span class="card-value ${calc.color(b.syp)}">${calc.num(b.syp)}</span></div><div class="flex-between"><span class="card-title">USD</span><span class="card-value text-gold">${calc.num(b.usd,true)}</span></div></div>`;
     const lastSevenDates = () => Array.from({length:7}, (_, i) => { const d = new Date(); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); d.setDate(d.getDate() - (6 - i)); return d.toISOString().slice(0,10); });
     const trendSeries = (filterFn, amountFn) => lastSevenDates().map(day => state.tx.filter(t => (t.date || '').slice(0,10) === day && filterFn(t)).reduce((sum, t) => sum + Math.abs(Number(amountFn(t)) || 0), 0));
+    const weightedExchangeRateSeries = () => lastSevenDates().map(day => {
+        let syp = 0, usd = 0;
+        state.tx.forEach(t => {
+            if ((t.date || '').slice(0,10) !== day) return;
+            if (t.type === 'HANDOVER' && handoverCutUsd(t)) { syp += Number(t.cutSyp) || 0; usd += handoverCutUsd(t); }
+            if ((t.type === 'SAFE_EXCHANGE_SYP_TO_USD' || t.type === 'office_convert_syp_to_usd') && Number(t.rate) > 0) { syp += Number(t.amt) || 0; usd += convertSypToUsd(t.amt, t.rate); }
+        });
+        return usd > 0 ? syp / usd : 0;
+    });
     const breadcrumbTrail = (items=[]) => `<div class="breadcrumb-trail">${items.map((item, i) => `<span>${escapeHtml(item)}</span>${i < items.length - 1 ? '<i>←</i>' : ''}`).join('')}</div>`;
     const pageTopbar = () => { const current = NAV.find(n => n.id === state.view) || NAV[0]; return `<div class="premium-topbar"><div><div class="premium-page-kicker">IMAD PRO</div><div class="premium-page-title">${escapeHtml(current.title)}</div></div><div class="premium-topbar-actions"><button class="icon-btn" data-shortcut="Ctrl+B" onclick="premium.toggleSidebar()" title="تصغير القائمة">☰</button><button class="icon-btn" data-shortcut="Ctrl+K" onclick="premium.openCommand()" title="بحث سريع">⌘K</button><button class="icon-btn" onclick="premium.toggleTheme()" title="تبديل المظهر">◐</button><div class="premium-clock" id="premium-clock"><strong>--:--</strong><br>--</div></div></div>`; };
     const officeNameCell = (name) => name && CONSTANTS.OFFICES.includes(name) ? `<span class="clickable-name" onclick="ui.openOffice('${encodeURIComponent(name)}')">${escapeHtml(name)}</span>` : escapeHtml(name || '-');
@@ -1769,6 +1778,7 @@
         ui.dels().forEach(d=>{ const b=calc.delegate(d).b; if(b>0) rem+=b; });
         CONSTANTS.OFFICES.forEach(o=>{ const b=calc.office(o); oSyp+=b.syp; oUsd+=b.usd; });
         const mainSafe = calc.safe('صندوق أساسي');
+        const avgExchangeRate = cUsd > 0 ? cSyp / cUsd : 0;
         const officeBalanceCards = CONSTANTS.OFFICES.map(o => ({name:o, b:calc.office(o)})).filter(x => Math.abs(x.b.syp) > 0.0001 || Math.abs(x.b.usd) > 0.0001).map(x => dashboardOfficeCard(x.name, x.b)).join('');
         
         return `${toolbar('المركز المالي', '', '')}
@@ -1781,6 +1791,7 @@
             ${metricCard('الصندوق الأساسي', `${calc.num(mainSafe.syp)} <span style="font-size:1rem;color:var(--text-muted)">SYP</span><br><span class="text-gold">${calc.num(mainSafe.usd,true)} <span style="font-size:1rem;color:var(--text-muted)">USD</span></span>`, 'text-success', 'الصندوق الأساسي فقط', trendSeries(t=>matchesSafeMovement(t, 'صندوق أساسي'), t=>txSypValue(t)+txUsdValue(t)))}
             ${metricCard('السوري المقصوص', `${calc.num(cSyp)} <span style="font-size:1rem;color:var(--text-muted)">SYP</span>`, 'text-danger', 'كل عمليات القص', trendSeries(t=>(t.type==='HANDOVER' && Number(t.cutSyp)>0) || t.type==='SAFE_EXCHANGE_SYP_TO_USD' || t.type==='office_convert_syp_to_usd', t=>t.cutSyp||t.amt))}
             ${metricCard('دولار ناتج القص', `${calc.num(cUsd,true)} <span style="font-size:1rem;color:var(--text-muted)">USD</span>`, 'text-success', 'ناتج القص الكامل', trendSeries(t=>(t.type==='HANDOVER' && Number(t.cutSyp)>0) || t.type==='SAFE_EXCHANGE_SYP_TO_USD' || t.type==='office_convert_syp_to_usd', t=>handoverCutUsd(t)||convertSypToUsd(t.amt, t.rate)))}
+            ${metricCard('سعر الصرف الوسطي', `${calc.num(avgExchangeRate)} <span style="font-size:1rem;color:var(--text-muted)">SYP/USD</span>`, 'text-gold', 'المقصوص ÷ الدولار الناتج', weightedExchangeRateSeries())}
         </div>
         <div class="panel" style="padding:1.5rem; margin-top:2rem">
             <h3 style="color:var(--accent); font-size:1.1rem; margin-bottom:1rem;">المكاتب النشطة</h3>
