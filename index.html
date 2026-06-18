@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IMAD Pro - Premium Matte Coral</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" crossorigin="anonymous" referrerpolicy="no-referrer" onerror="window.__IMAD_CDN_ERROR__=(window.__IMAD_CDN_ERROR__||[]).concat('xlsx')"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" crossorigin="anonymous" referrerpolicy="no-referrer" onerror="window.__IMAD_CDN_ERROR__=(window.__IMAD_CDN_ERROR__||[]).concat('html2pdf')"></script>
     <style>
         /* ==========================================
            1. Core Variables & Solid Matte Reset
@@ -1142,6 +1142,35 @@
             *, body::after, .logo-particle, .skeleton-line::after, .skeleton-card::after { animation: none !important; transition: none !important; }
         }
 
+
+        /* ==========================================
+           13. Critical Overlay / Toast Fixes
+           ========================================== */
+        #toasts {
+            position: fixed !important;
+            top: 20px !important;
+            left: 20px !important;
+            right: auto !important;
+            bottom: auto !important;
+            z-index: 20000 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 10px !important;
+            pointer-events: none;
+        }
+
+        #toasts .toast { pointer-events: auto; }
+
+        #edit-modal-overlay.modal-overlay {
+            position: fixed !important;
+            inset: 0 !important;
+            z-index: 19000 !important;
+            justify-content: center !important;
+            align-items: center !important;
+        }
+
+        .modal { z-index: 19001 !important; }
+
     </style>
 </head>
 <body>
@@ -1165,12 +1194,58 @@
     </div>
 
 <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
     // --- 1. CONFIG & CONSTANTS ---
     const FIREBASE_CONFIG = { apiKey: "AIzaSyDeIRDMjUmJQkF0WAb1K2gfwJcd7ileHgk", authDomain: "imad55-83b4c.firebaseapp.com", projectId: "imad55-83b4c", storageBucket: "imad55-83b4c.firebasestorage.app", messagingSenderId: "238038993797", appId: "1:238038993797:web:7e4fd6f0d745c5d86692ec", measurementId: "G-5NQZPXDW22" };
-    let db = null; try { db = getFirestore(initializeApp(FIREBASE_CONFIG)); } catch(e) {}
+    const FIRESTORE_LEDGER_PATH = ["sync", "main-ledger"];
+    let db = null;
+    let auth = null;
+    let firestoreApi = null;
+    let authApi = null;
+    let currentUser = null;
+    const syncStatus = { busy:false, lastLocalSavedAt:0, lastCloudSavedAt:0, lastCloudError:'', authReady:false };
+    async function initFirebase() {
+        try {
+            const [appModule, firestoreModule, authModule] = await Promise.all([
+                import("https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"),
+                import("https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"),
+                import("https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js")
+            ]);
+            const app = appModule.initializeApp(FIREBASE_CONFIG);
+            db = firestoreModule.getFirestore(app);
+            auth = authModule.getAuth(app);
+            firestoreApi = { doc: firestoreModule.doc, runTransaction: firestoreModule.runTransaction };
+            authApi = {
+                signInWithEmailAndPassword: authModule.signInWithEmailAndPassword,
+                signOut: authModule.signOut,
+                onAuthStateChanged: authModule.onAuthStateChanged
+            };
+            await new Promise(resolve => {
+                let unsub = () => {};
+                unsub = authApi.onAuthStateChanged(auth, user => {
+                    currentUser = user || null;
+                    syncStatus.authReady = true;
+                    unsub();
+                    resolve();
+                }, () => {
+                    currentUser = null;
+                    syncStatus.authReady = true;
+                    resolve();
+                });
+            });
+            syncStatus.lastCloudError = '';
+            return true;
+        } catch(e) {
+            db = null;
+            firestoreApi = null;
+            auth = null;
+            authApi = null;
+            currentUser = null;
+            syncStatus.authReady = false;
+            syncStatus.lastCloudError = cleanText(e?.message || 'Firebase غير جاهز أو المكتبات لم تحمل', 180);
+            console.warn('Firebase init failed:', e);
+            return false;
+        }
+    }
 
     window.CONSTANTS = {
         REGIONS: ['Region 1', 'Region 2', 'Region 3', 'Region 4'],
@@ -1178,7 +1253,7 @@
         OFFICES: ['هوكر تمي ديريك','تبارك رميلان','اسماعيل عبدي','محمد عامودا','شيخاني','عماد تمو','سوار قامشلو','ميداس عامودا','دعدوش درباسية','روهين تربه سبيه','روهين تل تمر','الحديدي تل كوجر','فهد','زين حسكة','سوار حسكة','يارا حسكة','زين 2 حسكة','نورجان حسكة','جاد شداده','العويد للحوالات رقة','الصفا جزرة بوحميد','خريس طبقة','انس العويد','رامي العويد','القصاب منبج','مسرو كوباني','ابو امير منبج'],
         SAFES: ['صندوق أساسي', 'صندوق فرهاد', 'صندوق كوران مصاري'],
         REV_TYPES: ['CCBS', 'MASARY'],
-        OFFICE_TYPES: { 'office_transfer':'تحويل مكتب لمكتب', 'office_to_cashbox':'تحويل مكتب لصندوق', 'office_convert_syp_to_usd':'قص رصيد مكتب سوري لدولار', 'office_external':'حوالة خارجية', 'office_person':'صرف لشخص/جهة', 'office_adjust_add':'تعديل زيادة رصيد', 'office_adjust_sub':'تعديل نقص رصيد', 'cashbox_to_office':'استلام من صندوق' },
+        OFFICE_TYPES: { 'office_transfer':'تحويل مكتب لمكتب', 'office_convert_syp_to_usd':'قص رصيد مكتب سوري لدولار', 'office_external':'حوالة خارجية', 'office_person':'صرف لشخص/جهة', 'office_adjust_add':'تعديل زيادة رصيد', 'office_adjust_sub':'تعديل نقص رصيد' },
         SAFE_TYPES: { 'SAFE_IN_SYP':'قبض سوري/افتتاحي', 'SAFE_IN_USD':'قبض دولار/افتتاحي', 'SAFE_OUT_PERSON_SYP':'صرف سوري لشخص', 'SAFE_OUT_PERSON_USD':'صرف دولار لشخص', 'SAFE_EXPENSE_SYP':'مصروف سوري', 'SAFE_EXPENSE_USD':'مصروف دولار', 'ADVANCE_GIVEN_SYP':'إعطاء سلفة سوري', 'ADVANCE_GIVEN_USD':'إعطاء سلفة دولار', 'ADVANCE_RETURN_SYP':'رجوع سلفة سوري', 'ADVANCE_RETURN_USD':'رجوع سلفة دولار', 'SAFE_RECEIVE_PERSON_SYP':'قبض سوري من شخص', 'SAFE_RECEIVE_PERSON_USD':'قبض دولار من شخص', 'SAFE_EXCHANGE_SYP_TO_USD':'تحويل سوري لدولار', 'SAFE_EXCHANGE_USD_TO_SYP':'تحويل دولار لسوري', 'SAFE_TO_OFFICE':'صندوق إلى مكتب', 'SAFE_TO_SAFE':'صندوق إلى صندوق', 'OFFICE_TO_SAFE':'مكتب إلى صندوق', 'SAFE_IN_GENERAL':'وارد للصندوق', 'SAFE_OUT_GENERAL':'صندوق إلى جهة' }
     };
 
@@ -1208,7 +1283,7 @@
     const numText = (n, usd=false) => Number(usd ? parseFloat(n || 0).toFixed(2) : Math.floor(n || 0)).toLocaleString('en-US');
     const handoverCutDetails = (t) => { const usd = handoverCutUsd(t); if (!usd) return ''; return `ناتج القص: ${numText(usd, true)} USD من ${numText(t.cutSyp)} SYP على سعر ${numText(t.rate)}`; };
     const txTypeLabel = (t) => { if (t.type === 'HANDOVER') { const dest = t.toType === 'safe' ? 'صندوق' : 'مكتب'; return handoverCutUsd(t) ? `تسليم إلى ${dest} / قص دولار` : `تسليم إلى ${dest}`; } return CONSTANTS.SAFE_TYPES[t.type] || CONSTANTS.OFFICE_TYPES[t.type] || t.type; };
-    const officeCommissionTypes = ['office_transfer','office_to_cashbox','office_external','office_person'];
+    const officeCommissionTypes = ['office_transfer','OFFICE_TO_SAFE','office_external','office_person'];
     const hasOfficeCommission = (t) => officeCommissionTypes.includes(t.type);
     const officeCommissionSyp = (t) => hasOfficeCommission(t) ? (Number(t.commissionSyp) || 0) : 0;
     const officeCommissionUsd = (t) => hasOfficeCommission(t) ? (Number(t.commissionUsd) || 0) : 0;
@@ -1218,22 +1293,35 @@
     const officeRowUsd = (t) => { if (t.type === 'HANDOVER') return (Number(t.usd) || 0) + handoverCutUsd(t); if (t.type === 'office_convert_syp_to_usd') return convertSypToUsd(t.amt, t.rate); return t.cur === 'USD' ? (Number(t.amt) || 0) : 0; };
     const ledgerAmountText = (t) => { const withCommission = (text) => { const comm = officeCommissionDetails(t); return comm ? `${text} + ${comm}` : text; }; if (t.type === 'HANDOVER') { const parts = []; if (Number(t.syp) > 0) parts.push(`${calc.num(t.syp)} SYP مباشر`); if (Number(t.usd) > 0) parts.push(`${calc.num(t.usd, true)} USD مباشر`); if (handoverCutUsd(t)) parts.push(`${calc.num(t.cutSyp)} SYP قص = ${calc.num(handoverCutUsd(t), true)} USD`); return withCommission(parts.join(' + ') || '0'); } if (t.type === 'office_convert_syp_to_usd' || t.type === 'SAFE_EXCHANGE_SYP_TO_USD') { return withCommission(`${calc.num(t.amt)} SYP قص = ${calc.num(convertSypToUsd(t.amt, t.rate), true)} USD`); } if (t.type === 'SAFE_EXCHANGE_USD_TO_SYP') { return withCommission(`${calc.num(t.amt, true)} USD قص = ${calc.num((Number(t.amt)||0) * (Number(t.rate)||0))} SYP`); } return withCommission(`${calc.num(t.amt || t.syp || 0, t.cur === 'USD' || t.usd)} ${t.cur || (t.usd ? 'USD' : 'SYP')}`); };
     const escapeHtml = (value='') => String(value ?? '').replace(/[&<>"]/g, (ch) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
+    const cleanText = (value='', max=220) => String(value ?? '')
+        .replace(/[\u0000-\u001F\u007F]/g, '')
+        .replace(/\s+/g, ' ')
+        .trim()
+        .slice(0, max);
+    const cleanDate = (value='') => /^\d{4}-\d{2}-\d{2}$/.test(String(value || '')) ? String(value) : (() => { const d = new Date(); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0,10); })();
+    const cleanId = (value='') => /^[A-Za-z0-9_.:-]{3,80}$/.test(String(value || '')) ? String(value) : genId();
+    const cleanCurrency = (value='SYP') => String(value || '').toUpperCase() === 'USD' ? 'USD' : 'SYP';
+    const moneyFields = ['syp','usd','amt','cutSyp','rate','commissionSyp','commissionUsd'];
+    const timeFields = ['createdAt','updatedAt','deletedAt','restoredAt'];
+    const editableCurrencyTypes = ['SAFE_TO_SAFE','SAFE_TO_OFFICE','OFFICE_TO_SAFE','SAFE_IN_GENERAL','SAFE_OUT_GENERAL'];
+    const fixedUsdTypes = ['SAFE_IN_USD','SAFE_RECEIVE_PERSON_USD','ADVANCE_RETURN_USD','SAFE_OUT_PERSON_USD','SAFE_EXPENSE_USD','ADVANCE_GIVEN_USD','SAFE_EXCHANGE_USD_TO_SYP'];
+    const fixedSypTypes = ['SAFE_IN_SYP','SAFE_RECEIVE_PERSON_SYP','ADVANCE_RETURN_SYP','SAFE_OUT_PERSON_SYP','SAFE_EXPENSE_SYP','ADVANCE_GIVEN_SYP','SAFE_EXCHANGE_SYP_TO_USD'];
     const txSource = (t) => { if (t.type === 'office_convert_syp_to_usd') return t.fromId || '-'; if (t.type === 'SAFE_EXCHANGE_SYP_TO_USD' || t.type === 'SAFE_EXCHANGE_USD_TO_SYP') return t.safeId || '-'; return t.delegate || t.fromId || t.safeId || '-'; };
     const txDestination = (t) => { if (t.type === 'office_convert_syp_to_usd') return 'داخل نفس المكتب / ناتج USD'; if (t.type === 'SAFE_EXCHANGE_SYP_TO_USD' || t.type === 'SAFE_EXCHANGE_USD_TO_SYP') return 'داخل نفس الصندوق'; if (t.type === 'office_adjust_add' || t.type === 'office_adjust_sub') return 'تعديل رصيد داخلي'; return t.toId || t.person || '-'; };
     const txSypValue = (t) => { if (t.type === 'HANDOVER') return Number(t.syp) || 0; if (t.type === 'office_convert_syp_to_usd' || t.type === 'SAFE_EXCHANGE_SYP_TO_USD') return Number(t.amt) || 0; if (t.type === 'SAFE_EXCHANGE_USD_TO_SYP') return (Number(t.amt)||0) * (Number(t.rate)||0); return (t.cur === 'SYP' || (!t.cur && !t.usd)) ? (Number(t.amt || t.syp) || 0) : 0; };
     const txUsdValue = (t) => { if (t.type === 'HANDOVER') return (Number(t.usd) || 0) + handoverCutUsd(t); if (t.type === 'office_convert_syp_to_usd' || t.type === 'SAFE_EXCHANGE_SYP_TO_USD') return convertSypToUsd(t.amt, t.rate); if (t.type === 'SAFE_EXCHANGE_USD_TO_SYP') return Number(t.amt) || 0; return (t.cur === 'USD' || t.usd) ? (Number(t.amt || t.usd) || 0) : 0; };
     const matchesOfficeMovement = (t, name) => { if (t.type === 'office_convert_syp_to_usd') return t.fromId === name; return (t.toId === name || t.fromId === name || (t.type === 'HANDOVER' && t.toType === 'office' && t.toId === name)); };
-    const matchesSafeMovement = (t, name) => { if (t.type === 'HANDOVER') return t.toType === 'safe' && t.toId === name; if (t.type === 'SAFE_TO_SAFE') return t.fromId === name || t.toId === name; if (t.type === 'SAFE_TO_OFFICE') return t.fromId === name || (!t.fromId && t.safeId === name); if (t.type === 'OFFICE_TO_SAFE') return t.toId === name || (!t.toId && t.safeId === name); if (t.type === 'office_to_cashbox') return t.toId === name; if (t.type === 'cashbox_to_office') return t.fromId === name; return t.safeId === name; };
+    const matchesSafeMovement = (t, name) => { if (t.type === 'HANDOVER') return t.toType === 'safe' && t.toId === name; if (t.type === 'SAFE_TO_SAFE') return t.fromId === name || t.toId === name; if (t.type === 'SAFE_TO_OFFICE') return t.fromId === name || (!t.fromId && t.safeId === name); if (t.type === 'OFFICE_TO_SAFE') return t.toId === name || (!t.toId && t.safeId === name); return t.safeId === name; };
     
     const sectionTransactions = (section, key='') => {
         if(section === 'ledger') return [...state.tx];
         if(section === 'revenue') return state.tx.filter(t=>t.type==='REVENUE');
         if(section === 'handover') return state.tx.filter(t=>t.type==='HANDOVER');
-        if(section === 'offices') return state.tx.filter(t=>Object.keys(CONSTANTS.OFFICE_TYPES).includes(t.type) || (t.type==='HANDOVER' && t.toType==='office'));
+        if(section === 'offices') return state.tx.filter(t=>Object.keys(CONSTANTS.OFFICE_TYPES).includes(t.type) || ['SAFE_TO_OFFICE','OFFICE_TO_SAFE'].includes(t.type) || (t.type==='HANDOVER' && t.toType==='office'));
         if(section === 'officeEntity') return state.tx.filter(t=>matchesOfficeMovement(t, key));
-        if(section === 'safes') return state.tx.filter(t=>Object.keys(CONSTANTS.SAFE_TYPES).includes(t.type) || (t.type==='HANDOVER' && t.toType==='safe') || ['office_to_cashbox','cashbox_to_office'].includes(t.type));
+        if(section === 'safes') return state.tx.filter(t=>Object.keys(CONSTANTS.SAFE_TYPES).includes(t.type) || (t.type==='HANDOVER' && t.toType==='safe'));
         if(section === 'safeEntity') return state.tx.filter(t=>matchesSafeMovement(t, key));
-        if(section === 'exchange') return state.tx.filter(t=>(t.type==='HANDOVER' && Number(t.cutSyp)>0) || t.type==='SAFE_EXCHANGE_SYP_TO_USD' || t.type==='office_convert_syp_to_usd');
+        if(section === 'exchange') return state.tx.filter(t=>(t.type==='HANDOVER' && Number(t.cutSyp)>0) || t.type==='SAFE_EXCHANGE_SYP_TO_USD' || t.type==='SAFE_EXCHANGE_USD_TO_SYP' || t.type==='office_convert_syp_to_usd');
         if(section === 'advances') return state.tx.filter(t=>String(t.type||'').includes('ADVANCE'));
         if(section === 'delegateEntity') return state.tx.filter(t=>t.delegate === key);
         return [];
@@ -1248,6 +1336,48 @@
         const rows = items.slice().sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0)).map(t=>`<tr><td data-label="التاريخ">${escapeHtml(t.date||'')}</td><td data-label="النوع">${typeBadge(txTypeLabel(t))}</td><td data-label="من">${escapeHtml(txSource(t))}</td><td data-label="إلى">${escapeHtml(txDestination(t))}</td><td data-label="SYP" class="ltr-num text-success">${calc.num(txSypValue(t))}</td><td data-label="USD" class="ltr-num text-gold">${calc.num(txUsdValue(t), true)}</td><td data-label="ملاحظة" class="note-cell">${escapeHtml(txNoteWithCut(t))}</td></tr>`).join('');
         if(!rows) return `<div class="empty-state">${empty}</div>`;
         return `${tableFilterControls(tableId)}<div class="table-wrap"><table id="${tableId}" class="records-table"><thead><tr><th>التاريخ</th><th>النوع</th><th>من</th><th>إلى</th><th>SYP</th><th>USD</th><th>ملاحظة</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+    };
+
+    const signedClass = (value, usd=false) => value < 0 ? 'text-danger' : (value > 0 ? (usd ? 'text-gold' : 'text-success') : '');
+    const officeEffect = (t, name) => {
+        let syp = 0, usd = 0;
+        if (t.type === 'HANDOVER' && t.toType === 'office' && t.toId === name) { syp += Number(t.syp)||0; usd += (Number(t.usd)||0) + handoverCutUsd(t); }
+        if (t.type === 'office_transfer') { if(t.fromId===name){ t.cur==='SYP'?syp-=t.amt:usd-=t.amt; syp-=officeCommissionSyp(t); usd-=officeCommissionUsd(t); } if(t.toId===name) t.cur==='SYP'?syp+=t.amt:usd+=t.amt; }
+        if (t.type === 'office_convert_syp_to_usd' && t.fromId === name) { syp -= Number(t.amt)||0; usd += convertSypToUsd(t.amt, t.rate); }
+        if (['office_external','office_person','office_adjust_sub'].includes(t.type) && t.fromId === name) { t.cur==='SYP'?syp-=t.amt:usd-=t.amt; if(['office_external','office_person'].includes(t.type)){ syp-=officeCommissionSyp(t); usd-=officeCommissionUsd(t); } }
+        if (t.type === 'office_adjust_add' && t.fromId === name) t.cur==='SYP'?syp+=t.amt:usd+=t.amt;
+        if (t.type === 'SAFE_TO_OFFICE' && t.toId === name) t.cur==='SYP'?syp+=t.amt:usd+=t.amt;
+        if (t.type === 'OFFICE_TO_SAFE' && t.fromId === name) { t.cur==='SYP'?syp-=t.amt:usd-=t.amt; syp-=officeCommissionSyp(t); usd-=officeCommissionUsd(t); }
+        return {syp, usd};
+    };
+    const safeEffect = (t, name) => {
+        let syp = 0, usd = 0;
+        if (t.type === 'HANDOVER' && t.toType === 'safe' && t.toId === name) { syp += Number(t.syp)||0; usd += (Number(t.usd)||0) + handoverCutUsd(t); }
+        if (t.safeId === name || t.fromId === name || t.toId === name) {
+            switch(t.type) {
+                case 'SAFE_IN_SYP': case 'SAFE_RECEIVE_PERSON_SYP': case 'ADVANCE_RETURN_SYP': if(t.safeId===name) syp+=t.amt; break;
+                case 'SAFE_IN_GENERAL': if(t.safeId===name) t.cur==='USD'?usd+=t.amt:syp+=t.amt; break;
+                case 'SAFE_IN_USD': case 'SAFE_RECEIVE_PERSON_USD': case 'ADVANCE_RETURN_USD': if(t.safeId===name) usd+=t.amt; break;
+                case 'SAFE_OUT_PERSON_SYP': case 'SAFE_EXPENSE_SYP': case 'ADVANCE_GIVEN_SYP': if(t.safeId===name) syp-=t.amt; break;
+                case 'SAFE_OUT_GENERAL': if(t.safeId===name) t.cur==='USD'?usd-=t.amt:syp-=t.amt; break;
+                case 'SAFE_OUT_PERSON_USD': case 'SAFE_EXPENSE_USD': case 'ADVANCE_GIVEN_USD': if(t.safeId===name) usd-=t.amt; break;
+                case 'SAFE_EXCHANGE_SYP_TO_USD': if(t.safeId===name){ syp-=Number(t.amt)||0; usd+=convertSypToUsd(t.amt,t.rate); } break;
+                case 'SAFE_EXCHANGE_USD_TO_SYP': if(t.safeId===name){ usd-=Number(t.amt)||0; syp+=(Number(t.amt)||0)*(Number(t.rate)||0); } break;
+                case 'SAFE_TO_SAFE': if(t.fromId===name) t.cur==='SYP'?syp-=t.amt:usd-=t.amt; if(t.toId===name) t.cur==='SYP'?syp+=t.amt:usd+=t.amt; break;
+                case 'SAFE_TO_OFFICE': if(t.fromId===name || (!t.fromId && t.safeId===name)) t.cur==='SYP'?syp-=t.amt:usd-=t.amt; break;
+                case 'OFFICE_TO_SAFE': if(t.toId===name || (!t.toId && t.safeId===name)) t.cur==='SYP'?syp+=t.amt:usd+=t.amt; break;
+            }
+        }
+        return {syp, usd};
+    };
+    const signedEntityTxTable = (items, kind, name, empty='لا يوجد حركات', tableId=`entity-detail-${Date.now()}`) => {
+        const effectFor = kind === 'office' ? officeEffect : safeEffect;
+        const rows = items.slice().sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0)).map(t => {
+            const effect = effectFor(t, name);
+            return `<tr><td data-label="التاريخ">${escapeHtml(t.date||'')}</td><td data-label="النوع">${typeBadge(txTypeLabel(t))}</td><td data-label="من">${escapeHtml(txSource(t))}</td><td data-label="إلى">${escapeHtml(txDestination(t))}</td><td data-label="أثر SYP" class="ltr-num ${signedClass(effect.syp)}">${calc.num(effect.syp)}</td><td data-label="أثر USD" class="ltr-num ${signedClass(effect.usd, true)}">${calc.num(effect.usd, true)}</td><td data-label="ملاحظة" class="note-cell">${escapeHtml(txNoteWithCut(t))}</td></tr>`;
+        }).join('');
+        if(!rows) return `<div class="empty-state">${empty}</div>`;
+        return `${tableFilterControls(tableId)}<div class="table-wrap"><table id="${tableId}" class="records-table"><thead><tr><th>التاريخ</th><th>النوع</th><th>من</th><th>إلى</th><th>أثر SYP</th><th>أثر USD</th><th>ملاحظة</th></tr></thead><tbody>${rows}</tbody></table></div>`;
     };
     
     const metricSparkline = (values=[]) => {
@@ -1267,6 +1397,7 @@
             if ((t.date || '').slice(0,10) !== day) return;
             if (t.type === 'HANDOVER' && handoverCutUsd(t)) { syp += Number(t.cutSyp) || 0; usd += handoverCutUsd(t); }
             if ((t.type === 'SAFE_EXCHANGE_SYP_TO_USD' || t.type === 'office_convert_syp_to_usd') && Number(t.rate) > 0) { syp += Number(t.amt) || 0; usd += convertSypToUsd(t.amt, t.rate); }
+            if (t.type === 'SAFE_EXCHANGE_USD_TO_SYP' && Number(t.rate) > 0) { usd += Number(t.amt) || 0; syp += (Number(t.amt) || 0) * Number(t.rate); }
         });
         return usd > 0 ? syp / usd : 0;
     });
@@ -1347,7 +1478,44 @@
 
 
     const normalizeTx = (raw={}) => {
-        const t = {...raw};
+        const source = raw && typeof raw === 'object' && !Array.isArray(raw) ? raw : {};
+        const t = {...source};
+        const now = Date.now();
+
+        t.id = cleanId(t.id);
+        t.type = cleanText(t.type, 72);
+        if (t.type === 'office_to_cashbox') t.type = 'OFFICE_TO_SAFE';
+        if (t.type === 'cashbox_to_office') t.type = 'SAFE_TO_OFFICE';
+        t.date = cleanDate(t.date);
+        timeFields.forEach(field => {
+            if (t[field] !== undefined && t[field] !== '') {
+                const n = Number(t[field]);
+                t[field] = Number.isFinite(n) ? n : now;
+            }
+        });
+        t.createdAt = Number(t.createdAt) || Number(t.updatedAt) || now;
+        t.updatedAt = Number(t.updatedAt) || t.createdAt || now;
+
+        moneyFields.forEach(field => { t[field] = parseMoney(t[field]); });
+        ['region','delegate','revType','toType','toId','fromId','safeId','person','note'].forEach(field => {
+            if (t[field] !== undefined) t[field] = cleanText(t[field], field === 'note' ? 420 : 160);
+        });
+        t.cur = cleanCurrency(t.cur);
+
+        if (t.type === 'REVENUE') {
+            t.syp = Math.max(0, t.syp);
+            t.usd = 0; t.amt = 0; t.cutSyp = 0; t.rate = 0;
+        }
+
+        if (t.type === 'HANDOVER') {
+            t.syp = Math.max(0, t.syp);
+            t.usd = Math.max(0, t.usd);
+            t.cutSyp = Math.max(0, t.cutSyp);
+            t.rate = Math.max(0, t.rate);
+            t.toType = t.toType === 'safe' ? 'safe' : 'office';
+            t.cur = 'SYP';
+            t.amt = 0;
+        }
 
         if (t.type === 'office_convert_syp_to_usd') {
             t.toId = '';
@@ -1382,11 +1550,15 @@
             t.person = '';
         }
 
+        if (fixedUsdTypes.includes(t.type)) t.cur = 'USD';
+        if (fixedSypTypes.includes(t.type)) t.cur = 'SYP';
         if (t.type === 'SAFE_EXCHANGE_SYP_TO_USD') t.cur = 'SYP';
         if (t.type === 'SAFE_EXCHANGE_USD_TO_SYP') t.cur = 'USD';
 
-        t.commissionSyp = Math.max(0, Number(t.commissionSyp) || 0);
-        t.commissionUsd = Math.max(0, Number(t.commissionUsd) || 0);
+        t.amt = Math.max(0, t.amt);
+        t.rate = Math.max(0, t.rate);
+        t.commissionSyp = Math.max(0, t.commissionSyp);
+        t.commissionUsd = Math.max(0, t.commissionUsd);
         if (!hasOfficeCommission(t)) {
             t.commissionSyp = 0;
             t.commissionUsd = 0;
@@ -1395,16 +1567,45 @@
         return t;
     };
 
+    const validateTx = (t) => {
+        if (!t || !t.type) throw new Error('نوع الحركة غير صالح');
+        if (t.type === 'REVENUE') {
+            if (!t.delegate) throw new Error('اختر المندوب');
+            if ((Number(t.syp) || 0) <= 0) throw new Error('أدخل مبلغ صحيح');
+        }
+        if (t.type === 'HANDOVER') {
+            if (!t.delegate) throw new Error('اختر المندوب');
+            if (!t.toId) throw new Error('اختر الوجهة');
+            if (t.toType === 'office' && !CONSTANTS.OFFICES.includes(t.toId)) throw new Error('اختر مكتب صحيح');
+            if (t.toType === 'safe' && !CONSTANTS.SAFES.includes(t.toId)) throw new Error('اختر صندوق صحيح');
+            if (!(Number(t.syp) || 0) && !(Number(t.usd) || 0) && !(Number(t.cutSyp) || 0)) throw new Error('أدخل مبلغ واحد على الأقل');
+            if ((Number(t.cutSyp) || 0) > 0 && (Number(t.rate) || 0) <= 0) throw new Error('أدخل سعر صرف صحيح للقص');
+        }
+        if (Object.keys(CONSTANTS.OFFICE_TYPES).includes(t.type)) {
+            if ((Number(t.amt) || 0) <= 0) throw new Error('أدخل مبلغ صحيح');
+            if (t.type === 'office_transfer' && t.fromId === t.toId) throw new Error('لا يمكن تحويل مكتب إلى نفس المكتب');
+            if (t.type === 'office_convert_syp_to_usd' && (Number(t.rate) || 0) <= 0) throw new Error('أدخل سعر صرف صحيح');
+        }
+        if (Object.keys(CONSTANTS.SAFE_TYPES).includes(t.type)) {
+            if ((Number(t.amt) || 0) <= 0) throw new Error('أدخل مبلغ صحيح');
+            if ((t.type === 'SAFE_EXCHANGE_SYP_TO_USD' || t.type === 'SAFE_EXCHANGE_USD_TO_SYP') && (Number(t.rate) || 0) <= 0) throw new Error('أدخل سعر صرف صحيح');
+            if (t.type === 'SAFE_TO_SAFE' && t.fromId === t.toId) throw new Error('لا يمكن تحويل صندوق إلى نفس الصندوق');
+            if (t.type === 'SAFE_TO_OFFICE' && (!CONSTANTS.SAFES.includes(t.fromId) || !CONSTANTS.OFFICES.includes(t.toId))) throw new Error('اختر صندوق ومكتب صحيحين');
+            if (t.type === 'OFFICE_TO_SAFE' && (!CONSTANTS.OFFICES.includes(t.fromId) || !CONSTANTS.SAFES.includes(t.toId))) throw new Error('اختر مكتب وصندوق صحيحين');
+        }
+        return t;
+    };
+
     const asArray = (value) => Array.isArray(value) ? value.filter(Boolean) : [];
     const asObject = (value) => value && typeof value === 'object' && !Array.isArray(value) ? value : {};
     const txTime = (t) => Number(t?.updatedAt || t?.createdAt || 0);
     const delTime = (t) => Number(t?.deletedAt || t?.updatedAt || t?.createdAt || 0);
     const newestRecord = (current, next, timeFn=txTime) => !current || timeFn(next) >= timeFn(current) ? next : current;
-    const cleanPurgedTx = (purged={}) => {
-        const now = Date.now();
-        const maxAge = 1000 * 60 * 60 * 24 * 120;
-        return Object.fromEntries(Object.entries(asObject(purged)).filter(([id, ts]) => id && Number(ts || 0) > now - maxAge));
-    };
+    const cleanPurgedTx = (purged={}) => Object.fromEntries(
+        Object.entries(asObject(purged))
+            .map(([id, ts]) => [id, Number(ts)])
+            .filter(([id, ts]) => id && Number.isFinite(ts) && ts > 0)
+    );
     const reconcileStore = (local={}, remote={}) => {
         const activeById = new Map();
         const deletedById = new Map();
@@ -1434,35 +1635,77 @@
             purgedTx
         };
     };
-    const persistLocal = () => localStorage.setItem('rc_data', JSON.stringify({tx:state.tx, delTx:state.delTx, purgedTx:state.purgedTx}));
+    const persistLocal = () => {
+        localStorage.setItem('rc_data', JSON.stringify({tx:state.tx, delTx:state.delTx, purgedTx:state.purgedTx}));
+        syncStatus.lastLocalSavedAt = Date.now();
+    };
 
-    async function sync() {
+    async function sync(options={}) {
+        const { renderAfterRemote=false } = options;
         const localSnapshot = { tx: state.tx, delTx: state.delTx, purgedTx: state.purgedTx };
         let merged = reconcileStore(localSnapshot, {});
         state.tx = merged.tx; state.delTx = merged.delTx; state.purgedTx = merged.purgedTx;
         persistLocal();
 
-        if(!db) return;
+        if(!db || !firestoreApi) {
+            syncStatus.lastCloudError = 'Firebase غير جاهز أو المكتبات لم تحمل';
+            return { ok:false, local:true, cloud:false, error:syncStatus.lastCloudError };
+        }
+        if(!currentUser) {
+            syncStatus.lastCloudError = 'سجلي دخول Firebase لتفعيل المزامنة السحابية';
+            return { ok:false, local:true, cloud:false, auth:false, error:syncStatus.lastCloudError };
+        }
+
+        syncStatus.busy = true;
         try {
-            const ref = doc(db, "sync", "main-ledger");
-            const snap = await getDoc(ref);
-            const remote = snap.exists() ? snap.data() : { tx:[], delTx:[], purgedTx:{} };
-            merged = reconcileStore({ tx: state.tx, delTx: state.delTx, purgedTx: state.purgedTx }, remote);
-            state.tx = merged.tx; state.delTx = merged.delTx; state.purgedTx = merged.purgedTx;
+            const ref = firestoreApi.doc(db, ...FIRESTORE_LEDGER_PATH);
+            const txResult = await firestoreApi.runTransaction(db, async (transaction) => {
+                const snap = await transaction.get(ref);
+                const remote = snap.exists() ? snap.data() : { tx:[], delTx:[], purgedTx:{} };
+                const mergedStore = reconcileStore({ tx: state.tx, delTx: state.delTx, purgedTx: state.purgedTx }, remote);
+                transaction.set(ref, { tx:mergedStore.tx, delTx:mergedStore.delTx, purgedTx:mergedStore.purgedTx, last:Date.now() }, { merge:true });
+                return mergedStore;
+            });
+            state.tx = txResult.tx; state.delTx = txResult.delTx; state.purgedTx = txResult.purgedTx;
             persistLocal();
-            await setDoc(ref, { tx:state.tx, delTx:state.delTx, purgedTx:state.purgedTx, last:Date.now() }, {merge:true});
-        } catch(e) { console.warn('Sync skipped:', e); }
+            syncStatus.lastCloudSavedAt = Date.now();
+            syncStatus.lastCloudError = '';
+            if (renderAfterRemote && typeof renderView === 'function') renderView();
+            return { ok:true, local:true, cloud:true };
+        } catch(e) {
+            syncStatus.lastCloudError = cleanText(e?.message || 'فشل مزامنة السحابة', 180);
+            console.warn('Sync failed:', e);
+            return { ok:false, local:true, cloud:false, error:syncStatus.lastCloudError };
+        } finally {
+            syncStatus.busy = false;
+        }
     }
-    window.saveData = () => { const merged = reconcileStore({tx:state.tx, delTx:state.delTx, purgedTx:state.purgedTx}, {}); state.tx=merged.tx; state.delTx=merged.delTx; state.purgedTx=merged.purgedTx; persistLocal(); sync(); };
-    window.loadData = () => { try { const d = JSON.parse(localStorage.getItem('rc_data')||'{"tx":[],"delTx":[],"purgedTx":{}}'); state.tx = d.tx||[]; state.delTx = d.delTx||[]; state.purgedTx = d.purgedTx||{}; } catch(e) { state.tx=[]; state.delTx=[]; state.purgedTx={}; } sync(); };
+
+    window.saveData = async () => {
+        const merged = reconcileStore({tx:state.tx, delTx:state.delTx, purgedTx:state.purgedTx}, {});
+        state.tx=merged.tx; state.delTx=merged.delTx; state.purgedTx=merged.purgedTx;
+        persistLocal();
+        return await sync({ renderAfterRemote:false });
+    };
+
+    window.loadData = async () => {
+        try {
+            const d = JSON.parse(localStorage.getItem('rc_data')||'{"tx":[],"delTx":[],"purgedTx":{}}');
+            const merged = reconcileStore(d, {});
+            state.tx = merged.tx; state.delTx = merged.delTx; state.purgedTx = merged.purgedTx;
+        } catch(e) { state.tx=[]; state.delTx=[]; state.purgedTx={}; }
+        persistLocal();
+        return await sync({ renderAfterRemote:false });
+    };
+
 
     // --- CORE CALCULATIONS ---
     window.calc = {
         num: (n, usd=false) => `<span class="ltr-num">${Number(usd?parseFloat(n||0).toFixed(2):Math.floor(n||0)).toLocaleString('en-US')}</span>`,
         color: (n) => n>0?'text-success':(n<0?'text-danger':''),
         delegate: (name) => { let b=0, rev=0, ho=0, cut=0; state.tx.filter(t=>t.delegate===name).forEach(t=>{ if(t.type==='REVENUE'){ b+=t.syp; rev+=t.syp; } if(t.type==='HANDOVER'){ b-=(t.syp||0)+(t.cutSyp||0); ho+=t.syp||0; cut+=t.cutSyp||0; } }); return {b, rev, ho, cut}; },
-        office: (name) => { let syp=0, usd=0; state.tx.forEach(t=>{ if(t.type==='HANDOVER' && t.toType==='office' && t.toId===name){ syp+=t.syp||0; usd+=(Number(t.usd)||0)+handoverCutUsd(t); } if(t.type==='cashbox_to_office' && t.toId===name){ if(t.cur==='SYP') syp+=t.amt; else usd+=t.amt; } if(t.type==='office_to_cashbox' && t.fromId===name){ if(t.cur==='SYP') syp-=t.amt; else usd-=t.amt; syp-=officeCommissionSyp(t); usd-=officeCommissionUsd(t); } if(t.type==='office_transfer'){ if(t.fromId===name){ t.cur==='SYP'?syp-=t.amt:usd-=t.amt; syp-=officeCommissionSyp(t); usd-=officeCommissionUsd(t); } if(t.toId===name) t.cur==='SYP'?syp+=t.amt:usd+=t.amt; } if(t.type==='office_convert_syp_to_usd' && t.fromId===name){ syp-=Number(t.amt)||0; usd+=convertSypToUsd(t.amt, t.rate); } if(['office_external','office_person','office_adjust_sub'].includes(t.type) && t.fromId===name){ t.cur==='SYP'?syp-=t.amt:usd-=t.amt; if(['office_external','office_person'].includes(t.type)){ syp-=officeCommissionSyp(t); usd-=officeCommissionUsd(t); } } if(t.type==='office_adjust_add' && t.fromId===name){ t.cur==='SYP'?syp+=t.amt:usd+=t.amt; } if(t.type==='SAFE_TO_OFFICE' && t.toId===name){ t.cur==='SYP'?syp+=t.amt:usd+=t.amt; } if(t.type==='OFFICE_TO_SAFE' && t.fromId===name){ t.cur==='SYP'?syp-=t.amt:usd-=t.amt; } }); return {syp, usd}; },
-        safe: (name) => { let syp=0, usd=0; state.tx.forEach(t=>{ if(t.type==='HANDOVER' && t.toType==='safe' && t.toId===name){ syp+=t.syp||0; usd+=(Number(t.usd)||0)+handoverCutUsd(t); } if(t.safeId===name || t.fromId===name || t.toId===name){ switch(t.type){ case 'SAFE_IN_SYP': case 'SAFE_RECEIVE_PERSON_SYP': case 'ADVANCE_RETURN_SYP': case 'SAFE_IN_GENERAL': if(t.safeId===name) syp+=t.amt; break; case 'SAFE_IN_USD': case 'SAFE_RECEIVE_PERSON_USD': case 'ADVANCE_RETURN_USD': if(t.safeId===name) usd+=t.amt; break; case 'SAFE_OUT_PERSON_SYP': case 'SAFE_EXPENSE_SYP': case 'ADVANCE_GIVEN_SYP': case 'SAFE_OUT_GENERAL': if(t.safeId===name) syp-=t.amt; break; case 'SAFE_OUT_PERSON_USD': case 'SAFE_EXPENSE_USD': case 'ADVANCE_GIVEN_USD': if(t.safeId===name) usd-=t.amt; break; case 'SAFE_EXCHANGE_SYP_TO_USD': if(t.safeId===name){ syp-=Number(t.amt)||0; usd+=convertSypToUsd(t.amt, t.rate); } break; case 'SAFE_EXCHANGE_USD_TO_SYP': if(t.safeId===name){ usd-=Number(t.amt)||0; syp+=(Number(t.amt)||0)*(Number(t.rate)||0); } break; case 'SAFE_TO_SAFE': if(t.fromId===name) t.cur==='SYP'?syp-=t.amt:usd-=t.amt; if(t.toId===name) t.cur==='SYP'?syp+=t.amt:usd+=t.amt; break; case 'SAFE_TO_OFFICE': if(t.fromId===name || (!t.fromId && t.safeId===name)) t.cur==='SYP'?syp-=t.amt:usd-=t.amt; break; case 'OFFICE_TO_SAFE': if(t.toId===name || (!t.toId && t.safeId===name)) t.cur==='SYP'?syp+=t.amt:usd+=t.amt; break; case 'office_to_cashbox': if(t.toId===name) t.cur==='SYP'?syp+=t.amt:usd+=t.amt; break; case 'cashbox_to_office': if(t.fromId===name) t.cur==='SYP'?syp-=t.amt:usd-=t.amt; break; } } }); return {syp, usd}; }
+        office: (name) => { let syp=0, usd=0; state.tx.forEach(t=>{ if(t.type==='HANDOVER' && t.toType==='office' && t.toId===name){ syp+=t.syp||0; usd+=(Number(t.usd)||0)+handoverCutUsd(t); } if(t.type==='office_transfer'){ if(t.fromId===name){ t.cur==='SYP'?syp-=t.amt:usd-=t.amt; syp-=officeCommissionSyp(t); usd-=officeCommissionUsd(t); } if(t.toId===name) t.cur==='SYP'?syp+=t.amt:usd+=t.amt; } if(t.type==='office_convert_syp_to_usd' && t.fromId===name){ syp-=Number(t.amt)||0; usd+=convertSypToUsd(t.amt, t.rate); } if(['office_external','office_person','office_adjust_sub'].includes(t.type) && t.fromId===name){ t.cur==='SYP'?syp-=t.amt:usd-=t.amt; if(['office_external','office_person'].includes(t.type)){ syp-=officeCommissionSyp(t); usd-=officeCommissionUsd(t); } } if(t.type==='office_adjust_add' && t.fromId===name){ t.cur==='SYP'?syp+=t.amt:usd+=t.amt; } if(t.type==='SAFE_TO_OFFICE' && t.toId===name){ t.cur==='SYP'?syp+=t.amt:usd+=t.amt; } if(t.type==='OFFICE_TO_SAFE' && t.fromId===name){ t.cur==='SYP'?syp-=t.amt:usd-=t.amt; syp-=officeCommissionSyp(t); usd-=officeCommissionUsd(t); } }); return {syp, usd}; },
+        safe: (name) => { let syp=0, usd=0; state.tx.forEach(t=>{ if(t.type==='HANDOVER' && t.toType==='safe' && t.toId===name){ syp+=t.syp||0; usd+=(Number(t.usd)||0)+handoverCutUsd(t); } if(t.safeId===name || t.fromId===name || t.toId===name){ switch(t.type){ case 'SAFE_IN_SYP': case 'SAFE_RECEIVE_PERSON_SYP': case 'ADVANCE_RETURN_SYP': if(t.safeId===name) syp+=t.amt; break; case 'SAFE_IN_GENERAL': if(t.safeId===name) t.cur==='USD'?usd+=t.amt:syp+=t.amt; break; case 'SAFE_IN_USD': case 'SAFE_RECEIVE_PERSON_USD': case 'ADVANCE_RETURN_USD': if(t.safeId===name) usd+=t.amt; break; case 'SAFE_OUT_PERSON_SYP': case 'SAFE_EXPENSE_SYP': case 'ADVANCE_GIVEN_SYP': if(t.safeId===name) syp-=t.amt; break; case 'SAFE_OUT_GENERAL': if(t.safeId===name) t.cur==='USD'?usd-=t.amt:syp-=t.amt; break; case 'SAFE_OUT_PERSON_USD': case 'SAFE_EXPENSE_USD': case 'ADVANCE_GIVEN_USD': if(t.safeId===name) usd-=t.amt; break; case 'SAFE_EXCHANGE_SYP_TO_USD': if(t.safeId===name){ syp-=Number(t.amt)||0; usd+=convertSypToUsd(t.amt, t.rate); } break; case 'SAFE_EXCHANGE_USD_TO_SYP': if(t.safeId===name){ usd-=Number(t.amt)||0; syp+=(Number(t.amt)||0)*(Number(t.rate)||0); } break; case 'SAFE_TO_SAFE': if(t.fromId===name) t.cur==='SYP'?syp-=t.amt:usd-=t.amt; if(t.toId===name) t.cur==='SYP'?syp+=t.amt:usd+=t.amt; break; case 'SAFE_TO_OFFICE': if(t.fromId===name || (!t.fromId && t.safeId===name)) t.cur==='SYP'?syp-=t.amt:usd-=t.amt; break; case 'OFFICE_TO_SAFE': if(t.toId===name || (!t.toId && t.safeId===name)) t.cur==='SYP'?syp+=t.amt:usd+=t.amt; break; } } }); return {syp, usd}; }
     };
 
     // --- 4. UI HELPERS ---
@@ -1492,24 +1735,185 @@
         ui.toast('تم تصدير Excel');
     };
 
+    const optionHtml = (arr=[], selected='') => arr.map(item => `<option value="${escapeHtml(item)}" ${String(item)===String(selected)?'selected':''}>${escapeHtml(item)}</option>`).join('');
+    const editField = (name, label, value='', type='text', extra='') => `<div class="form-group"><label>${escapeHtml(label)}</label><input type="${escapeHtml(type)}" name="${escapeHtml(name)}" value="${escapeHtml(value)}" ${extra}></div>`;
+    const editMoneyField = (name, label, value='0') => editField(name, label, value, 'text', 'inputmode="decimal" class="money-input"');
+    const editSelectField = (name, label, options=[], selected='') => `<div class="form-group"><label>${escapeHtml(label)}</label><select name="${escapeHtml(name)}">${optionHtml(options, selected)}</select></div>`;
+    const editNoteField = (value='') => `<div class="form-group full"><label>ملاحظة</label><input type="text" name="note" value="${escapeHtml(value || '')}"></div>`;
+
+    const buildEditForm = (tx) => {
+        const t = normalizeTx(tx);
+        const allDelegates = Object.values(CONSTANTS.DELEGATES).flat();
+        const typeLabel = txTypeLabel(t);
+        let fields = [editField('date', 'التاريخ', t.date || cleanDate(), 'date'), `<div class="form-group"><label>نوع الحركة</label><input type="text" value="${escapeHtml(typeLabel)}" disabled></div>`];
+
+        if (t.type === 'REVENUE') {
+            fields.push(editSelectField('delegate', 'المندوب', allDelegates, t.delegate), editSelectField('revType', 'نوع الإيراد', CONSTANTS.REV_TYPES, t.revType), editMoneyField('syp', 'المبلغ SYP', t.syp), editNoteField(t.note));
+        } else if (t.type === 'HANDOVER') {
+            const destinationList = t.toType === 'safe' ? CONSTANTS.SAFES : CONSTANTS.OFFICES;
+            fields.push(
+                editSelectField('delegate', 'المندوب', allDelegates, t.delegate),
+                `<div class="form-group"><label>نوع الوجهة</label><select name="toType" id="edit-ho-totype">${optionHtml(['office','safe'], t.toType || 'office')}</select></div>`,
+                `<div class="form-group"><label>الوجهة</label><select name="toId" id="edit-ho-toid">${optionHtml(destinationList, t.toId)}</select></div>`,
+                editMoneyField('syp', 'مباشر SYP', t.syp),
+                editMoneyField('usd', 'مباشر USD', t.usd),
+                editMoneyField('cutSyp', 'مبلغ مقصوص SYP', t.cutSyp),
+                editMoneyField('rate', 'سعر الصرف', t.rate),
+                editNoteField(t.note)
+            );
+        } else if (Object.keys(CONSTANTS.OFFICE_TYPES).includes(t.type)) {
+            if (t.type === 'office_transfer') {
+                fields.push(editSelectField('fromId', 'من مكتب', CONSTANTS.OFFICES, t.fromId), editSelectField('toId', 'إلى مكتب', CONSTANTS.OFFICES, t.toId), editSelectField('cur','العملة',['SYP','USD'],t.cur), editMoneyField('amt','المبلغ',t.amt), editMoneyField('commissionSyp','عمولة SYP',t.commissionSyp), editMoneyField('commissionUsd','عمولة USD',t.commissionUsd));
+            } else if (t.type === 'office_convert_syp_to_usd') {
+                fields.push(editSelectField('fromId', 'المكتب', CONSTANTS.OFFICES, t.fromId), editMoneyField('amt','المبلغ SYP',t.amt), editMoneyField('rate','سعر الصرف',t.rate));
+            } else if (t.type === 'office_external' || t.type === 'office_person') {
+                fields.push(editSelectField('fromId', 'من مكتب', CONSTANTS.OFFICES, t.fromId), editField('person','الجهة/الشخص',t.person), editSelectField('cur','العملة',['SYP','USD'],t.cur), editMoneyField('amt','المبلغ',t.amt), editMoneyField('commissionSyp','عمولة SYP',t.commissionSyp), editMoneyField('commissionUsd','عمولة USD',t.commissionUsd));
+            } else {
+                fields.push(editSelectField('fromId', 'المكتب', CONSTANTS.OFFICES, t.fromId), editSelectField('cur','العملة',['SYP','USD'],t.cur), editMoneyField('amt','المبلغ',t.amt));
+            }
+            fields.push(editNoteField(t.note));
+        } else if (Object.keys(CONSTANTS.SAFE_TYPES).includes(t.type)) {
+            if (t.type === 'SAFE_TO_SAFE') {
+                fields.push(editSelectField('fromId', 'من صندوق', CONSTANTS.SAFES, t.fromId), editSelectField('toId', 'إلى صندوق', CONSTANTS.SAFES, t.toId), editSelectField('cur','العملة',['SYP','USD'],t.cur), editMoneyField('amt','المبلغ',t.amt));
+            } else if (t.type === 'SAFE_TO_OFFICE') {
+                fields.push(editSelectField('fromId', 'من صندوق', CONSTANTS.SAFES, t.fromId), editSelectField('toId', 'إلى مكتب', CONSTANTS.OFFICES, t.toId), editSelectField('cur','العملة',['SYP','USD'],t.cur), editMoneyField('amt','المبلغ',t.amt));
+            } else if (t.type === 'OFFICE_TO_SAFE') {
+                fields.push(editSelectField('fromId', 'من مكتب', CONSTANTS.OFFICES, t.fromId), editSelectField('toId', 'إلى صندوق', CONSTANTS.SAFES, t.toId), editSelectField('cur','العملة',['SYP','USD'],t.cur), editMoneyField('amt','المبلغ',t.amt), editMoneyField('commissionSyp','عمولة SYP',t.commissionSyp), editMoneyField('commissionUsd','عمولة USD',t.commissionUsd));
+            } else {
+                fields.push(editSelectField('safeId', 'الصندوق', CONSTANTS.SAFES, t.safeId));
+                if (String(t.type).includes('PERSON') || String(t.type).includes('GENERAL') || String(t.type).includes('ADVANCE')) fields.push(editField('person','الجهة/الشخص',t.person));
+                if (editableCurrencyTypes.includes(t.type)) fields.push(editSelectField('cur','العملة',['SYP','USD'],t.cur));
+                fields.push(editMoneyField('amt','المبلغ',t.amt));
+                if (String(t.type).includes('EXCHANGE')) fields.push(editMoneyField('rate','سعر الصرف',t.rate));
+            }
+            fields.push(editNoteField(t.note));
+        } else {
+            fields.push(editMoneyField('amt','المبلغ',t.amt || t.syp || 0), editSelectField('cur','العملة',['SYP','USD'],t.cur), editNoteField(t.note));
+        }
+
+        return `<form id="frm-edit-tx" data-id="${escapeHtml(t.id)}" class="form-grid">${fields.join('')}<div class="form-group full"><button type="submit" class="btn-submit">حفظ التعديل الحقيقي</button></div></form>`;
+    };
+
+    const bindEditFormHelpers = (form) => {
+        const type = form?.querySelector('#edit-ho-totype');
+        const dest = form?.querySelector('#edit-ho-toid');
+        if (type && dest && dest.dataset.bound !== '1') {
+            dest.dataset.bound = '1';
+            type.addEventListener('change', () => {
+                const options = type.value === 'safe' ? CONSTANTS.SAFES : CONSTANTS.OFFICES;
+                const current = dest.value;
+                dest.innerHTML = optionHtml(options, options.includes(current) ? current : options[0]);
+            });
+        }
+    };
+
+    const showSaveResult = (result, cloudMessage='تم الحفظ والمزامنة بنجاح') => {
+        if (result?.cloud) ui.toast(cloudMessage);
+        else ui.toast(`تم الحفظ محلياً فقط — فشل رفع السحابة: ${result?.error || 'غير معروف'}`, 'error');
+    };
+
     window.ui = {
-        toast: (m, type='success') => { const c=document.getElementById('toasts'), t=document.createElement('div'); t.className=`toast ${type}`; t.innerHTML = (type==='success'?'✅ ':'❌ ') + m; c.appendChild(t); setTimeout(()=>t.remove(),3000); },
+        toast: (m, type='success') => { const c=document.getElementById('toasts'), t=document.createElement('div'); if(!c) return; t.className=`toast ${type}`; t.textContent = (type==='success'?'✅ ':'❌ ') + cleanText(m, 260); c.appendChild(t); setTimeout(()=>t.remove(),3000); },
         opts: (arr) => arr.map(a=>`<option value="${escapeHtml(a)}">${escapeHtml(a)}</option>`).join(''),
         optsObj: (obj) => Object.entries(obj).map(([k,v])=>`<option value="${escapeHtml(k)}">${escapeHtml(v)}</option>`).join(''),
         dels: () => Object.values(CONSTANTS.DELEGATES).flat(),
-        submit: (e, cb) => { e.preventDefault(); const form = e.target; const b=form.querySelector('button[type="submit"]'); if (form.dataset.saving === '1') return; form.dataset.saving = '1'; const oldText = b ? b.innerHTML : ''; if(b){ b.disabled=true; b.innerHTML='جاري الحفظ...'; } try{ cb(collectFormData(form)); form.reset(); ui.toast('تم الحفظ بنجاح'); premium.playSave(); premium.markChanged(); window.saveData(); renderView(); } catch(err){ ui.toast(err.message || 'خطأ في الحفظ','error'); if(b){ b.disabled=false; b.innerHTML=oldText; } form.dataset.saving = '0'; return; } setTimeout(()=>{ form.dataset.saving='0'; if(b){ b.disabled=false; b.innerHTML=oldText; } },500); },
-        openModal: (title, html) => { document.getElementById('modal-title').innerHTML = title; document.getElementById('modal-body').innerHTML = html; document.getElementById('edit-modal-overlay').style.display='flex'; setTimeout(() => { const body=document.getElementById('modal-body'); enhanceRecordTables(body); bindTableFilters(body); }, 0); },
+        submit: async (e, cb) => {
+            e.preventDefault();
+            const form = e.target;
+            const b=form.querySelector('button[type="submit"]');
+            if (form.dataset.saving === '1') return;
+            form.dataset.saving = '1';
+            const oldText = b ? b.innerHTML : '';
+            if(b){ b.disabled=true; b.innerHTML='جاري الحفظ...'; }
+            try{
+                cb(collectFormData(form));
+                const result = await window.saveData();
+                form.reset();
+                premium.playSave();
+                premium.markChanged();
+                renderView();
+                showSaveResult(result);
+            } catch(err){
+                ui.toast(err.message || 'خطأ في الحفظ','error');
+            } finally {
+                form.dataset.saving='0';
+                if(b){ b.disabled=false; b.innerHTML=oldText; }
+            }
+        },
+        openModal: (title, html) => { document.getElementById('modal-title').textContent = cleanText(title, 160); document.getElementById('modal-body').innerHTML = html; document.getElementById('edit-modal-overlay').style.display='flex'; setTimeout(() => { const body=document.getElementById('modal-body'); enhanceRecordTables(body); bindTableFilters(body); attachMoneyInputs(); }, 0); },
         closeModal: () => { document.getElementById('edit-modal-overlay').style.display='none'; state.editId=null; },
-        del: (id) => { if(confirm('متأكد من مسح الحركة وإعادة حساب الأرصدة؟')){ const idx = state.tx.findIndex(x=>x.id===id); if(idx>-1){ const now=Date.now(); const deleted={...state.tx[idx], deletedAt:now, updatedAt:now}; state.tx.splice(idx,1); state.delTx = [...state.delTx.filter(x=>x.id!==id), deleted]; delete state.purgedTx[id]; saveData(); renderView(); ui.toast('تم النقل للمحذوفات'); } } },
-        res: (id) => { const idx = state.delTx.findIndex(x=>x.id===id); if(idx>-1){ const now=Date.now(); const restored={...state.delTx[idx], restoredAt:now, updatedAt:now}; delete restored.deletedAt; state.delTx.splice(idx,1); state.tx = [...state.tx.filter(x=>x.id!==id), restored]; delete state.purgedTx[id]; saveData(); renderView(); ui.toast('تم الاسترجاع'); } },
-        hardDel: (id) => { if(confirm('حذف نهائي من سلة المحذوفات؟')){ const now=Date.now(); state.tx = state.tx.filter(x=>x.id!==id); state.delTx = state.delTx.filter(x=>x.id!==id); state.purgedTx[id]=now; saveData(); renderView(); ui.toast('تم الحذف النهائي'); } },
-        edit: (id) => { state.editId = id; const t = state.tx.find(x=>x.id===id); ui.openModal('تعديل الحركة', `<p style="color:var(--text-muted);margin-bottom:1rem">الحذف الذكي: سيتم مسح الحركة وتعود للنموذج لإدخالها من جديد.</p>${t ? miniTxTable([t]) : ''}<button class="btn-submit" onclick="ui.confirmEdit()">موافق، احذف وجهز النموذج</button>`); },
-        confirmEdit: () => { if(state.editId){ const id=state.editId; ui.closeModal(); ui.del(id); ui.toast('أدخل البيانات الجديدة الآن.'); } },
-        openDelegate: (encodedName) => { const name = decodeURIComponent(encodedName); const b = calc.delegate(name); const items = sectionTransactions('delegateEntity', name); const summary = sectionSummary(items); ui.openModal(`المندوب: ${escapeHtml(name)}`, `<div class="detail-grid"><div class="detail-box"><small>إجمالي الإيراد</small><strong class="ltr-num text-primary">${calc.num(b.rev)} SYP</strong></div><div class="detail-box"><small>المسلّم المباشر</small><strong class="ltr-num text-success">${calc.num(b.ho)} SYP</strong></div><div class="detail-box"><small>المقصوص SYP</small><strong class="ltr-num text-danger">${calc.num(b.cut)} SYP</strong></div><div class="detail-box"><small>الناتج USD</small><strong class="ltr-num text-gold">${calc.num(summary.cutUsd, true)} USD</strong></div><div class="detail-box"><small>المتبقي</small><strong class="ltr-num ${calc.color(b.b)}">${calc.num(b.b)} SYP</strong></div><div class="detail-box"><small>الحركات</small><strong class="ltr-num">${calc.num(items.length)}</strong></div></div>${miniTxTable(items, 'لا يوجد حركات لهذا المندوب', `detail-delegate-${Date.now()}`)}`); },
-        openOffice: (encodedName) => { const name = decodeURIComponent(encodedName); const b = calc.office(name); const items = sectionTransactions('officeEntity', name); const summary = sectionSummary(items); ui.openModal(`المكتب: ${escapeHtml(name)}`, `<div class="detail-grid"><div class="detail-box"><small>رصيد SYP</small><strong class="ltr-num ${calc.color(b.syp)}">${calc.num(b.syp)} SYP</strong></div><div class="detail-box"><small>رصيد USD</small><strong class="ltr-num ${calc.color(b.usd)}">${calc.num(b.usd, true)} USD</strong></div><div class="detail-box"><small>إجمالي SYP (حركات)</small><strong class="ltr-num text-success">${calc.num(summary.syp)} SYP</strong></div><div class="detail-box"><small>إجمالي USD (حركات)</small><strong class="ltr-num text-gold">${calc.num(summary.usd, true)} USD</strong></div><div class="detail-box"><small>السوري المقصوص</small><strong class="ltr-num text-danger">${calc.num(summary.cutSyp)} SYP</strong></div><div class="detail-box"><small>الحركات</small><strong class="ltr-num">${calc.num(items.length)}</strong></div></div>${miniTxTable(items, 'لا يوجد حركات لهذا المكتب', `detail-office-${Date.now()}`)}`); },
-        openSafe: (encodedName) => { const name = decodeURIComponent(encodedName); const b = calc.safe(name); const items = sectionTransactions('safeEntity', name); const summary = sectionSummary(items); ui.openModal(`الصندوق: ${escapeHtml(name)}`, `<div class="detail-grid"><div class="detail-box"><small>رصيد SYP</small><strong class="ltr-num ${calc.color(b.syp)}">${calc.num(b.syp)} SYP</strong></div><div class="detail-box"><small>رصيد USD</small><strong class="ltr-num ${calc.color(b.usd)}">${calc.num(b.usd, true)} USD</strong></div><div class="detail-box"><small>إجمالي SYP (حركات)</small><strong class="ltr-num text-success">${calc.num(summary.syp)} SYP</strong></div><div class="detail-box"><small>إجمالي USD (حركات)</small><strong class="ltr-num text-gold">${calc.num(summary.usd, true)} USD</strong></div><div class="detail-box"><small>الحركات</small><strong class="ltr-num">${calc.num(items.length)}</strong></div></div>${miniTxTable(items, 'لا يوجد حركات لهذا الصندوق', `detail-safe-${Date.now()}`)}`); },
+        del: async (id) => { if(confirm('متأكد من مسح الحركة وإعادة حساب الأرصدة؟')){ const idx = state.tx.findIndex(x=>x.id===id); if(idx>-1){ const now=Date.now(); const deleted=normalizeTx({...state.tx[idx], deletedAt:now, updatedAt:now}); state.tx.splice(idx,1); state.delTx = [...state.delTx.filter(x=>x.id!==id), deleted]; delete state.purgedTx[id]; const result = await saveData(); renderView(); showSaveResult(result, 'تم النقل للمحذوفات والمزامنة'); } } },
+        res: async (id) => { const idx = state.delTx.findIndex(x=>x.id===id); if(idx>-1){ const now=Date.now(); const restored=normalizeTx({...state.delTx[idx], restoredAt:now, updatedAt:now}); delete restored.deletedAt; state.delTx.splice(idx,1); state.tx = [...state.tx.filter(x=>x.id!==id), restored]; delete state.purgedTx[id]; const result = await saveData(); renderView(); showSaveResult(result, 'تم الاسترجاع والمزامنة'); } },
+        hardDel: async (id) => { if(confirm('حذف نهائي من سلة المحذوفات؟')){ const now=Date.now(); state.tx = state.tx.filter(x=>x.id!==id); state.delTx = state.delTx.filter(x=>x.id!==id); state.purgedTx[id]=now; const result = await saveData(); renderView(); showSaveResult(result, 'تم الحذف النهائي والمزامنة'); } },
+        edit: (id) => { const t = state.tx.find(x=>x.id===id); if(!t) return ui.toast('لم أجد الحركة للتعديل','error'); state.editId = id; ui.openModal('تعديل الحركة', buildEditForm(t)); const form = document.getElementById('frm-edit-tx'); if(form) { bindEditFormHelpers(form); form.onsubmit = ui.confirmEdit; } },
+        confirmEdit: async (e) => {
+            if(e) e.preventDefault();
+            const form = document.getElementById('frm-edit-tx');
+            const id = form?.dataset?.id || state.editId;
+            const idx = state.tx.findIndex(x=>x.id===id);
+            if(!form || idx < 0) return ui.toast('تعذر حفظ التعديل','error');
+            const b=form.querySelector('button[type="submit"]'); const oldText=b?.innerHTML || '';
+            if(b){ b.disabled=true; b.innerHTML='جاري حفظ التعديل...'; }
+            try {
+                const data = collectFormData(form);
+                const updated = validateTx(normalizeTx({...state.tx[idx], ...data, id:state.tx[idx].id, type:state.tx[idx].type, updatedAt:Date.now()}));
+                state.tx[idx] = updated;
+                const result = await saveData();
+                ui.closeModal();
+                renderView();
+                showSaveResult(result, 'تم تعديل الحركة والمزامنة');
+            } catch(err) {
+                ui.toast(err.message || 'فشل التعديل','error');
+                if(b){ b.disabled=false; b.innerHTML=oldText; }
+            }
+        },
         export: () => exportVisibleTableToExcel('ledger-tbl', 'IMAD_Ledger'),
         exportTable: (tableId, filename='IMAD_Export') => exportVisibleTableToExcel(tableId, filename),
+        exportPdf: async () => {
+            const target = document.getElementById('app-content');
+            if (!target) return ui.toast('لا يوجد محتوى للتصدير PDF','error');
+            if (!window.html2pdf) return ui.toast('مكتبة PDF غير جاهزة بعد','error');
+            const current = NAV.find(n => n.id === state.view)?.title || 'IMAD';
+            try {
+                await window.html2pdf().set({
+                    margin: 8,
+                    filename: `IMAD_${current}_${Date.now()}.pdf`,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2, useCORS: true },
+                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                }).from(target).save();
+                ui.toast('تم تصدير PDF');
+            } catch(e) {
+                ui.toast('فشل تصدير PDF','error');
+            }
+        },
+        loginCloud: async () => {
+            const email = document.getElementById('cloud-email')?.value?.trim();
+            const password = document.getElementById('cloud-password')?.value || '';
+            if (!email || !password) return ui.toast('أدخلي البريد وكلمة المرور','error');
+            if (!auth || !authApi) return ui.toast('Firebase Auth غير جاهز','error');
+            try {
+                const cred = await authApi.signInWithEmailAndPassword(auth, email, password);
+                currentUser = cred.user || null;
+                document.getElementById('cloud-password').value = '';
+                const result = await loadData();
+                renderView();
+                showSaveResult(result, 'تم تسجيل الدخول والمزامنة');
+            } catch(e) {
+                ui.toast(cleanText(e?.message || 'فشل تسجيل الدخول', 220), 'error');
+            }
+        },
+        logoutCloud: async () => {
+            if (!auth || !authApi) return ui.toast('Firebase Auth غير جاهز','error');
+            try {
+                await authApi.signOut(auth);
+                currentUser = null;
+                renderView();
+                ui.toast('تم تسجيل الخروج. الحفظ أصبح محلياً فقط');
+            } catch(e) {
+                ui.toast('فشل تسجيل الخروج','error');
+            }
+        },
         exportDelegates: () => {
             const rows = ui.dels().map(name => {
                 const b = calc.delegate(name); const delivered = (Number(b.ho)||0) + (Number(b.cut)||0); const pct = b.rev > 0 ? ((delivered / b.rev) * 100).toFixed(1) : '0.0';
@@ -1526,10 +1930,11 @@
             exportRowsToExcel(`IMAD_Delegate_${name}`, ['التاريخ','النوع','من','إلى','SYP','USD','ملاحظة'], rows);
             ui.toast('تم تصدير حركات المندوب');
         },
-        backup: () => { const a=document.createElement('a'); a.href="data:text/json;charset=utf-8,"+encodeURIComponent(JSON.stringify({tx:state.tx,delTx:state.delTx,purgedTx:state.purgedTx})); a.download=`IMAD_Backup_${Date.now()}.json`; a.click(); },
-        restore: () => { const f=document.getElementById('f-res').files[0]; if(!f) return; const r=new FileReader(); r.onload=e=>{ try{ const d=JSON.parse(e.target.result); const incomingIds = [...asArray(d.tx), ...asArray(d.delTx)].map(x=>x?.id).filter(Boolean); incomingIds.forEach(id=>delete state.purgedTx[id]); state.tx=d.tx||[]; state.delTx=d.delTx||[]; state.purgedTx={...state.purgedTx, ...asObject(d.purgedTx)}; saveData(); renderView(); ui.toast('تم الدمج بنجاح'); } catch(err){ ui.toast('ملف النسخة غير صالح','error'); } }; r.readAsText(f); },
-        wipe: () => { if(prompt('اكتب 9999 للتأكيد:')==='9999'){ const now=Date.now(); [...state.tx, ...state.delTx].forEach(t=>{ if(t?.id) state.purgedTx[t.id]=now; }); state.tx=[]; state.delTx=[]; saveData(); renderView(); ui.toast('تم مسح البيانات'); } }
+        backup: () => { const a=document.createElement('a'); a.href="data:text/json;charset=utf-8,"+encodeURIComponent(JSON.stringify({tx:state.tx,delTx:state.delTx,purgedTx:state.purgedTx, exportedAt:Date.now()})); a.download=`IMAD_Backup_${Date.now()}.json`; a.click(); },
+        restore: () => { const f=document.getElementById('f-res').files[0]; if(!f) return; const r=new FileReader(); r.onload=async e=>{ try{ const d=JSON.parse(e.target.result); const incoming = { tx:asArray(d.tx), delTx:asArray(d.delTx), purgedTx:asObject(d.purgedTx) }; const merged = reconcileStore({tx:state.tx, delTx:state.delTx, purgedTx:state.purgedTx}, incoming); state.tx=merged.tx; state.delTx=merged.delTx; state.purgedTx=merged.purgedTx; const result = await saveData(); renderView(); showSaveResult(result, 'تم دمج النسخة والمزامنة'); } catch(err){ ui.toast('ملف النسخة غير صالح','error'); } }; r.readAsText(f); },
+        wipe: async () => { if(prompt('اكتب 9999 للتأكيد:')==='9999'){ const now=Date.now(); [...state.tx, ...state.delTx].forEach(t=>{ if(t?.id) state.purgedTx[t.id]=now; }); state.tx=[]; state.delTx=[]; const result = await saveData(); renderView(); showSaveResult(result, 'تم مسح البيانات والمزامنة'); } }
     }
+
 
 
     // --- PREMIUM UX LAYER ---
@@ -1752,8 +2157,8 @@
             try { await navigator.clipboard.writeText(text); ui.toast('تم نسخ الحركة'); } catch(e) { ui.toast('تعذر النسخ','error'); }
         },
         openDelegate: (encodedName) => { const name = decodeURIComponent(encodedName); const b = calc.delegate(name); const items = sectionTransactions('delegateEntity', name); const summary = sectionSummary(items); const delivered = (Number(b.ho)||0) + (Number(b.cut)||0); const pct = b.rev > 0 ? Math.min(100, Math.round((delivered / b.rev) * 100)) : 0; ui.openModal(`المندوب: ${escapeHtml(name)}`, `${breadcrumbTrail(['لوحة التحكم','ذمم المندوبين', name])}<div class="delegate-card-head"><div class="progress-ring" style="--p:${pct}"><span>${pct}%</span></div><div style="flex:1"><div class="card-title">نسبة المسلّم من الإيراد</div><strong class="ltr-num text-gold">${calc.num(delivered)} / ${calc.num(b.rev)}</strong></div><button type="button" class="btn-soft btn-mini" onclick="ui.exportDelegateDetails('${encodeURIComponent(name)}')">تصدير Excel 📊</button></div><div class="detail-grid"><div class="detail-box"><small>إجمالي الإيراد</small><strong class="ltr-num text-primary">${calc.num(b.rev)} SYP</strong></div><div class="detail-box"><small>المسلّم المباشر</small><strong class="ltr-num text-success">${calc.num(b.ho)} SYP</strong></div><div class="detail-box"><small>المقصوص SYP</small><strong class="ltr-num text-danger">${calc.num(b.cut)} SYP</strong></div><div class="detail-box"><small>الناتج USD</small><strong class="ltr-num text-gold">${calc.num(summary.cutUsd, true)} USD</strong></div><div class="detail-box"><small>المتبقي</small><strong class="ltr-num ${calc.color(b.b)}">${calc.num(b.b)} SYP</strong></div><div class="detail-box"><small>الحركات</small><strong class="ltr-num">${calc.num(items.length)}</strong></div></div>${miniTxTable(items, 'لا يوجد حركات لهذا المندوب', `detail-delegate-${Date.now()}`)}`); },
-        openOffice: (encodedName) => { const name = decodeURIComponent(encodedName); const b = calc.office(name); const items = sectionTransactions('officeEntity', name); const summary = sectionSummary(items); ui.openModal(`المكتب: ${escapeHtml(name)}`, `${breadcrumbTrail(['لوحة التحكم','المكاتب', name])}<div class="detail-grid"><div class="detail-box"><small>رصيد SYP</small><strong class="ltr-num ${calc.color(b.syp)}">${calc.num(b.syp)} SYP</strong></div><div class="detail-box"><small>رصيد USD</small><strong class="ltr-num ${calc.color(b.usd)}">${calc.num(b.usd, true)} USD</strong></div><div class="detail-box"><small>إجمالي SYP (حركات)</small><strong class="ltr-num text-success">${calc.num(summary.syp)} SYP</strong></div><div class="detail-box"><small>إجمالي USD (حركات)</small><strong class="ltr-num text-gold">${calc.num(summary.usd, true)} USD</strong></div><div class="detail-box"><small>السوري المقصوص</small><strong class="ltr-num text-danger">${calc.num(summary.cutSyp)} SYP</strong></div><div class="detail-box"><small>الحركات</small><strong class="ltr-num">${calc.num(items.length)}</strong></div></div>${miniTxTable(items, 'لا يوجد حركات لهذا المكتب', `detail-office-${Date.now()}`)}`); },
-        openSafe: (encodedName) => { const name = decodeURIComponent(encodedName); const b = calc.safe(name); const items = sectionTransactions('safeEntity', name); const summary = sectionSummary(items); ui.openModal(`الصندوق: ${escapeHtml(name)}`, `${breadcrumbTrail(['لوحة التحكم','الصناديق', name])}<div class="detail-grid"><div class="detail-box"><small>رصيد SYP</small><strong class="ltr-num ${calc.color(b.syp)}">${calc.num(b.syp)} SYP</strong></div><div class="detail-box"><small>رصيد USD</small><strong class="ltr-num ${calc.color(b.usd)}">${calc.num(b.usd, true)} USD</strong></div><div class="detail-box"><small>إجمالي SYP (حركات)</small><strong class="ltr-num text-success">${calc.num(summary.syp)} SYP</strong></div><div class="detail-box"><small>إجمالي USD (حركات)</small><strong class="ltr-num text-gold">${calc.num(summary.usd, true)} USD</strong></div><div class="detail-box"><small>الحركات</small><strong class="ltr-num">${calc.num(items.length)}</strong></div></div>${miniTxTable(items, 'لا يوجد حركات لهذا الصندوق', `detail-safe-${Date.now()}`)}`); }
+        openOffice: (encodedName) => { const name = decodeURIComponent(encodedName); const b = calc.office(name); const items = sectionTransactions('officeEntity', name); const summary = sectionSummary(items); ui.openModal(`المكتب: ${escapeHtml(name)}`, `${breadcrumbTrail(['لوحة التحكم','المكاتب', name])}<div class="detail-grid"><div class="detail-box"><small>رصيد SYP</small><strong class="ltr-num ${calc.color(b.syp)}">${calc.num(b.syp)} SYP</strong></div><div class="detail-box"><small>رصيد USD</small><strong class="ltr-num ${calc.color(b.usd)}">${calc.num(b.usd, true)} USD</strong></div><div class="detail-box"><small>إجمالي SYP (حركات)</small><strong class="ltr-num text-success">${calc.num(summary.syp)} SYP</strong></div><div class="detail-box"><small>إجمالي USD (حركات)</small><strong class="ltr-num text-gold">${calc.num(summary.usd, true)} USD</strong></div><div class="detail-box"><small>السوري المقصوص</small><strong class="ltr-num text-danger">${calc.num(summary.cutSyp)} SYP</strong></div><div class="detail-box"><small>الحركات</small><strong class="ltr-num">${calc.num(items.length)}</strong></div></div>${signedEntityTxTable(items, 'office', name, 'لا يوجد حركات لهذا المكتب', `detail-office-${Date.now()}`)}`); },
+        openSafe: (encodedName) => { const name = decodeURIComponent(encodedName); const b = calc.safe(name); const items = sectionTransactions('safeEntity', name); const summary = sectionSummary(items); ui.openModal(`الصندوق: ${escapeHtml(name)}`, `${breadcrumbTrail(['لوحة التحكم','الصناديق', name])}<div class="detail-grid"><div class="detail-box"><small>رصيد SYP</small><strong class="ltr-num ${calc.color(b.syp)}">${calc.num(b.syp)} SYP</strong></div><div class="detail-box"><small>رصيد USD</small><strong class="ltr-num ${calc.color(b.usd)}">${calc.num(b.usd, true)} USD</strong></div><div class="detail-box"><small>إجمالي SYP (حركات)</small><strong class="ltr-num text-success">${calc.num(summary.syp)} SYP</strong></div><div class="detail-box"><small>إجمالي USD (حركات)</small><strong class="ltr-num text-gold">${calc.num(summary.usd, true)} USD</strong></div><div class="detail-box"><small>الحركات</small><strong class="ltr-num">${calc.num(items.length)}</strong></div></div>${signedEntityTxTable(items, 'safe', name, 'لا يوجد حركات لهذا الصندوق', `detail-safe-${Date.now()}`)}`); }
     });
 
     // --- 5. RENDER ENGINE ---
@@ -1792,6 +2197,7 @@
             if(t.type==='REVENUE') { rev += Number(t.syp) || 0; if(t.revType === 'CCBS') revCcbs += Number(t.syp) || 0; if(t.revType === 'MASARY') revMasary += Number(t.syp) || 0; }
             if(t.type==='HANDOVER' && handoverCutUsd(t)) { cSyp += Number(t.cutSyp) || 0; cUsd += handoverCutUsd(t); }
             if((t.type==='SAFE_EXCHANGE_SYP_TO_USD'||t.type==='office_convert_syp_to_usd') && Number(t.rate)>0) { cSyp += Number(t.amt) || 0; cUsd += (Number(t.amt) || 0) / Number(t.rate); }
+            if(t.type==='SAFE_EXCHANGE_USD_TO_SYP' && Number(t.rate)>0) { cUsd += Number(t.amt) || 0; cSyp += (Number(t.amt) || 0) * Number(t.rate); }
         });
         ui.dels().forEach(d=>{ const b=calc.delegate(d).b; if(b>0) rem+=b; });
         CONSTANTS.OFFICES.forEach(o=>{ const b=calc.office(o); oSyp+=b.syp; oUsd+=b.usd; });
@@ -1807,8 +2213,8 @@
             ${metricCard('متبقي المندوبين SYP', calc.num(rem), 'text-danger', 'ذمم غير مسلمة', trendSeries(t=>t.type==='HANDOVER' || t.type==='REVENUE', t=>t.type==='REVENUE'?t.syp:((t.syp||0)+(t.cutSyp||0))))}
             ${metricCard('أرصدة المكاتب', `${calc.num(oSyp)} <span style="font-size:1rem;color:var(--text-muted)">SYP</span><br><span class="text-gold">${calc.num(oUsd,true)} <span style="font-size:1rem;color:var(--text-muted)">USD</span></span>`, 'text-success', 'كل المكاتب', trendSeries(t=>sectionTransactions('offices').some(x=>x.id===t.id), t=>txSypValue(t)+txUsdValue(t)))}
             ${metricCard('الصندوق الأساسي', `${calc.num(mainSafe.syp)} <span style="font-size:1rem;color:var(--text-muted)">SYP</span><br><span class="text-gold">${calc.num(mainSafe.usd,true)} <span style="font-size:1rem;color:var(--text-muted)">USD</span></span>`, 'text-success', 'الصندوق الأساسي فقط', trendSeries(t=>matchesSafeMovement(t, 'صندوق أساسي'), t=>txSypValue(t)+txUsdValue(t)))}
-            ${metricCard('السوري المقصوص', `${calc.num(cSyp)} <span style="font-size:1rem;color:var(--text-muted)">SYP</span>`, 'text-danger', 'كل عمليات القص', trendSeries(t=>(t.type==='HANDOVER' && Number(t.cutSyp)>0) || t.type==='SAFE_EXCHANGE_SYP_TO_USD' || t.type==='office_convert_syp_to_usd', t=>t.cutSyp||t.amt))}
-            ${metricCard('دولار ناتج القص', `${calc.num(cUsd,true)} <span style="font-size:1rem;color:var(--text-muted)">USD</span>`, 'text-success', 'ناتج القص الكامل', trendSeries(t=>(t.type==='HANDOVER' && Number(t.cutSyp)>0) || t.type==='SAFE_EXCHANGE_SYP_TO_USD' || t.type==='office_convert_syp_to_usd', t=>handoverCutUsd(t)||convertSypToUsd(t.amt, t.rate)))}
+            ${metricCard('السوري المتداول بالقص', `${calc.num(cSyp)} <span style="font-size:1rem;color:var(--text-muted)">SYP</span>`, 'text-danger', 'كل عمليات القص', trendSeries(t=>(t.type==='HANDOVER' && Number(t.cutSyp)>0) || t.type==='SAFE_EXCHANGE_SYP_TO_USD' || t.type==='SAFE_EXCHANGE_USD_TO_SYP' || t.type==='office_convert_syp_to_usd', t=>t.type==='SAFE_EXCHANGE_USD_TO_SYP' ? (Number(t.amt)||0)*(Number(t.rate)||0) : (t.cutSyp||t.amt)))}
+            ${metricCard('الدولار المتداول بالقص', `${calc.num(cUsd,true)} <span style="font-size:1rem;color:var(--text-muted)">USD</span>`, 'text-success', 'كل عمليات القص', trendSeries(t=>(t.type==='HANDOVER' && Number(t.cutSyp)>0) || t.type==='SAFE_EXCHANGE_SYP_TO_USD' || t.type==='SAFE_EXCHANGE_USD_TO_SYP' || t.type==='office_convert_syp_to_usd', t=>t.type==='SAFE_EXCHANGE_USD_TO_SYP' ? t.amt : (handoverCutUsd(t)||convertSypToUsd(t.amt, t.rate))))}
             ${metricCard('سعر الصرف الوسطي', `${calc.num(avgExchangeRate)} <span style="font-size:1rem;color:var(--text-muted)">SYP/USD</span>`, 'text-gold', 'المقصوص ÷ الدولار الناتج', weightedExchangeRateSeries())}
         </div>
         <div class="panel" style="padding:1.5rem; margin-top:2rem">
@@ -1819,7 +2225,7 @@
 
     function viewRevenue() {
         const isRev = state.tab === 'rev_entry';
-        const d = new Date().toISOString().split('T')[0];
+        const d = localDateText();
         const section = isRev ? 'revenue' : 'handover';
         let formHTML = isRev ? `
             <form id="frm-rev" class="form-grid">
@@ -1853,7 +2259,7 @@
         const summary = sectionSummary(txs);
         const handedSypTotal = summary.syp + summary.cutSyp;
         const remainingDelegatesTotal = ui.dels().reduce((sum, name) => { const bal = calc.delegate(name).b; return sum + (bal > 0 ? bal : 0); }, 0);
-        const trs = txs.map(t=>`<tr><td data-label="التاريخ">${t.date}</td><td data-label="المندوب"><span class="clickable-name" onclick="ui.openDelegate('${encodeURIComponent(t.delegate||'')}')">${escapeHtml(t.delegate||'-')}</span></td>${!isRev?`<td data-label="الوجهة">${escapeHtml(t.toId||'-')}</td>`:''}
+        const trs = txs.map(t=>`<tr><td data-label="التاريخ">${escapeHtml(t.date)}</td><td data-label="المندوب"><span class="clickable-name" onclick="ui.openDelegate('${encodeURIComponent(t.delegate||'')}')">${escapeHtml(t.delegate||'-')}</span></td>${!isRev?`<td data-label="الوجهة">${escapeHtml(t.toId||'-')}</td>`:''}
             <td data-label="مباشر" class="ltr-num text-success">${calc.num(t.syp)} ${isRev?'':(t.usd?` | ${calc.num(t.usd,true)} USD`:``)}</td>
             ${!isRev?`<td data-label="قص" class="ltr-num text-gold">${handoverCutUsd(t)?`${calc.num(t.cutSyp)} / ${calc.num(t.rate)} = ${calc.num(handoverCutUsd(t), true)} USD`:'-'}</td>`:''}
             <td data-label="ملاحظة" class="note-cell">${escapeHtml(txNoteWithCut(t))}</td><td data-label="إجراء" class="actions-cell"><button class="btn-action" onclick="ui.edit('${t.id}')">تعديل</button><button class="btn-action del" onclick="ui.del('${t.id}')">حذف</button></td></tr>`).join('');
@@ -1872,10 +2278,10 @@
                 <div class="flex-between"><span class="card-title">SYP</span><span class="card-value ${calc.color(b.syp)}">${calc.num(b.syp)}</span></div>
                 <div class="flex-between"><span class="card-title">USD</span><span class="card-value text-gold">${calc.num(b.usd,true)}</span></div>
             </div>`).join('');
-        const d = new Date().toISOString().split('T')[0];
+        const d = localDateText();
         const officeTx = sectionTransactions('offices').sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0));
         const summary = sectionSummary(officeTx);
-        const trs = officeTx.map(t=>`<tr><td data-label="التاريخ">${t.date}</td><td data-label="النوع">${typeBadge(txTypeLabel(t))}</td><td data-label="من">${sourceCell(t)}</td><td data-label="إلى">${destinationCell(t)}</td><td data-label="SYP" class="ltr-num text-success">${calc.num(officeRowSyp(t))}</td><td data-label="USD" class="ltr-num text-gold">${calc.num(officeRowUsd(t),true)}</td><td data-label="عمولة SYP" class="ltr-num text-danger">${officeCommissionSyp(t) ? calc.num(officeCommissionSyp(t)) : '-'}</td><td data-label="عمولة USD" class="ltr-num text-gold">${officeCommissionUsd(t) ? calc.num(officeCommissionUsd(t),true) : '-'}</td><td data-label="ملاحظة" class="note-cell">${escapeHtml(txNoteWithCut(t))}</td><td data-label="إجراء" class="actions-cell"><button class="btn-action" onclick="ui.edit('${t.id}')">تعديل</button><button class="btn-action del" onclick="ui.del('${t.id}')">حذف</button></td></tr>`).join('');
+        const trs = officeTx.map(t=>`<tr><td data-label="التاريخ">${escapeHtml(t.date)}</td><td data-label="النوع">${typeBadge(txTypeLabel(t))}</td><td data-label="من">${sourceCell(t)}</td><td data-label="إلى">${destinationCell(t)}</td><td data-label="SYP" class="ltr-num text-success">${calc.num(officeRowSyp(t))}</td><td data-label="USD" class="ltr-num text-gold">${calc.num(officeRowUsd(t),true)}</td><td data-label="عمولة SYP" class="ltr-num text-danger">${officeCommissionSyp(t) ? calc.num(officeCommissionSyp(t)) : '-'}</td><td data-label="عمولة USD" class="ltr-num text-gold">${officeCommissionUsd(t) ? calc.num(officeCommissionUsd(t),true) : '-'}</td><td data-label="ملاحظة" class="note-cell">${escapeHtml(txNoteWithCut(t))}</td><td data-label="إجراء" class="actions-cell"><button class="btn-action" onclick="ui.edit('${t.id}')">تعديل</button><button class="btn-action del" onclick="ui.del('${t.id}')">حذف</button></td></tr>`).join('');
         return `${toolbar('المكاتب', '', 'office-table')}
             <div class="grid-cards">${offs||'<div class="empty-state" style="grid-column:1/-1">لا يوجد أرصدة</div>'}</div>
             <div class="summary-strip">${summaryPill('سجلات', calc.num(officeTx.length))}${summaryPill('SYP حركات', `${calc.num(summary.syp)} SYP`, 'text-success')}${summaryPill('USD حركات', `${calc.num(summary.usd,true)} USD`, 'text-gold')}${summaryPill('عمولات SYP', `${calc.num(summary.commissionSyp)} SYP`, 'text-danger')}${summaryPill('عمولات USD', `${calc.num(summary.commissionUsd,true)} USD`, 'text-gold')}${summaryPill('مقصوص SYP', `${calc.num(summary.cutSyp)} SYP`, 'text-danger')}</div>
@@ -1898,10 +2304,10 @@
 
     function viewSafes() {
         const sfs = CONSTANTS.SAFES.map(s => { const b = calc.safe(s); return `<div class="card office-card" onclick="ui.openSafe('${encodeURIComponent(s)}')"><h3>${escapeHtml(s)}</h3><div class="flex-between"><span class="card-title">SYP</span><span class="card-value ${calc.color(b.syp)}">${calc.num(b.syp)}</span></div><div class="flex-between"><span class="card-title">USD</span><span class="card-value text-gold">${calc.num(b.usd,true)}</span></div></div>`; }).join('');
-        const d = new Date().toISOString().split('T')[0];
+        const d = localDateText();
         const safeTx = sectionTransactions('safes').sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0));
         const summary = sectionSummary(safeTx);
-        const trs = safeTx.map(t=>`<tr><td data-label="التاريخ">${t.date}</td><td data-label="النوع">${typeBadge(txTypeLabel(t))}</td><td data-label="من">${sourceCell(t)}</td><td data-label="إلى">${destinationCell(t)}</td><td data-label="SYP" class="ltr-num text-success">${calc.num(t.type==='HANDOVER' ? (Number(t.syp)||0) : (t.cur==='SYP'||!t.cur?t.amt||t.syp:0))}</td><td data-label="USD" class="ltr-num text-gold">${calc.num(t.type==='HANDOVER' ? ((Number(t.usd)||0)+handoverCutUsd(t)) : (t.cur==='USD'||t.usd?t.amt||t.usd:0),true)}</td><td data-label="ملاحظة" class="note-cell">${escapeHtml(txNoteWithCut(t))}</td><td data-label="إجراء" class="actions-cell"><button class="btn-action" onclick="ui.edit('${t.id}')">تعديل</button><button class="btn-action del" onclick="ui.del('${t.id}')">حذف</button></td></tr>`).join('');
+        const trs = safeTx.map(t=>`<tr><td data-label="التاريخ">${escapeHtml(t.date)}</td><td data-label="النوع">${typeBadge(txTypeLabel(t))}</td><td data-label="من">${sourceCell(t)}</td><td data-label="إلى">${destinationCell(t)}</td><td data-label="SYP" class="ltr-num text-success">${calc.num(t.type==='HANDOVER' ? (Number(t.syp)||0) : (t.cur==='SYP'||!t.cur?t.amt||t.syp:0))}</td><td data-label="USD" class="ltr-num text-gold">${calc.num(t.type==='HANDOVER' ? ((Number(t.usd)||0)+handoverCutUsd(t)) : (t.cur==='USD'||t.usd?t.amt||t.usd:0),true)}</td><td data-label="ملاحظة" class="note-cell">${escapeHtml(txNoteWithCut(t))}</td><td data-label="إجراء" class="actions-cell"><button class="btn-action" onclick="ui.edit('${t.id}')">تعديل</button><button class="btn-action del" onclick="ui.del('${t.id}')">حذف</button></td></tr>`).join('');
         return `${toolbar('الصناديق', '', 'safe-table')}<div class="grid-cards">${sfs}</div>
             <div class="summary-strip">${summaryPill('سجلات', calc.num(safeTx.length))}${summaryPill('SYP حركات', `${calc.num(summary.syp)} SYP`, 'text-success')}${summaryPill('USD حركات', `${calc.num(summary.usd,true)} USD`, 'text-gold')}${summaryPill('مقصوص SYP', `${calc.num(summary.cutSyp)} SYP`, 'text-danger')}</div>
             <div class="panel form-section"><form id="frm-safe" class="form-grid">
@@ -1911,8 +2317,11 @@
                 <div class="form-group hidden" id="sf-f"><label>من صندوق/مكتب</label><select name="fromId"></select></div>
                 <div class="form-group hidden" id="sf-t"><label>إلى صندوق/مكتب</label><select name="toId"></select></div>
                 <div class="form-group hidden" id="sf-p"><label>الجهة/الشخص</label><input type="text" name="person"></div>
+                <div class="form-group hidden" id="sf-c"><label>العملة</label><select name="cur"><option>SYP</option><option>USD</option></select></div>
                 <div class="form-group"><label>المبلغ</label><input type="text" inputmode="decimal" class="money-input" name="amt" step="any" min="0.01" required></div>
                 <div class="form-group hidden" id="sf-r"><label>سعر الصرف</label><input type="text" inputmode="decimal" class="money-input" name="rate" step="any" min="1"></div>
+                <div class="form-group hidden" id="sf-comm-syp"><label>عمولة SYP</label><input type="text" inputmode="numeric" class="money-input" name="commissionSyp" value="0" min="0"></div>
+                <div class="form-group hidden" id="sf-comm-usd"><label>عمولة USD</label><input type="text" inputmode="decimal" class="money-input" name="commissionUsd" value="0" step="any" min="0"></div>
                 <div class="form-group full"><label>ملاحظة</label><input type="text" name="note"></div>
                 <div class="form-group full"><button type="submit" class="btn-submit">تنفيذ الحركة</button></div>
             </form></div>
@@ -1923,16 +2332,18 @@
         const cuts = sectionTransactions('exchange').sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0));
         let syp=0, usd=0;
         const trs = cuts.map(t=>{
-            const cSyp = Number(t.cutSyp||t.amt||0), cUsd = (Number(t.rate)||0)>0 ? cSyp/Number(t.rate) : 0; syp+=cSyp; usd+=cUsd;
-            return `<tr><td data-label="التاريخ">${t.date}</td><td data-label="المصدر">${t.delegate?`<span class="clickable-name" onclick="ui.openDelegate('${encodeURIComponent(t.delegate)}')">${escapeHtml(t.delegate)}</span>`:escapeHtml(t.safeId||t.fromId||'-')}</td><td data-label="الوجهة/النوع">${escapeHtml(txDestination(t) === '-' ? txTypeLabel(t) : txDestination(t))}</td><td data-label="SYP المقصوص" class="ltr-num">${calc.num(cSyp)}</td><td data-label="السعر" class="ltr-num text-gold">${calc.num(t.rate)}</td><td data-label="USD الناتج" class="ltr-num text-success">${calc.num(cUsd,true)}</td></tr>`;
+            const cSyp = txSypValue(t);
+            const cUsd = txUsdValue(t);
+            syp += cSyp; usd += cUsd;
+            return `<tr><td data-label="التاريخ">${escapeHtml(t.date)}</td><td data-label="المصدر">${t.delegate?`<span class="clickable-name" onclick="ui.openDelegate('${encodeURIComponent(t.delegate)}')">${escapeHtml(t.delegate)}</span>`:escapeHtml(t.safeId||t.fromId||'-')}</td><td data-label="الوجهة/النوع">${escapeHtml(txDestination(t) === '-' ? txTypeLabel(t) : txDestination(t))}</td><td data-label="SYP المتداول" class="ltr-num">${calc.num(cSyp)}</td><td data-label="السعر" class="ltr-num text-gold">${calc.num(t.rate)}</td><td data-label="USD المتداول" class="ltr-num text-success">${calc.num(cUsd,true)}</td></tr>`;
         }).join('');
         return `${toolbar('قص الدولار', '', 'exchange-table')}
         <div class="grid-cards dashboard-cards">
-            ${metricCard('إجمالي المقصوص SYP', calc.num(syp), 'text-danger')}
-            ${metricCard('إجمالي الناتج USD', calc.num(usd,true), 'text-success')}
+            ${metricCard('إجمالي SYP المتداول', calc.num(syp), 'text-danger')}
+            ${metricCard('إجمالي USD المتداول', calc.num(usd,true), 'text-success')}
             ${metricCard('المتوسط', calc.num(usd>0?syp/usd:0), 'text-gold')}
         </div>
-        <div class="table-wrap"><table id="exchange-table" class="records-table"><thead><tr><th>التاريخ</th><th>المصدر</th><th>الوجهة/النوع</th><th>SYP المقصوص</th><th>السعر</th><th>USD الناتج</th></tr></thead><tbody>${trs||'<tr><td colspan="6" class="empty-state">لا يوجد عمليات قص</td></tr>'}</tbody></table></div>`;
+        <div class="table-wrap"><table id="exchange-table" class="records-table"><thead><tr><th>التاريخ</th><th>المصدر</th><th>الوجهة/النوع</th><th>SYP المتداول</th><th>السعر</th><th>USD المتداول</th></tr></thead><tbody>${trs||'<tr><td colspan="6" class="empty-state">لا يوجد عمليات قص</td></tr>'}</tbody></table></div>`;
     }
 
     function viewDelegates() {
@@ -1949,28 +2360,32 @@
 
     function viewAdvances() {
         const adv = sectionTransactions('advances').sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0));
-        const trs = adv.map(t=>`<tr><td data-label="التاريخ">${t.date}</td><td data-label="الصندوق">${escapeHtml(t.safeId||'-')}</td><td data-label="النوع">${typeBadge(CONSTANTS.SAFE_TYPES[t.type]||t.type)}</td><td data-label="الشخص">${escapeHtml(t.person||'-')}</td><td data-label="المبلغ" class="ltr-num">${calc.num(t.amt, t.type.includes('USD'))}</td><td data-label="ملاحظة" class="note-cell">${escapeHtml(t.note||'-')}</td><td data-label="إجراء" class="actions-cell"><button class="btn-action del" onclick="ui.del('${t.id}')">حذف</button></td></tr>`).join('');
+        const trs = adv.map(t=>`<tr><td data-label="التاريخ">${escapeHtml(t.date)}</td><td data-label="الصندوق">${escapeHtml(t.safeId||'-')}</td><td data-label="النوع">${typeBadge(CONSTANTS.SAFE_TYPES[t.type]||t.type)}</td><td data-label="الشخص">${escapeHtml(t.person||'-')}</td><td data-label="المبلغ" class="ltr-num">${calc.num(t.amt, t.type.includes('USD'))}</td><td data-label="ملاحظة" class="note-cell">${escapeHtml(t.note||'-')}</td><td data-label="إجراء" class="actions-cell"><button class="btn-action" onclick="ui.edit('${t.id}')">تعديل</button><button class="btn-action del" onclick="ui.del('${t.id}')">حذف</button></td></tr>`).join('');
         return `${toolbar('السلف', '', 'adv-table')}<div class="table-wrap"><table id="adv-table" class="records-table"><thead><tr><th>التاريخ</th><th>الصندوق</th><th>النوع</th><th>الشخص/الجهة</th><th>المبلغ</th><th>ملاحظة</th><th>إجراء</th></tr></thead><tbody>${trs||'<tr><td colspan="7" class="empty-state">لا يوجد سلف</td></tr>'}</tbody></table></div>`;
     }
 
     function viewLedger() {
         const txs = [...state.tx].sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0));
-        const trs = txs.map(t=>`<tr><td data-label="ID"><small style="color:var(--text-muted)">${escapeHtml(String(t.id||'').split('-')[1]||'')}</small></td><td data-label="التاريخ">${t.date}</td><td data-label="النوع">${typeBadge(txTypeLabel(t))}</td><td data-label="المصدر">${sourceCell(t)}</td><td data-label="الوجهة">${destinationCell(t)}</td><td data-label="المبلغ" class="ltr-num">${ledgerAmountText(t)}</td><td data-label="ملاحظة" class="note-cell">${escapeHtml(txNoteWithCut(t))}</td><td data-label="إجراء" class="actions-cell"><button class="btn-action del" onclick="ui.del('${t.id}')">حذف</button></td></tr>`).join('');
+        const trs = txs.map(t=>`<tr><td data-label="ID"><small style="color:var(--text-muted)">${escapeHtml(String(t.id||'').split('-')[1]||'')}</small></td><td data-label="التاريخ">${escapeHtml(t.date)}</td><td data-label="النوع">${typeBadge(txTypeLabel(t))}</td><td data-label="المصدر">${sourceCell(t)}</td><td data-label="الوجهة">${destinationCell(t)}</td><td data-label="المبلغ" class="ltr-num">${ledgerAmountText(t)}</td><td data-label="ملاحظة" class="note-cell">${escapeHtml(txNoteWithCut(t))}</td><td data-label="إجراء" class="actions-cell"><button class="btn-action" onclick="ui.edit('${t.id}')">تعديل</button><button class="btn-action del" onclick="ui.del('${t.id}')">حذف</button></td></tr>`).join('');
         return `${toolbar('الدفتر الأستاذ', 'ui.export()', 'ledger-tbl')}<div class="table-wrap"><table id="ledger-tbl" class="records-table"><thead><tr><th>ID</th><th>التاريخ</th><th>النوع</th><th>المصدر</th><th>الوجهة</th><th>المبلغ</th><th>ملاحظة</th><th>إجراء</th></tr></thead><tbody>${trs||'<tr><td colspan="8" class="empty-state">لا يوجد بيانات</td></tr>'}</tbody></table></div>`;
     }
 
     function viewRecycle() {
-        const trs = state.delTx.map(t=>`<tr><td data-label="التاريخ">${t.date}</td><td data-label="النوع">${typeBadge(txTypeLabel(t))}</td><td data-label="المبلغ" class="ltr-num">${ledgerAmountText(t)}</td><td data-label="إجراء" class="actions-cell"><button class="btn-action text-success" onclick="ui.res('${t.id}')">استرجاع</button><button class="btn-action del" onclick="ui.hardDel('${t.id}')">نهائي</button></td></tr>`).join('');
+        const trs = state.delTx.map(t=>`<tr><td data-label="التاريخ">${escapeHtml(t.date)}</td><td data-label="النوع">${typeBadge(txTypeLabel(t))}</td><td data-label="المبلغ" class="ltr-num">${ledgerAmountText(t)}</td><td data-label="إجراء" class="actions-cell"><button class="btn-action text-success" onclick="ui.res('${t.id}')">استرجاع</button><button class="btn-action del" onclick="ui.hardDel('${t.id}')">نهائي</button></td></tr>`).join('');
         return `${toolbar('سلة المحذوفات', '', 'recycle-table')}<div class="table-wrap"><table id="recycle-table" class="records-table"><thead><tr><th>التاريخ</th><th>النوع</th><th>المبلغ</th><th>إجراء</th></tr></thead><tbody>${trs||'<tr><td colspan="4" class="empty-state">السلة فارغة</td></tr>'}</tbody></table></div>`;
     }
     
     function viewSettings() { 
         const isLight = document.body.classList.contains('theme-light');
         const soundOn = localStorage.getItem('imad_sound_enabled') === '1';
+        const cloudEmail = currentUser?.email || '';
+        const cloudState = currentUser ? `متصل: ${escapeHtml(cloudEmail)}` : 'غير مسجل دخول — الحفظ محلي فقط';
         return `<h2>الإعدادات</h2><div class="grid-cards">
             <div class="card"><h3>المظهر</h3><p class="card-title">تبديل Dark / Light بانتقال سلس.</p><button class="btn-submit" style="margin-top:auto" onclick="premium.toggleTheme()">${isLight ? 'تفعيل المظهر الداكن' : 'تفعيل المظهر الفاتح'}</button></div>
             <div class="card"><h3>صوت الحفظ</h3><p class="card-title">صوت ناعم اختياري عند الحفظ الناجح.</p><button class="btn-submit" style="margin-top:auto" onclick="premium.toggleSound()">${soundOn ? 'إيقاف الصوت' : 'تفعيل الصوت'}</button></div>
+            <div class="card"><h3>حماية السحابة</h3><p class="card-title">${cloudState}</p>${currentUser ? `<button class="btn-submit" style="margin-top:auto; background:var(--danger)" onclick="ui.logoutCloud()">تسجيل الخروج</button>` : `<input id="cloud-email" type="email" placeholder="Firebase email" autocomplete="username" style="margin-bottom:.75rem"><input id="cloud-password" type="password" placeholder="Firebase password" autocomplete="current-password" style="margin-bottom:.75rem"><button class="btn-submit" style="margin-top:auto" onclick="ui.loginCloud()">تسجيل الدخول للسحابة</button>`}</div>
             <div class="card"><h3>نسخ احتياطي</h3><button class="btn-submit" style="margin-top:auto" onclick="ui.backup()">تحميل النسخة</button></div>
+            <div class="card"><h3>تصدير PDF</h3><p class="card-title">تصدير الصفحة الحالية كما تظهر الآن.</p><button class="btn-submit" style="margin-top:auto" onclick="ui.exportPdf()">تحميل PDF</button></div>
             <div class="card"><h3>استعادة ودمج</h3><input type="file" id="f-res" style="margin-bottom:1rem; padding:0.5rem"><button class="btn-submit" style="margin-top:auto; background:var(--success)" onclick="ui.restore()">دمج البيانات</button></div>
             <div class="card" style="border-color:var(--danger)"><h3 class="text-danger">مسح النظام</h3><button class="btn-submit" style="margin-top:auto; background:var(--danger)" onclick="ui.wipe()">Wipe Data</button></div>
         </div>`; 
@@ -1986,7 +2401,7 @@
                 bal.classList.add('hidden'); 
             };
             del.onchange=e=>{ if(e.target.value){ const b=calc.delegate(e.target.value).b; bal.innerHTML=`المتبقي: <span class="ltr-num ${calc.color(b)}">${calc.num(b)}</span>`; bal.classList.remove('hidden'); }};
-            document.getElementById('frm-rev').onsubmit=e=>ui.submit(e, d=>{ d.id=genId(); d.type='REVENUE'; d.syp=parseMoney(d.syp); if(d.syp <= 0) throw new Error('أدخل مبلغ صحيح'); d.updatedAt=Date.now(); state.tx.push(normalizeTx(d)); });
+            document.getElementById('frm-rev').onsubmit=e=>ui.submit(e, d=>{ d.id=genId(); d.type='REVENUE'; d.syp=parseMoney(d.syp); d.updatedAt=Date.now(); const tx = validateTx(normalizeTx(d)); state.tx.push(tx); });
         }
         if(document.getElementById('frm-ho')) {
             const tType=document.getElementById('ho-totype'), tId=document.getElementById('ho-toid'), cSyp=document.getElementById('ho-cutsyp'), rate=document.getElementById('ho-rate'), res=document.getElementById('ho-res'), hoDelegate=document.getElementById('ho-delegate'), hoInfo=document.getElementById('ho-delegate-info');
@@ -2000,45 +2415,42 @@
                 hoInfo.classList.remove('hidden');
             };
             const calcCut=()=>{ const r=parseMoney(rate.value), s=parseMoney(cSyp.value); res.innerHTML=calc.num(r>0?s/r:0, true) + ' <span style="font-size:1rem;color:var(--text-muted)">USD</span>';}; cSyp.oninput=calcCut; rate.oninput=calcCut;
-            document.getElementById('frm-ho').onsubmit=e=>ui.submit(e, d=>{ d.syp=parseMoney(d.syp); d.usd=parseMoney(d.usd); d.cutSyp=parseMoney(d.cutSyp); d.rate=parseMoney(d.rate); if(!d.syp&&!d.usd&&!d.cutSyp)throw new Error('أدخل مبلغ واحد على الأقل'); if(d.cutSyp > 0 && d.rate <= 0) throw new Error('أدخل سعر صرف صحيح للقص'); d.id=genId(); d.type='HANDOVER'; d.updatedAt=Date.now(); state.tx.push(normalizeTx(d)); });
+            document.getElementById('frm-ho').onsubmit=e=>ui.submit(e, d=>{ d.syp=parseMoney(d.syp); d.usd=parseMoney(d.usd); d.cutSyp=parseMoney(d.cutSyp); d.rate=parseMoney(d.rate); d.id=genId(); d.type='HANDOVER'; d.updatedAt=Date.now(); const tx = validateTx(normalizeTx(d)); state.tx.push(tx); });
         }
         if(document.getElementById('frm-off')) {
             const typ=document.getElementById('off-type'), f=document.getElementById('off-f'), t=document.getElementById('off-t'), p=document.getElementById('off-p'), c=document.getElementById('off-c'), r=document.getElementById('off-r'), commSyp=document.getElementById('off-comm-syp'), commUsd=document.getElementById('off-comm-usd');
             typ.onchange=e=>{
                 const v=e.target.value; [f,t,p,c,r,commSyp,commUsd].forEach(x=>x.classList.add('hidden')); f.classList.remove('hidden'); f.querySelector('label').innerText='من مكتب'; f.querySelector('select').innerHTML=ui.opts(CONSTANTS.OFFICES); t.querySelector('label').innerText='إلى';
                 if(v==='office_transfer'){ t.classList.remove('hidden'); c.classList.remove('hidden'); commSyp.classList.remove('hidden'); commUsd.classList.remove('hidden'); t.querySelector('select').innerHTML=ui.opts(CONSTANTS.OFFICES); }
-                if(v==='office_to_cashbox'){ t.classList.remove('hidden'); c.classList.remove('hidden'); commSyp.classList.remove('hidden'); commUsd.classList.remove('hidden'); t.querySelector('select').innerHTML=ui.opts(CONSTANTS.SAFES); }
-                if(v==='cashbox_to_office'){ f.querySelector('label').innerText='من صندوق'; f.querySelector('select').innerHTML=ui.opts(CONSTANTS.SAFES); t.classList.remove('hidden'); t.querySelector('label').innerText='إلى مكتب'; t.querySelector('select').innerHTML=ui.opts(CONSTANTS.OFFICES); c.classList.remove('hidden'); }
                 if(v==='office_convert_syp_to_usd'){ r.classList.remove('hidden'); }
                 if(v==='office_external'||v==='office_person'){ p.classList.remove('hidden'); c.classList.remove('hidden'); commSyp.classList.remove('hidden'); commUsd.classList.remove('hidden'); }
                 if(v==='office_adjust_add'||v==='office_adjust_sub'){ c.classList.remove('hidden'); }
             }; typ.dispatchEvent(new Event('change'));
             document.getElementById('frm-off').onsubmit=e=>ui.submit(e, d=>{
                 d.id=genId(); d.amt=parseMoney(d.amt); d.rate=parseMoney(d.rate); d.commissionSyp=parseMoney(d.commissionSyp); d.commissionUsd=parseMoney(d.commissionUsd);
-                if(d.amt <= 0) throw new Error('أدخل مبلغ صحيح');
                 if(d.commissionSyp < 0 || d.commissionUsd < 0) throw new Error('العمولة لا يمكن أن تكون سالبة');
-                if(d.type==='office_convert_syp_to_usd') { if(d.rate <= 0) throw new Error('أدخل سعر صرف صحيح'); d.toId=''; d.person=''; d.cur='SYP'; }
+                if(d.type==='office_convert_syp_to_usd') { d.toId=''; d.person=''; d.cur='SYP'; }
                 if(d.type==='office_external'||d.type==='office_person') { d.toId=''; }
                 if(d.type==='office_adjust_add'||d.type==='office_adjust_sub') { d.toId=''; d.person=''; }
-                d.updatedAt=Date.now(); state.tx.push(normalizeTx(d));
+                d.updatedAt=Date.now(); const tx = validateTx(normalizeTx(d)); state.tx.push(tx);
             });
         }
         if(document.getElementById('frm-safe')) {
-            const typ=document.getElementById('sf-type'), s=document.getElementById('sf-s'), f=document.getElementById('sf-f'), t=document.getElementById('sf-t'), p=document.getElementById('sf-p'), r=document.getElementById('sf-r');
+            const typ=document.getElementById('sf-type'), s=document.getElementById('sf-s'), f=document.getElementById('sf-f'), t=document.getElementById('sf-t'), p=document.getElementById('sf-p'), c=document.getElementById('sf-c'), r=document.getElementById('sf-r'), commSyp=document.getElementById('sf-comm-syp'), commUsd=document.getElementById('sf-comm-usd');
             typ.onchange=e=>{
-                const v=e.target.value; [s,f,t,p,r].forEach(x=>x.classList.add('hidden')); s.classList.remove('hidden');
+                const v=e.target.value; [s,f,t,p,c,r,commSyp,commUsd].forEach(x=>x.classList.add('hidden')); s.classList.remove('hidden');
                 if(v.includes('PERSON')||v.includes('GENERAL')||v.includes('ADVANCE')) p.classList.remove('hidden');
+                if(editableCurrencyTypes.includes(v)) c.classList.remove('hidden');
                 if(v.includes('EXCHANGE')) r.classList.remove('hidden');
-                if(v==='SAFE_TO_SAFE'){ s.classList.add('hidden'); f.classList.remove('hidden'); t.classList.remove('hidden'); f.querySelector('select').innerHTML=ui.opts(CONSTANTS.SAFES); t.querySelector('select').innerHTML=ui.opts(CONSTANTS.SAFES); }
-                if(v==='SAFE_TO_OFFICE'){ s.classList.add('hidden'); f.classList.remove('hidden'); t.classList.remove('hidden'); f.querySelector('select').innerHTML=ui.opts(CONSTANTS.SAFES); t.querySelector('select').innerHTML=ui.opts(CONSTANTS.OFFICES); }
-                if(v==='OFFICE_TO_SAFE'){ s.classList.add('hidden'); f.classList.remove('hidden'); t.classList.remove('hidden'); f.querySelector('select').innerHTML=ui.opts(CONSTANTS.OFFICES); t.querySelector('select').innerHTML=ui.opts(CONSTANTS.SAFES); }
+                if(v==='SAFE_TO_SAFE'){ s.classList.add('hidden'); f.classList.remove('hidden'); t.classList.remove('hidden'); c.classList.remove('hidden'); f.querySelector('select').innerHTML=ui.opts(CONSTANTS.SAFES); t.querySelector('select').innerHTML=ui.opts(CONSTANTS.SAFES); }
+                if(v==='SAFE_TO_OFFICE'){ s.classList.add('hidden'); f.classList.remove('hidden'); t.classList.remove('hidden'); c.classList.remove('hidden'); f.querySelector('select').innerHTML=ui.opts(CONSTANTS.SAFES); t.querySelector('select').innerHTML=ui.opts(CONSTANTS.OFFICES); }
+                if(v==='OFFICE_TO_SAFE'){ s.classList.add('hidden'); f.classList.remove('hidden'); t.classList.remove('hidden'); c.classList.remove('hidden'); commSyp.classList.remove('hidden'); commUsd.classList.remove('hidden'); f.querySelector('select').innerHTML=ui.opts(CONSTANTS.OFFICES); t.querySelector('select').innerHTML=ui.opts(CONSTANTS.SAFES); }
             }; typ.dispatchEvent(new Event('change'));
             document.getElementById('frm-safe').onsubmit=e=>ui.submit(e, d=>{
-                d.id=genId(); d.amt=parseMoney(d.amt); d.rate=parseMoney(d.rate);
-                if(d.amt <= 0) throw new Error('أدخل مبلغ صحيح');
-                if(d.type==='SAFE_EXCHANGE_SYP_TO_USD' || d.type==='SAFE_EXCHANGE_USD_TO_SYP') { if(d.rate <= 0) throw new Error('أدخل سعر صرف صحيح'); }
-                d.cur = (d.type.includes('_USD') || d.type==='SAFE_EXCHANGE_USD_TO_SYP') ? 'USD' : 'SYP';
-                d.updatedAt=Date.now(); state.tx.push(normalizeTx(d));
+                d.id=genId(); d.amt=parseMoney(d.amt); d.rate=parseMoney(d.rate); d.cur=cleanCurrency(d.cur); d.commissionSyp=parseMoney(d.commissionSyp); d.commissionUsd=parseMoney(d.commissionUsd);
+                if(d.commissionSyp < 0 || d.commissionUsd < 0) throw new Error('العمولة لا يمكن أن تكون سالبة');
+                if(!editableCurrencyTypes.includes(d.type)) d.cur = (d.type.includes('_USD') || d.type==='SAFE_EXCHANGE_USD_TO_SYP') ? 'USD' : 'SYP';
+                d.updatedAt=Date.now(); const tx = validateTx(normalizeTx(d)); state.tx.push(tx);
             });
         }
         enhanceRecordTables();
@@ -2049,12 +2461,14 @@
     }
 
     // --- INIT ---
-    window.onload = () => {
+    window.onload = async () => {
         document.getElementById('nav-menu').innerHTML = NAV.map(n=>`<button class="nav-btn ${state.view===n.id?'active':''}" data-id="${n.id}" onclick="nav('${n.id}')"><span class="nav-icon">${n.icon}</span><span>${n.title}</span></button>`).join('');
         premium.init();
-        loadData();
         premium.renderSkeleton();
-        setTimeout(renderView, 120);
+        await initFirebase();
+        const result = await loadData();
+        renderView();
+        if (result && !result.cloud) ui.toast(`تم تحميل البيانات المحلية فقط — ${result.error || 'تعذر الاتصال بالسحابة'}`, 'error');
     };
 </script>
 </body>
