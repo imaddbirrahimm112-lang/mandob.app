@@ -781,6 +781,14 @@
                 font-size: .82rem !important;
                 font-weight: 900 !important;
             }
+            .records-table td.empty-state {
+                grid-column: 1 / -1 !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                border: 1px dashed rgba(255,255,255,0.12) !important;
+                background: rgba(0,0,0,0.22) !important;
+            }
             .records-table .note-cell,
             .records-table .actions-cell { grid-column: 1 / -1 !important; }
             .records-table .note-cell {
@@ -1276,7 +1284,21 @@
 
     const parseMoney = (value) => { const n = Number(String(value ?? '').replace(/,/g, '').replace(/[^0-9.\-]/g, '')); return Number.isFinite(n) ? n : 0; };
     const formatMoneyText = (value) => { const raw = String(value ?? '').replace(/,/g, '').replace(/[^0-9.]/g, ''); if (!raw) return ''; const [whole, ...rest] = raw.split('.'); const grouped = whole ? Number(whole).toLocaleString('en-US') : '0'; return rest.length ? `${grouped}.${rest.join('').slice(0, 4)}` : grouped; };
-    const attachMoneyInputs = () => { document.querySelectorAll('input.money-input').forEach(input => { if (input.dataset.moneyReady === '1') return; input.dataset.moneyReady = '1'; input.value = formatMoneyText(input.value); input.addEventListener('input', () => { input.value = formatMoneyText(input.value); input.setSelectionRange(input.value.length, input.value.length); }); }); };
+    const attachMoneyInputs = () => {
+        document.querySelectorAll('input.money-input').forEach(input => {
+            if (input.dataset.moneyReady === '1') return;
+            input.dataset.moneyReady = '1';
+            input.value = formatMoneyText(input.value);
+            input.addEventListener('input', (e) => {
+                const originalLength = input.value.length;
+                const caretPosition = input.selectionStart;
+                input.value = formatMoneyText(input.value);
+                const newLength = input.value.length;
+                const newPosition = caretPosition + (newLength - originalLength);
+                input.setSelectionRange(newPosition, newPosition);
+            });
+        });
+    };
     const collectFormData = (form) => { const data = Object.fromEntries(new FormData(form)); form.querySelectorAll('input.money-input').forEach(input => { data[input.name] = parseMoney(input.value); }); return data; };
     const handoverCutUsd = (t) => { const cutSyp = Number(t.cutSyp) || 0; const rate = Number(t.rate) || 0; return cutSyp > 0 && rate > 0 ? cutSyp / rate : 0; };
     const convertSypToUsd = (amount, rate) => { const syp = Number(amount) || 0; const r = Number(rate) || 0; return syp > 0 && r > 0 ? syp / r : 0; };
@@ -1849,9 +1871,15 @@
         confirmEdit: async (e) => {
             if(e) e.preventDefault();
             const form = document.getElementById('frm-edit-tx');
+            if(form && form.dataset.saving === '1') return;
+            if(form) form.dataset.saving = '1';
+            
             const id = form?.dataset?.id || state.editId;
             const idx = state.tx.findIndex(x=>x.id===id);
-            if(!form || idx < 0) return ui.toast('تعذر حفظ التعديل','error');
+            if(!form || idx < 0) {
+                if(form) form.dataset.saving = '0';
+                return ui.toast('تعذر حفظ التعديل','error');
+            }
             const b=form.querySelector('button[type="submit"]'); const oldText=b?.innerHTML || '';
             if(b){ b.disabled=true; b.innerHTML='جاري حفظ التعديل...'; }
             try {
@@ -1865,6 +1893,8 @@
             } catch(err) {
                 ui.toast(err.message || 'فشل التعديل','error');
                 if(b){ b.disabled=false; b.innerHTML=oldText; }
+            } finally {
+                if(form) form.dataset.saving = '0';
             }
         },
         export: () => exportVisibleTableToExcel('ledger-tbl', 'IMAD_Ledger'),
@@ -2119,7 +2149,15 @@
         },
         bindContextMenu: () => {
             let menu = document.getElementById('premium-context-menu');
-            if(!menu){ menu = document.createElement('div'); menu.id='premium-context-menu'; menu.className='premium-context-menu'; document.body.appendChild(menu); document.addEventListener('click', () => menu.classList.remove('show')); }
+            if(!menu){ 
+                menu = document.createElement('div'); 
+                menu.id='premium-context-menu'; 
+                menu.className='premium-context-menu'; 
+                document.body.appendChild(menu); 
+                document.addEventListener('click', () => menu.classList.remove('show')); 
+                const mainEl = document.querySelector('.main');
+                if(mainEl) mainEl.addEventListener('scroll', () => menu.classList.remove('show'), { passive: true });
+            }
             document.querySelectorAll('table.records-table tbody tr[data-tx-id]').forEach(row => {
                 if(row.dataset.ctxReady === '1') return; row.dataset.ctxReady = '1';
                 row.addEventListener('contextmenu', e => {
@@ -2365,7 +2403,7 @@
     }
 
     function viewLedger() {
-        const txs = [...state.tx].sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0));
+        const txs = [...state.tx].sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0)).slice(0, 300);
         const trs = txs.map(t=>`<tr><td data-label="ID"><small style="color:var(--text-muted)">${escapeHtml(String(t.id||'').split('-')[1]||'')}</small></td><td data-label="التاريخ">${escapeHtml(t.date)}</td><td data-label="النوع">${typeBadge(txTypeLabel(t))}</td><td data-label="المصدر">${sourceCell(t)}</td><td data-label="الوجهة">${destinationCell(t)}</td><td data-label="المبلغ" class="ltr-num">${ledgerAmountText(t)}</td><td data-label="ملاحظة" class="note-cell">${escapeHtml(txNoteWithCut(t))}</td><td data-label="إجراء" class="actions-cell"><button class="btn-action" onclick="ui.edit('${t.id}')">تعديل</button><button class="btn-action del" onclick="ui.del('${t.id}')">حذف</button></td></tr>`).join('');
         return `${toolbar('الدفتر الأستاذ', 'ui.export()', 'ledger-tbl')}<div class="table-wrap"><table id="ledger-tbl" class="records-table"><thead><tr><th>ID</th><th>التاريخ</th><th>النوع</th><th>المصدر</th><th>الوجهة</th><th>المبلغ</th><th>ملاحظة</th><th>إجراء</th></tr></thead><tbody>${trs||'<tr><td colspan="8" class="empty-state">لا يوجد بيانات</td></tr>'}</tbody></table></div>`;
     }
@@ -2462,6 +2500,9 @@
 
     // --- INIT ---
     window.onload = async () => {
+        document.getElementById('edit-modal-overlay').addEventListener('click', (e) => {
+            if (e.target.id === 'edit-modal-overlay') ui.closeModal();
+        });
         document.getElementById('nav-menu').innerHTML = NAV.map(n=>`<button class="nav-btn ${state.view===n.id?'active':''}" data-id="${n.id}" onclick="nav('${n.id}')"><span class="nav-icon">${n.icon}</span><span>${n.title}</span></button>`).join('');
         premium.init();
         premium.renderSkeleton();
