@@ -1657,13 +1657,47 @@
             purgedTx
         };
     };
+    const extractBackupStore = (payload={}) => {
+        const objectPayload = asObject(payload);
+        const nestedData = asObject(objectPayload.data);
+        const source = Array.isArray(payload)
+            ? { tx: payload, delTx: [], purgedTx: {} }
+            : (Array.isArray(nestedData.tx) || Array.isArray(nestedData.delTx) || Object.prototype.hasOwnProperty.call(nestedData, 'purgedTx'))
+                ? nestedData
+                : objectPayload;
+        if (!Array.isArray(source.tx) && !Array.isArray(source.delTx) && !Object.prototype.hasOwnProperty.call(source, 'purgedTx')) {
+            throw new Error('ملف النسخة لا يحتوي بيانات قابلة للاستعادة');
+        }
+        return { tx:asArray(source.tx), delTx:asArray(source.delTx), purgedTx:asObject(source.purgedTx) };
+    };
+    const buildBackupPayload = () => ({
+        app:'IMAD Pro',
+        version:2,
+        exportedAt:Date.now(),
+        counts:{ tx:state.tx.length, delTx:state.delTx.length, purgedTx:Object.keys(state.purgedTx || {}).length },
+        tx:state.tx,
+        delTx:state.delTx,
+        purgedTx:state.purgedTx
+    });
+    const safeDownloadName = (value='IMAD') => cleanText(value, 140).replace(/[\\/:*?"<>|]+/g, '_') || 'IMAD';
+    const downloadJson = (filename, payload) => {
+        const blob = new Blob([JSON.stringify(payload, null, 2)], { type:'application/json;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = safeDownloadName(filename);
+        a.style.display = 'none';
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 0);
+    };
     const persistLocal = () => {
         localStorage.setItem('rc_data', JSON.stringify({tx:state.tx, delTx:state.delTx, purgedTx:state.purgedTx}));
         syncStatus.lastLocalSavedAt = Date.now();
     };
 
     async function sync(options={}) {
-        const { renderAfterRemote=false } = options;
+        const { renderAfterRemote=false, forcePush=false } = options;
         const localSnapshot = { tx: state.tx, delTx: state.delTx, purgedTx: state.purgedTx };
         let merged = reconcileStore(localSnapshot, {});
         state.tx = merged.tx; state.delTx = merged.delTx; state.purgedTx = merged.purgedTx;
@@ -1683,6 +1717,11 @@
             const ref = firestoreApi.doc(db, ...FIRESTORE_LEDGER_PATH);
             const txResult = await firestoreApi.runTransaction(db, async (transaction) => {
                 const snap = await transaction.get(ref);
+                if (forcePush) {
+                    const forcedStore = reconcileStore({}, { tx: state.tx, delTx: state.delTx, purgedTx: state.purgedTx });
+                    transaction.set(ref, { tx:forcedStore.tx, delTx:forcedStore.delTx, purgedTx:forcedStore.purgedTx, last:Date.now() });
+                    return forcedStore;
+                }
                 const remote = snap.exists() ? snap.data() : { tx:[], delTx:[], purgedTx:{} };
                 const mergedStore = reconcileStore({ tx: state.tx, delTx: state.delTx, purgedTx: state.purgedTx }, remote);
                 transaction.set(ref, { tx:mergedStore.tx, delTx:mergedStore.delTx, purgedTx:mergedStore.purgedTx, last:Date.now() }, { merge:true });
@@ -1703,11 +1742,11 @@
         }
     }
 
-    window.saveData = async () => {
+    window.saveData = async (options={}) => {
         const merged = reconcileStore({tx:state.tx, delTx:state.delTx, purgedTx:state.purgedTx}, {});
         state.tx=merged.tx; state.delTx=merged.delTx; state.purgedTx=merged.purgedTx;
         persistLocal();
-        return await sync({ renderAfterRemote:false });
+        return await sync({ renderAfterRemote:false, forcePush: options.forcePush === true });
     };
 
     window.loadData = async () => {
@@ -1742,16 +1781,23 @@
         const wb = XLSX.utils.book_new();
         ws['!cols'] = headers.map((h, i) => ({ wch: Math.max(String(h).length + 4, ...rows.map(r => String(r[i] ?? '').length + 2), 14) }));
         XLSX.utils.book_append_sheet(wb, ws, 'Export');
-        XLSX.writeFile(wb, `${filename}_${Date.now()}.xlsx`);
+        XLSX.writeFile(wb, `${safeDownloadName(filename)}_${Date.now()}.xlsx`);
     };
     const exportVisibleTableToExcel = (tableId, filename) => {
         const table = document.getElementById(tableId);
         if (!table) return ui.toast('ما لقيت الجدول للتصدير','error');
         if (!window.XLSX) return ui.toast('مكتبة Excel غير جاهزة بعد','error');
-        const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.innerText.trim()).filter(h => h && h !== 'إجراء');
-        const rows = Array.from(table.querySelectorAll('tbody tr')).filter(row => row.style.display !== 'none').map(row => {
-            return Array.from(row.querySelectorAll('td')).filter((td, i) => (headers[i] || td.getAttribute('data-label')) !== 'إجراء').map(td => td.innerText.replace(/\s+/g, ' ').trim());
-        }).filter(row => row.length && !row.join('').includes('لا يوجد'));
+        const columns = Array.from(table.querySelectorAll('thead th'))
+            .map((th, index) => ({ index, label:(th.innerText || th.textContent || '').replace(/\s+/g, ' ').trim() }))
+            .filter(col => col.label && col.label !== 'إجراء');
+        const headers = columns.map(col => col.label);
+        const rows = Array.from(table.querySelectorAll('tbody tr')).filter(row => {
+            if (row.hidden || row.style.display === 'none') return false;
+            return !window.getComputedStyle || getComputedStyle(row).display !== 'none';
+        }).map(row => columns.map(col => {
+            const td = row.cells[col.index];
+            return (td?.innerText || td?.textContent || '').replace(/\s+/g, ' ').trim();
+        })).filter(row => row.length && !row.join('').includes('لا يوجد'));
         if (!rows.length) return ui.toast('لا يوجد بيانات ظاهرة للتصدير','error');
         exportRowsToExcel(filename, headers, rows);
         ui.toast('تم تصدير Excel');
@@ -1960,8 +2006,41 @@
             exportRowsToExcel(`IMAD_Delegate_${name}`, ['التاريخ','النوع','من','إلى','SYP','USD','ملاحظة'], rows);
             ui.toast('تم تصدير حركات المندوب');
         },
-        backup: () => { const a=document.createElement('a'); a.href="data:text/json;charset=utf-8,"+encodeURIComponent(JSON.stringify({tx:state.tx,delTx:state.delTx,purgedTx:state.purgedTx, exportedAt:Date.now()})); a.download=`IMAD_Backup_${Date.now()}.json`; a.click(); },
-        restore: () => { const f=document.getElementById('f-res').files[0]; if(!f) return; const r=new FileReader(); r.onload=async e=>{ try{ const d=JSON.parse(e.target.result); const incoming = { tx:asArray(d.tx), delTx:asArray(d.delTx), purgedTx:asObject(d.purgedTx) }; const merged = reconcileStore({tx:state.tx, delTx:state.delTx, purgedTx:state.purgedTx}, incoming); state.tx=merged.tx; state.delTx=merged.delTx; state.purgedTx=merged.purgedTx; const result = await saveData(); renderView(); showSaveResult(result, 'تم دمج النسخة والمزامنة'); } catch(err){ ui.toast('ملف النسخة غير صالح','error'); } }; r.readAsText(f); },
+        backup: () => {
+            try {
+                downloadJson(`IMAD_Backup_${Date.now()}.json`, buildBackupPayload());
+                ui.toast('تم تحميل النسخة الاحتياطية');
+            } catch(e) {
+                ui.toast('فشل إنشاء النسخة الاحتياطية','error');
+            }
+        },
+        restore: (mode='replace') => {
+            const input = document.getElementById('f-res');
+            const f = input?.files?.[0];
+            if(!f) return ui.toast('اختاري ملف النسخة أولاً','error');
+            const replaceMode = mode !== 'merge';
+            if(replaceMode && !confirm('الاستعادة الكاملة ستستبدل البيانات الحالية بالنسخة المختارة. متابعة؟')) return;
+            const r = new FileReader();
+            r.onerror = () => ui.toast('تعذر قراءة ملف النسخة','error');
+            r.onload = async e => {
+                try {
+                    const incoming = extractBackupStore(JSON.parse(e.target.result));
+                    const nextStore = replaceMode
+                        ? reconcileStore({}, incoming)
+                        : reconcileStore({tx:state.tx, delTx:state.delTx, purgedTx:state.purgedTx}, incoming);
+                    state.tx = nextStore.tx;
+                    state.delTx = nextStore.delTx;
+                    state.purgedTx = nextStore.purgedTx;
+                    const result = await saveData({ forcePush: replaceMode });
+                    if(input) input.value = '';
+                    renderView();
+                    showSaveResult(result, replaceMode ? 'تمت الاستعادة الكاملة والمزامنة' : 'تم دمج النسخة والمزامنة');
+                } catch(err) {
+                    ui.toast(err.message || 'ملف النسخة غير صالح','error');
+                }
+            };
+            r.readAsText(f);
+        },
         wipe: async () => { if(prompt('اكتب 9999 للتأكيد:')==='9999'){ const now=Date.now(); [...state.tx, ...state.delTx].forEach(t=>{ if(t?.id) state.purgedTx[t.id]=now; }); state.tx=[]; state.delTx=[]; const result = await saveData(); renderView(); showSaveResult(result, 'تم مسح البيانات والمزامنة'); } }
     }
 
@@ -2424,7 +2503,7 @@
             <div class="card"><h3>حماية السحابة</h3><p class="card-title">${cloudState}</p>${currentUser ? `<button class="btn-submit" style="margin-top:auto; background:var(--danger)" onclick="ui.logoutCloud()">تسجيل الخروج</button>` : `<input id="cloud-email" type="email" placeholder="Firebase email" autocomplete="username" style="margin-bottom:.75rem"><input id="cloud-password" type="password" placeholder="Firebase password" autocomplete="current-password" style="margin-bottom:.75rem"><button class="btn-submit" style="margin-top:auto" onclick="ui.loginCloud()">تسجيل الدخول للسحابة</button>`}</div>
             <div class="card"><h3>نسخ احتياطي</h3><button class="btn-submit" style="margin-top:auto" onclick="ui.backup()">تحميل النسخة</button></div>
             <div class="card"><h3>تصدير PDF</h3><p class="card-title">تصدير الصفحة الحالية كما تظهر الآن.</p><button class="btn-submit" style="margin-top:auto" onclick="ui.exportPdf()">تحميل PDF</button></div>
-            <div class="card"><h3>استعادة ودمج</h3><input type="file" id="f-res" style="margin-bottom:1rem; padding:0.5rem"><button class="btn-submit" style="margin-top:auto; background:var(--success)" onclick="ui.restore()">دمج البيانات</button></div>
+            <div class="card"><h3>استعادة النسخة</h3><input type="file" id="f-res" accept=".json,application/json" style="margin-bottom:1rem; padding:0.5rem"><button class="btn-submit" style="margin-top:auto; background:var(--success)" onclick="ui.restore('replace')">استعادة كاملة</button><button class="btn-soft btn-mini" style="margin-top:.75rem" onclick="ui.restore('merge')">دمج فقط</button></div>
             <div class="card" style="border-color:var(--danger)"><h3 class="text-danger">مسح النظام</h3><button class="btn-submit" style="margin-top:auto; background:var(--danger)" onclick="ui.wipe()">Wipe Data</button></div>
         </div>`; 
     }
